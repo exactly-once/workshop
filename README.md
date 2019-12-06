@@ -1,5 +1,11 @@
 # Consistent messaging in the cloud. How to build fault-tolerant distributed systems when throwing away consistency is not an option
 
+## Elevator pitch
+
+Building fault-tolerant distributed systems that maintain full consistency is not an easy thing. What makes it even harder is lack of solid infrastructure foundations like distributed transactions. Forget about them. Learn to build reliable system from unreliable components available in the cloud.
+
+## Description
+
 The workshop focuses on building line-of-business, fault-tolerant cloud-based distributed systems. Such systems cannot afford to lose messages (nobody wants their order for Christmas gifts to be lost) nor to get them duplicated (that second Porsche in the driveway - who ordered that?). Such systems were, in the past, built based on the firm ground established by either distributed transactions or large database instances that served also as messaging brokers.
 
 These technologies are either too expensive, too cumbersome or simply not available in the cloud. In this workshop, we will show how one can deal with the consistent messaging problem by de-duplicating messages.
