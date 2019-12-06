@@ -1,6 +1,8 @@
-# Message delivery patterns in asynchronous distributed systems
+# Consistent messaging in the cloud. How to build fault-tolerant distributed systems when throwing away consistency is not an option
 
-The workshop focuses on issues related to processing messages exchanged between components of distributed systems, especially with ensuring that business logic for a given message is triggered exactly once. 
+The workshop focuses on building line-of-business fault-tolerant cloud-based distributed systems. Such systems cannot afford to lose messages (nobody wants their order for christmas gifts to be lost) nor to them (that second Porsche in the drive way -- who ordered that?). Such systems were, in the past, built based on the firm ground established by either distributed transactions or large database instances that served also as messaging brokers.
+
+These technologies are either too expensive, too cumbersome or simply not available in the cloud. In this workshop we will show how one can deal with the consistent messaging problem by de-duplicating messages.
 
 We'll start by asking ourselves a question why the systems we build need to be distributed. We'll see how duplicating messages is the only way to get components to reliably exchange information. Finally, we'll spend most of our time identifying subtle issues inherent to message processing, devising solutions to these issues and encoding these solutions in reusable patterns.
 
