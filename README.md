@@ -1,20 +1,20 @@
 # Consistent messaging in the cloud. How to build fault-tolerant distributed systems when throwing away consistency is not an option
 
-The workshop focuses on building line-of-business fault-tolerant cloud-based distributed systems. Such systems cannot afford to lose messages (nobody wants their order for Christmas gifts to be lost) nor to get them duplicated (that second Porsche in the drive way -- who ordered that?). Such systems were, in the past, built based on the firm ground established by either distributed transactions or large database instances that served also as messaging brokers.
+The workshop focuses on building line-of-business, fault-tolerant cloud-based distributed systems. Such systems cannot afford to lose messages (nobody wants their order for Christmas gifts to be lost) nor to get them duplicated (that second Porsche in the driveway - who ordered that?). Such systems were, in the past, built based on the firm ground established by either distributed transactions or large database instances that served also as messaging brokers.
 
-These technologies are either too expensive, too cumbersome or simply not available in the cloud. In this workshop we will show how one can deal with the consistent messaging problem by de-duplicating messages.
+These technologies are either too expensive, too cumbersome or simply not available in the cloud. In this workshop, we will show how one can deal with the consistent messaging problem by de-duplicating messages.
 
-We'll start by asking ourselves a question why the systems we build need to be distributed. We'll see how duplicating messages is the only way to get components to reliably exchange information. Finally, we'll spend most of our time identifying subtle issues inherent to message processing, devising solutions to these issues and encoding these solutions in reusable patterns.
+We'll start by asking ourselves a question of why the systems we build need to be distributed. We'll see how duplicating messages is the only way to get components to reliably exchange information. Finally, we'll spend most of our time identifying subtle issues inherent to message processing, devising solutions to these issues and encoding these solutions in reusable patterns.
 
-Join me in the series of ten hands-on exercises interleaved with short lectures after which you'll have good understanding of most of the things that can go wrong when processing messages and enough knowledge to either build build a bullet-and-duplicate-proof message processor or (even better) find a framework that implements one for you.
+Join us in the series of ten hands-on exercises interleaved with short lectures after which you'll have a good understanding of most of the things that can go wrong when processing messages and enough knowledge to either build a bullet-and-duplicate-proof message processor or (even better) find a framework that implements one for you.
 
 ## What will I learn?
 
-For start you will learn some solid reasons why distributed systems offer a significant advantage over monolithic ones. Once we all agree that distributing components of the system makes sense, we will focus on the communication between these components. You'll learn why message de-duplication is a key part of a successful communication strategy.
+For start, you will learn some solid reasons why distributed systems offer a significant advantage over monolithic ones. Once we all agree that distributing components of the system makes sense, we will focus on the communication between these components. You'll learn why message de-duplication is a key part of a successful communication strategy.
 
 Next, you will learn the basic concepts of chaos engineering and how to use it in practice. You will see how a messaging framework can be extended to simulate various types of failures that happen in real production distributed systems. You will use chaos engineering techniques to find flaws in a system even before it gets live.
 
-You will also experience how out-of-order message delivery can wreck havoc in message de-duplication strategies that otherwise seem perfect. Last, but not least, you will learn how to build practical message de-duplication solution for your distributed system. 
+You will also experience how out-of-order message delivery can wreak havoc in message de-duplication strategies that otherwise seem perfect. Last, but not least, you will learn how to build a practical message de-duplication solution for your distributed system. 
 
 ## Agenda
 
