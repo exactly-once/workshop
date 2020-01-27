@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Event-driven microservices: making sure each messages is processed exactly once</title>
+		<meta name="description" content="Event-driven microservices: making sure each messages is processed exactly once">
+		<meta name="author" content="Szymon Pobiega">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<style media="screen" type="text/css">
+			.reveal section img { background:none; border:none; box-shadow:none; }
+
+			.reveal table {
+			  margin: auto;
+			  border-collapse: collapse;
+			  border-spacing: 0;
+			}
+
+			.reveal table th {
+			  font-weight: bold;
+			}
+
+			.reveal table th,
+			.reveal table td {
+			  text-align: left;
+			  padding: 0.2em 0.5em 0.2em 0.5em;
+			  border-bottom: 1px solid;
+			}
+
+			.highlight-inline {
+            	background:yellow;
+            	color:black;
+			}
+			
+			.highlight-inline span {
+				background:inherit;
+				color:inherit;
+			}
+
+			.reveal pre code {
+				font-size: 1.4em;
+				line-height: 1.2;
+			}
+
+			img.zoom-island {
+				transform: translate(0, -15%);
+			}
+
+			img.zoom-centre {
+				transform: scale(2.1) translate(0, 0);
+			}
+			
+			img.zoom-left-centre {
+				transform: scale(2.2) translate(25%, 0);
+			}
+
+			img.zoom-left-top {
+				transform: scale(2.2) translate(25%, 30%);
+			}
+
+			img.zoom-left-bottom {
+				transform: scale(2.2) translate(25%, -25%);
+			}
+
+			img.zoom-right-centre {
+				transform: scale(1.8) translate(-25%, 0);
+			}
+
+			img.zoom-right-top {
+				transform: scale(2.4) translate(-25%, 20%);
+			}
+
+			img.zoom-right-centre-top {
+				transform: scale(2.4) translate(-25%, 0);
+			}
+
+			img.zoom-right-bottom {
+				transform: scale(2.4) translate(-25%, -25%);
+			}
+			#footer-left {
+				position: absolute;
+				bottom: 5%;
+				left: 2%;
+			}
+			.container{
+				display: flex;
+			}
+			.col{
+				flex: 1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>Event-driven microservices</h2>
+					<h3>making sure each messages is processed exactly once</h3>
+					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
+					<p><a href="https://twitter.com/SzymonPobiega">twitter.com/SzymonPobiega</a></p>
+					<p><a href="https://www.linkedin.com/in/szymonpobiega/">linkedin.com/in/SzymonPobiega</a></p>
+				</section>
+				<section>
+					<h2 class="fragment">Domain-Driven Design</h2>
+					<h2 class="fragment">Event Sourcing</h2>
+					<h2 class="fragment">Message delivery &amp; processing</h2>
+				</section>
+				<section>
+					<img src="images/lego1.jpg" class="stretch"/>
+				</section>
+				<section>
+					<img src="images/lego2.jpg" class="stretch"/>
+				</section>
+				<section>
+					<img src="images/lego4.jpg" class="stretch"/>
+				</section>
+				<section>
+					<img src="images/jura.jpg" class="stretch"/>
+				</section>
+				<section>
+					<h2 class="fragment">Sync request-response</h2>
+					<h2 class="fragment">Async fire-and-forget</h2>
+					<h2 class="fragment">Async reliable</h2>
+				</section>
+				<section>
+					<img src="images/overview.png" class="stretch"/>
+				</section>
+				<section>
+					<img src="images/distributed-process.png" class="stretch"/>
+				</section>
+				<section>
+					<h2>Exercise 1</h2>
+					<h3>Processing a message</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Add a message handler class</h3></li>
+						<li class="fragment"><h3>Load an order from the order repository</h3></li>
+						<li class="fragment"><h3>Add new item to the order</h3></li>
+						<li class="fragment"><h3>Publish an event</h3></li>
+						<li class="fragment"><h3>Persist changes in the order repository</h3></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Exercise 2</h2>
+					<h3>Simulate duplicates</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Extend the Client sending pipeline with via a Behavior</h3></li>
+						<li class="fragment"><h3>Duplicate the send by invoking the pipeline twice</h3></li>
+						<li class="fragment"><h3>Test the behavior of the message handler 🤞</h3></li>
+					</ul>
+				</section>
+				<section>
+					<img src="images/twins.png" class="stretch"/>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Treat order as a <i>set</i> of items</h3></li>
+						<li class="fragment"><h3>Check for duplicates based on contents of the order</h3></li>
+						<li class="fragment"><h3>Duplicate if already contains a given type of item</h3></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Exercise 3</h2>
+					<h3>Simulate database problems</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Prevent storing an order that has item of type <i>SwissCheese</i></h3></li>
+						<li class="fragment"><h3>Test the behavior of the message handler 🤞</h3></li>
+					</ul>
+				</section>
+				<section>
+					<img src="images/ghost.png" class="stretch"/>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Reverse the order of publish and store operations</h3></li>
+						<li class="fragment"><h3>Test the behavior of the message handler 🤞</h3></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Exercise 4</h2>
+					<h3>Simulate message broker problems</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Extend the Orders sending pipeline with via a Behavior</h3></li>
+						<li class="fragment"><h3>If a message being sent contains <i>QuarkAndPotatoes</i> throw exception</h3></li>
+						<li class="fragment"><h3>Test the behavior of the message handler 🤞</h3></li>
+					</ul>
+				</section>
+				<section>
+					<img src="images/garbage.png" class="stretch"/>
+				</section>
+				<section>
+					<h2>Framing the problem</h2>
+					<img src="images/what-do-we-want.png" width="30%" style="float: right"/>
+					<ul style="width: 60%;">
+						<li class="fragment"><h3>Don’t lose messages 🗑️</h3></li>
+						<li class="fragment"><h3>Apply state change only once 👯‍♂️</h3></li>
+						<li class="fragment"><h3>Don't leak non-durable state 👻</h3></li>
+					</ul>
+				</section>
+				<section>
+					<img src="images/publish-persist.png" class="stretch"/>
+				</section>
+				<section>
+					<img src="images/publish-persist-2.png" class="stretch"/>
+				</section>
+				<section>
+					<h2>Exercise 6</h2>
+					<h3>Simulate message re-ordering</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Make sending messages <i>fire-and-forget</i> in the Client</h3></li>
+						<li class="fragment"><h3>Duplicate <i>AddItem</i> messages of type <i>Mushrooms</i> with a 10 seconds delay</h3></li>
+						<li class="fragment"><h3>Test the behavior of the message handler 🤞</h3></li>
+					</ul>
+				</section>
+				<section>
+					<blockquote cite="https://exactly-once.github.io/posts/consistent-messaging/" style="width: 100%;">
+						<h3>
+							"... we want an endpoint to produce observable side-effects equivalent to some execution in which each logical message gets processed exactly-once" 
+						</h3>
+						-- Tomasz Masternak				
+					</blockquote>
+				</section>
+				<section>
+					<h1>Consistent messaging</h1>
+				</section>
+				<section>
+					<h2>Exercise 7</h2>
+					<h3>ID-based de-duplication</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Add collection of processed message IDs to the order</h3></li>
+						<li class="fragment"><h3>Check if that collection contains the current message ID when de-duplicating</h3></li>
+						<li class="fragment"><h3>Add current message ID to the collection before persisting changes</h3></li>
+						<li class="fragment"><h3>Leave publishing as-is</h3></li>
+						<li class="fragment"><h3>Check the behavior of the Billing service. What happened? 🤔</h3></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Exercise 8</h2>
+					<h3>Deterministic message ID</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>Use the Utils class to generate deterministic message ID when publishing</h3></li>
+						<li class="fragment"><h3>Test the behavior of Billing service 🤞</h3></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Exercise 9</h2>
+					<h3>Deterministic message generation</h3>
+				</section>
+				<section>
+					<ul>
+						<li class="fragment"><h3>A new event is published when the first item is added to an order</h3></li>
+						<li class="fragment"><h3>Sometimes when two items are added quickly, the new event is not published</h3></li>
+						<li class="fragment"><h3>The missing event can be correlated to message broker issues 🤔</h3></li>
+					</ul>
+				</section>
+				<section>
+					<img src="images/garbage.png" class="stretch"/>
+				</section>
+				<section>
+					<h3 class="fragment">Business logic is executed correctly ✔️</h3>
+					<h3 class="fragment">Message publishing is based on an incorrect state ❌</h3>
+				</section>
+				<section>
+					<h2>Consistent messaging</h2>
+					<h3 class="fragment">Durably store outgoing messages</h3>
+					<h3 class="fragment">Re-publish messages based on historic state</h3>
+				</section>
+				<section>
+					<h1>Thank you!</h1>
+					<p><a href="https://microcph.dk/">microcph.dk</a></p>
+					<p><a href="https://github.com/exactly-once/outbox-based-consistent-messaging">github.com/exactly-once/outbox-based-consistent-messaging</a></p>
+					<p><a href="https://github.com/exactly-once/state-based-consistent-messaging">github.com/state-once/outbox-based-consistent-messaging</a></p>
+					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
+					<p><a href="https://twitter.com/SzymonPobiega">twitter.com/SzymonPobiega</a></p>
+					<p><a href="https://www.linkedin.com/in/szymonpobiega/">linkedin.com/in/SzymonPobiega</a></p>
+				</section>
+				<section>
+					<img src="images/blog.png" class="stretch"/>
+				</section>
+			</div>
+		</div>
+
+		<div id="hidden" style="display:none;">
+			<div id="header">
+				<div id="footer-left">@SzymonPobiega | exactly-once.github.io</div>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="lib/js/jquery-2.1.4.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+		$(function() {
+
+			$('img.demo').each(function(i, img){
+				var $img = $(img);
+				var prefix = $img.data('img-prefix');
+				var frames = $img.data('frames');
+				var suffix = $img.data('suffix') || '.jpg';
+				if (typeof frames !== 'undefined') {
+					var div = $('<div></div>')
+					for (var i = 1; i < frames; i++) {
+						div.append('<span class="fragment imgsrc" data-src="'+prefix+'-'+i+suffix+'"/>')
+					}
+					$img.after(div);
+				}
+				$img.attr('src', prefix+'-'+0+suffix)
+			})
+		});
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				margin: 0,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				math: {
+					// mathjax: 'http://cdn.mathjax.org/mathjax/latest/MathJax.js',
+					config: 'TeX-AMS_HTML-full'
+				},
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { 
+						hljs.initHighlightingOnLoad(); 
+						hljs.configure({tabReplace: '   '})
+						} },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+
+			function fadeImage($el) {
+				// Get image DOM element
+				$img = $el.parent().prev();
+
+				$img.removeClass();
+				$img.addClass('demo');
+
+				var src = $el.data('src');
+				if (typeof src !== `undefined`) {
+					$img.attr('src', src)
+				}
+
+				var index = $el.data('index');
+				if (typeof index !== `undefined`) {
+					var prefix = $img.data('img-prefix');
+					var suffix = $img.data('suffix') || '.jpg';
+					if (typeof prefix !== `undefined`) {
+						$img.attr('src', prefix+'-'+index+suffix)
+					}
+				}
+
+				var transform = $el.data('transform');
+				if (typeof transform !== `undefined`) {
+					$img.addClass(transform);
+				}
+			}
+
+			Reveal.addEventListener( 'slidechanged', function( event ) {
+				var $slide = $(event.currentSlide);
+				var $img = $slide.children('img');
+				var prefix = $img.data('img-prefix');
+				var suffix = $img.data('suffix') || '.jpg';
+				if (typeof prefix !== `undefined`) {
+					$img.attr('src', prefix+'-'+0+suffix)
+				}
+			} );
+
+			// var header = $('#header').html();
+			// if ( window.location.search.match( /print-pdf/gi ) ) {
+			// 	Reveal.addEventListener( 'ready', function( event ) {
+			// 		$('.slide-background').append(header);
+			// 	});
+			// }
+			// else {
+			// 	$('div.reveal').append(header);
+			// }
+
+			Reveal.addEventListener('fragmentshown', function(event) {
+				// Get DOM element of current fragment
+				var $el = $(event.fragment);
+
+				// Check if current fragment is of 'type' imgsrc
+				// If yes: fade image with source of current element
+				if($el.hasClass('imgsrc'))
+					fadeImage($el);
+			});
+
+			Reveal.addEventListener('fragmenthidden', function(event) {
+				// Get DOM element of current fragment
+				var $el = $(event.fragment);
+
+				// Check if current fragment is of 'type' imgsrc
+				// If yes: fade image with source of previous element
+				if($el.hasClass('imgsrc')) {
+					fadeImage($el.prev());
+				}
+			});
+
+		</script>
+
+	</body>
+</html>

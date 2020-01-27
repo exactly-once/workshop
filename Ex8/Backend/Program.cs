@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Features;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
 using Serilog;
@@ -37,7 +38,6 @@ class Program
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
         config.Recoverability().AddUnrecoverableException(typeof(DbEntityValidationException));
         config.Pipeline.Register(new BrokerFailureBehavior(), "Simulates broker failures");
-        config.Pipeline.Register(new BrokerFailureDispatchBehavior(), "Simulates broker failures");
         config.Pipeline.Register(new DeduplicatingBehavior(), "Deduplicates incoming messages");
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();

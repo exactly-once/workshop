@@ -1,6 +1,6 @@
 # Exercise 7: ID-based de-duplication
 
-In this exercise we are going to fundamentally alter the way we process messages. Instead of relying on the idempotence of data structures used, we will employ unique message IDs. Because we have multiple handlers, we will attempt to create a re-usable component that can de-duplicate any type of message
+In the previous exercise we've seen that idempotent data structures do not guarantee correctness of the behavior if messages can be re-ordered in transit. In this exercise we are going solve this problem by to fundamentally altering the way we process messages. Instead of relying on the idempotence of data structures, we will employ synthetic message IDs. 
 
 - Add a `ProcessedMessages` property to `Order` that contains a list of IDs of processed messages (each ID is a string)
 - In `AddItemHandler` and `RemoveItemHandler` replace the filling-based de-duplication check with one based on processed messages

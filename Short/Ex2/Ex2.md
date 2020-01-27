@@ -2,7 +2,7 @@
 
 In this exercise we are going to use principles of *chaos engineering* to add a chaos monkey that duplicates all outgoing messages. We are going to use NServiceBus framework for messaging but any other similar framework offers similar extension points.
 
-In NServiceBus the extension point is the `Behavior` class. NServiceBus has message processing pipelines for incoming and outgoing messages. These pipelines are composed of `Behaviors`. Each behavior can execute arbitrary code and pass invocation further to behaviors that are further down the pipeline. Here's an example behavior:
+In NServiceBus the appropriate extension point for this task is the `Behavior` class. NServiceBus has message processing pipelines for incoming and outgoing messages. These pipelines are composed of `Behaviors`. Each behavior can execute arbitrary code and pass invocation to behaviors that are further down the pipeline. Here's an example behavior:
 
 ```
 class MyBehavior : Behavior<IOutgoingLogicalMessageContext> //T defines in which part of the pipeline the behavior is injected

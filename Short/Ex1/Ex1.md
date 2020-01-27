@@ -4,7 +4,7 @@ In the first exercise we are going to attempt to implement an idempotent message
 
 - In the Orders project find `AddItemHandler` class. Notice it implements `IHandleMessages<AddItem>` in order to tell the endpoint that it can handle messages of type `AddItem`
 - Inside the `Handle` method:
-  - Load the `Order` entity using the repository
+  - Load the `Order` entity using the `OrderRepository`
   - Create a new `OrderLine` object and add it to the order's collection
   - Publish an `ItemAdded` event
   - Persist the changes to the `Order` entity using the repository
