@@ -1,4 +1,4 @@
-# Exercise 9: Even more chaos
+# Exercise 9: Deterministic message generation
 
 In this exercise we won't be writing any code. The previous solution has already been modified to include a behavior that simulates broker failures when acknowledging processing of a message -- `BrokerFailureWhenAcknowledgingMessageBehavior`. This behavior is triggered by `Strawberry` items.
 
