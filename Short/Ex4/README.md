@@ -10,3 +10,6 @@ In this exercise we are going to continue using principles of *chaos engineering
 
 - Add an instance field `failed` to ensure that only the first message triggers the failure
 - Add code in the behavior that inspects `context.Message.Instance`, checks it is an instance of `ItemAdded`, it is of type `QuarkAndPotatoes` and `failed` flag is not set. If all these are true, set the flag to `true` and throw new `Exception`.
+- Run the solution
+  - What happened?
+  - Go to [follow up](https://github.com/exactly-once/workshop/blob/master/Short/Ex4/follow-up.md) section to continue
