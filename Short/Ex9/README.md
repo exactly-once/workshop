@@ -1,7 +1,5 @@
 # Exercise 9: Deterministic message generation
 
-In this exercise we won't be writing any code. The previous solution has already been modified to include a behavior that simulates broker failures when acknowledging processing of a message -- `BrokerFailureWhenAcknowledgingMessageBehavior`. This behavior is triggered by `Strawberry` items.
+In this exercise we are going to extend the `BrokerErrorSimulatorBehavior` by adding another `if` clause that checks if the outgoing message is of type `FirstItemAdded`. In that case we will simulate a timeout error by waiting for 10 seconds and then throwing an exception. We hope that his is exactly what the operations team have seen in production.
 
-The unique thing about the new behavior is the fact that it delays 10 seconds before throwing an exception. This allows other messages to be processed before the initial message that failed can be retried.
-
-The solution includes publishing an event whenever first item is added to a given order. That new feature works for most item types but does not work when you try to add multiple `Strawberry` items. Can you tell why?
+We will examine the behavior of our code by using a brand new type of pierogi. Try adding two items of type `Strawberry` quickly. What happens?

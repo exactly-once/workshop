@@ -14,6 +14,7 @@ static class MessageSessionExtensions
     {
         var options = new PublishOptions();
         options.SetMessageId(id);
+        options.RequireImmediateDispatch();
         return messageSession.Publish(message, options);
     }
 }
