@@ -1,10 +1,10 @@
-Reliable and robust event-driven microservices: making sure each messages is processed exactly once
+Building reliable event-driven microservices architectures: making sure all messages are processed exactly once
 
 ### Abstract
 
-The workshop focuses on building line-of-business fault-tolerant cloud-based distributed systems. Such systems cannot afford to lose messages (nobody wants their order for Christmas gifts to be lost) nor to get them duplicated (that second Porsche in the drive way -- who ordered that?). Such systems were, in the past, built based on the firm ground established by either distributed transactions or large database instances that served also as messaging brokers. These technologies are either too expensive, too cumbersome or simply not available any more.
+The workshop focuses on building line-of-business, fault-tolerant, cloud-based distributed systems. Such systems cannot afford to lose messages (nobody wants their order for Christmas gifts to be lost) nor to get them duplicated (that second Porsche in the driveway -- who ordered that?). In the past, we used to build such systems on the firm ground established by distributed transactions or large database instances - serving both as business data stores and messaging brokers. These times have come to an end as these technologies are either too expensive, too cumbersome, or simply not available anymore.
 
-In this workshop you will learn how you to use simple and inexpensive components available in the cloud to build reliable and robust systems that don't compromise consistency. The key to this is making peace with message duplication (yes, that's a fact of life) and understanding how and where it can be dealt with.
+Through the workshop, you will learn how to use simple and inexpensive components available in the cloud to build reliable and robust systems that don't compromise consistency. The key to this is making peace with message duplication (yes, that's a fact of life) and understanding how and where it can be dealt with.
 
 Some of the topics we are going to cover:
  - Synchronous vs asynchronous communication in microservices
@@ -15,11 +15,11 @@ Some of the topics we are going to cover:
 
 ### Details
 
-The workshop consists of ~15 hands-on exercises with short lectures between each exercise. Each exercises can be completed in 10-20 minutes and is designed to move us one step further towards designing a reliable distributed system. Each exercise is split into two parts. In the first part each attendee is given time to work on the problem independently. In the second part all attendees attempt to solve it using mob programming approach.
+The workshop consists of ~15 hands-on exercises with short lectures in between. Each exercise takes 10-20 minutes to complete and is designed to move us one step closer to designing a reliable distributed system. Each exercise is split into two parts. In the first part, each attendee is given time to work on the problem independently. In the second part, all attendees attempt to solve it using the mob programming approach.
 
-First, we will learn the advantages and pitfalls of synchronous and asynchronous architectures. In order to maximize the benefits of both approaches we will split our system into two parts, the outer synchronous part and the inner asynchronous core. Next, we will take a look at the very place where these two approaches come into the contact. Let's call it a sync-async boundary.
+First, we will learn the advantages and pitfalls of synchronous and asynchronous architectures. In order to maximize the benefits of both approaches, we will split our system into two parts, the outer synchronous part, and the inner asynchronous core. Next, we will take a look at the very place where these two parts come together - a so called sync-async boundary.
 
-In the next part we will look at the correctness requirements for an asynchronous message-driven distributed system. What guarantees are necessary for our core async components to be able to execute the business process reliably? We will focus on following aspects:
+Next, we gonna look at the correctness requirements for an asynchronous message-driven distributed system. What guarantees are necessary for our core async components to be able to execute the business process reliably? We will focus on the following aspects:
  - how to not lose messages?
  - how to prevent processing a single message multiple times?
  - how to prevent propagating invalid state? 
@@ -41,7 +41,7 @@ Finally, in the sixth part we we will pull the camera back to see our distribute
 
 After the workshop you will understand the reasons for building distributed systems as opposed to centralized ones. You will be able to better articulate the need for going distributed and you will also know when to keep the good old monolith.
 
-You will know the different between a single-resource and a distributed transaction. You will also understand why cloud vendors are unlikely to ever provide a general purpose distributed transaction support and why you need to use an alternative approach to maintaining consistency.
+You will know the difference between a single-resource and a distributed transaction. You will also understand why cloud vendors are unlikely to ever provide a general-purpose distributed transaction support and why you need to use an alternative approach to maintaining consistency.
 
 You will be able to partition your system into synchronous and asynchronous parts in order to provide best user experience while not compromising on reliability nor throughput.
 
