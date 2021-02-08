@@ -14,18 +14,28 @@
 Model checking with TLA+ requries two elements, a specification (`MessageHandler.tla`) and model checker configuration (`MessageHandler.cfg`). 
 
 To run the model checker we need to:
- * Parse the specification: `Ctrl+P` -> `TLA+: parse module`
- * Check the model: `Ctrl+P` -> `TLA+: check the model with TLC`
+ * Parse the specification: `Ctrl+Shift+P` -> `TLA+: parse module`
+ * Check the model: `Ctrl+Shift+P` -> `TLA+: check the model with TLC`
 
  This opens `TLA+ model checking` window that shows model checking status and the final result.
 
 ## Exercise 2
 
-Let's verify that the model does not allow for ghost messages:
- * Open `MessageHandler.cfg` and add `NoGhostMessages` in the `PROPERTY` section of the file
- * Check the model
- * Analyze the trace to understand in what scenario ghost messages can happen
- * Change the order of steps in the handler specification to prevent ghost messages
+Let's verify that the model does not allow for ghost messages using `NoGhostMessages` formula:
+
+```tla+
+NoGhostMessages == \A m \in processed : 
+                        \/ ~ \E msg \in queueOut : msg.id = m.id
+                        \/   \E chg \in db       : chg.id = m.id
+```
+
+In the Visual Stuido code:
+ * Open `MessageHandler.cfg` and add `NoGhostMessages` in the `INVARIANTS` section of the file.
+ * Parse and model check the specification.
+ * The check fails with:
+    > Invariant NoGhostMessages is violated.
+ * Analyze the trace to understand in what scenario ghost messages can happen. 
+ * Change the order of steps in the handler specification to prevent ghost messages.
 
 ## Exercise 3
 

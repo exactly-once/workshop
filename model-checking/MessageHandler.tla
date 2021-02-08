@@ -63,14 +63,14 @@ MainLoop:
         with m \in queueIn do msg := m; end with; 
         c := c+1;
 
-    UpdateDb: (* update data base - can fail *)
-        either Fail();
-        or db := db \union {[id |-> msg.id, ver |-> c]}; 
-        end either;
-
     SendOutgoingMsg:  (*send output messages - can fail *)
         either Fail();
         or queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
+        end either;
+        
+    UpdateDb: (* update data base - can fail *)
+        either Fail();
+        or db := db \union {[id |-> msg.id, ver |-> c]}; 
         end either;
 
     AckInMsg: (* remove message from the input queue - can fail *)
@@ -144,21 +144,8 @@ Receive == /\ pc[1] = "Receive"
            /\ \E m \in queueIn:
                 msg' = m
            /\ c' = c+1
-           /\ pc' = [pc EXCEPT ![1] = "UpdateDb"]
+           /\ pc' = [pc EXCEPT ![1] = "SendOutgoingMsg"]
            /\ UNCHANGED << queueIn, queueOut, db, processed >>
-
-UpdateDb == /\ pc[1] = "UpdateDb"
-            /\ \/ /\ IF c > 2
-                        THEN /\ queueIn' = {m \in queueIn: m /= msg}
-                             /\ processed' = (processed \union {msg})
-                        ELSE /\ TRUE
-                             /\ UNCHANGED << queueIn, processed >>
-                  /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
-                  /\ db' = db
-               \/ /\ db' = (db \union {[id |-> msg.id, ver |-> c]})
-                  /\ pc' = [pc EXCEPT ![1] = "SendOutgoingMsg"]
-                  /\ UNCHANGED <<queueIn, processed>>
-            /\ UNCHANGED << queueOut, msg, c >>
 
 SendOutgoingMsg == /\ pc[1] = "SendOutgoingMsg"
                    /\ \/ /\ IF c > 2
@@ -169,9 +156,22 @@ SendOutgoingMsg == /\ pc[1] = "SendOutgoingMsg"
                          /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                          /\ UNCHANGED queueOut
                       \/ /\ queueOut' = (queueOut \union {[id |-> msg.id, ver |-> c]})
-                         /\ pc' = [pc EXCEPT ![1] = "AckInMsg"]
+                         /\ pc' = [pc EXCEPT ![1] = "UpdateDb"]
                          /\ UNCHANGED <<queueIn, processed>>
                    /\ UNCHANGED << db, msg, c >>
+
+UpdateDb == /\ pc[1] = "UpdateDb"
+            /\ \/ /\ IF c > 2
+                        THEN /\ queueIn' = {m \in queueIn: m /= msg}
+                             /\ processed' = (processed \union {msg})
+                        ELSE /\ TRUE
+                             /\ UNCHANGED << queueIn, processed >>
+                  /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
+                  /\ db' = db
+               \/ /\ db' = (db \union {[id |-> msg.id, ver |-> c]})
+                  /\ pc' = [pc EXCEPT ![1] = "AckInMsg"]
+                  /\ UNCHANGED <<queueIn, processed>>
+            /\ UNCHANGED << queueOut, msg, c >>
 
 AckInMsg == /\ pc[1] = "AckInMsg"
             /\ \/ /\ IF c > 2
@@ -185,7 +185,7 @@ AckInMsg == /\ pc[1] = "AckInMsg"
                   /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
             /\ UNCHANGED << queueOut, db, msg, c >>
 
-Handler == Start \/ MainLoop \/ Receive \/ UpdateDb \/ SendOutgoingMsg
+Handler == Start \/ MainLoop \/ Receive \/ SendOutgoingMsg \/ UpdateDb
               \/ AckInMsg
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
