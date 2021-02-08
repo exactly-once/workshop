@@ -10,13 +10,13 @@
 
 ## Exercise 1
 
-Model checking with TLA+ requries two elements, a specification (`MessageHandler.tla`) and model checker configuration (`MessageHandler.cfg`). 
+Model-checking with TLA+ requires two elements, a specification (`MessageHandler.tla`) and model checker configuration (`MessageHandler.cfg`). 
 
 To run the model checker we need to:
  * Parse the specification: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: parse module`
  * Check the model: <kbr>Ctrl</kbr>+<kbr>Shift</kbr>+<kbr>P</kbr> -> `TLA+: check the model with TLC`
 
- This opens `TLA+ model checking` window that shows model checking status and the final result.
+ This opens `TLA+ model checking` window that shows the model checking status and the final result.
 
 ## Exercise 2
 
@@ -28,9 +28,9 @@ NoGhostMessages == \A m \in processed :
                         \/   \E chg \in db       : chg.id = m.id
 ```
 
-In the Visual Stuido code:
+In the Visual Studio code:
  * Open `MessageHandler.cfg` and add `NoGhostMessages` in the `INVARIANTS` section of the file.
- * Parse and model check the specification.
+ * Parse and model-check the specification.
  * The check fails with:
     > Invariant NoGhostMessages is violated.
  * Analyze the trace to understand in what scenario ghost messages can happen. 
@@ -73,7 +73,7 @@ NoDuplicatedProcessings == \A a \in db:
  * Open `MessageHandler.cfg` and add `NoDuplicatedProcessings` in the `INVARIANTS` sections.
  * Parse and check the specification.
  * Analyze the trace.
- * Change the specification to prevent duplicated processing based on the database state. The message should be processed only when the db does not hold a change for that logical message.
+ * Change the specification to prevent duplicated processing based on the database state. The message should be processed only when the DB does not hold a change for that logical message.
 
 ``` TLA+
 if ~\E chg \in db : chg.id = msg.id then
@@ -82,7 +82,7 @@ end if;
 ```
 ## Exercise 5
 
-Let's remove the atomicity between database updates and sending outgoing messages. We want to keep current properites but remove the atomicity between database updates and sending out messages: 
+Let's remove the atomicity between database updates and sending outgoing messages. We want to keep current properties but remove the atomicity between database updates and sending out messages: 
  * First, we will make a change to the specification to model that eventually (possibly after many retires) any message gets processed.
  * Add `Fails(c)` definition just after `CONSTANTS` definition.
 
@@ -111,16 +111,16 @@ UpdateDb:
         end if;
     end with;
 ```
- * Parse and model check the specification.
+ * Parse and model-check the specification.
 
  HINT: do we need `If ~\E chg \in db: ...` check in the message sending step?
 
 ## Exercise 6
 
 Let's make the model a bit bigger
- * Change model allow for 4 failures.
+ * Change model to allow for up to 4 failures.
  * Parse and check the specification.
 
-## Exercise 6
+## Exercise 7
 
-Let's talk about what is not in the modell that makes. 
+Let's talk about what is not in the model :).
