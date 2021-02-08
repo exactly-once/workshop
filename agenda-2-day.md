@@ -1,14 +1,9 @@
-* questions
-    * How much time do we have?
-    * What is the communication platform?
+### Prerequisites
+   * VS 2020 and .net472
+   * Visual Studio Code and TLA+ extension
+   * NServiceBus 7
 
-* 2 days + 8h;
-* Prerequisites
- * VS 2020 + .net472
- * Docker - SQL Server for Developers ???
- * NServiceBus 7
-
-* Agenda
+### Agenda
 * Day 1
   * 3.5h
     * P: Why do we need to distribute our code
