@@ -40,7 +40,7 @@ define
     end define;
 
 macro Fail() begin
-    if c > 2 then 
+    if c > MaxFailures then 
         queueIn := {m \in queueIn: m /= msg};
         processed := processed \union {msg};
     end if;
@@ -148,7 +148,7 @@ Receive == /\ pc[1] = "Receive"
            /\ UNCHANGED << queueIn, queueOut, db, processed >>
 
 SendOutgoingMsg == /\ pc[1] = "SendOutgoingMsg"
-                   /\ \/ /\ IF c > 2
+                   /\ \/ /\ IF c > MaxFailures
                                THEN /\ queueIn' = {m \in queueIn: m /= msg}
                                     /\ processed' = (processed \union {msg})
                                ELSE /\ TRUE
@@ -161,7 +161,7 @@ SendOutgoingMsg == /\ pc[1] = "SendOutgoingMsg"
                    /\ UNCHANGED << db, msg, c >>
 
 UpdateDb == /\ pc[1] = "UpdateDb"
-            /\ \/ /\ IF c > 2
+            /\ \/ /\ IF c > MaxFailures
                         THEN /\ queueIn' = {m \in queueIn: m /= msg}
                              /\ processed' = (processed \union {msg})
                         ELSE /\ TRUE
@@ -174,7 +174,7 @@ UpdateDb == /\ pc[1] = "UpdateDb"
             /\ UNCHANGED << queueOut, msg, c >>
 
 AckInMsg == /\ pc[1] = "AckInMsg"
-            /\ \/ /\ IF c > 2
+            /\ \/ /\ IF c > MaxFailures
                         THEN /\ queueIn' = {m \in queueIn: m /= msg}
                              /\ processed' = (processed \union {msg})
                         ELSE /\ TRUE

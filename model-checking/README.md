@@ -8,7 +8,6 @@
 
 `MessageHandler.tla` holds a TLA+ specification of a message processing handler. It models an environment with no distributed transactions available i.e. messaging infrastructure and the business data store operations are performed without any atomicity guarantees. 
 
-
 ## Exercise 1
 
 Model checking with TLA+ requries two elements, a specification (`MessageHandler.tla`) and model checker configuration (`MessageHandler.cfg`). 
