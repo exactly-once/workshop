@@ -13,8 +13,8 @@
 Model checking with TLA+ requries two elements, a specification (`MessageHandler.tla`) and model checker configuration (`MessageHandler.cfg`). 
 
 To run the model checker we need to:
- * Parse the specification: `Ctrl+Shift+P` -> `TLA+: parse module`
- * Check the model: `Ctrl+Shift+P` -> `TLA+: check the model with TLC`
+ * Parse the specification: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: parse module`
+ * Check the model: <kbr>Ctrl</kbr>+<kbr>Shift</kbr>+<kbr>P</kbr> -> `TLA+: check the model with TLC`
 
  This opens `TLA+ model checking` window that shows model checking status and the final result.
 
@@ -54,11 +54,11 @@ NoLostMessages == \A m \in processed :
  * Change the atomicity of the steps to prevent outgoing message loss
 
 ```tla+
-    UpdateDbAndSend: (* update data base and send output messages - can fail *)
-        either Fail();
-        or db := db \union {[id |-> msg.id, ver |-> c]}; 
-           queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
-        end either;
+UpdateDbAndSend: (* update data base and send output messages - can fail *)
+    either Fail();
+    or db := db \union {[id |-> msg.id, ver |-> c]}; 
+       queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
+    end either;
 ```
 
 ## Exercise 4
@@ -66,8 +66,8 @@ NoLostMessages == \A m \in processed :
 Let's verify that the model does not allow for duplicated processing of the same message using `NoDuplicatedProcessings` formula:
 
 ```tla+
-   NoDuplicatedProcessings == \A a \in db:
-                               ~ \E b \in db : a.id = b.id /\ a.ver /= b.ver
+NoDuplicatedProcessings == \A a \in db:
+                            ~ \E b \in db : a.id = b.id /\ a.ver /= b.ver
 ```
 
  * Open `MessageHandler.cfg` and add `NoDuplicatedProcessings` in the `INVARIANTS` sections.
@@ -76,9 +76,9 @@ Let's verify that the model does not allow for duplicated processing of the same
  * Change the specification to prevent duplicated processing based on the database state. The message should be processed only when the db does not hold a change for that logical message.
 
 ``` TLA+
-    if ~\E chg \in db : chg.id = msg.id then
-        ...
-    end if;
+if ~\E chg \in db : chg.id = msg.id then
+    ...
+end if;
 ```
 ## Exercise 5
 
