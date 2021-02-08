@@ -65,14 +65,3 @@ Let's remove the atomicity between database updates and sending outgoing message
 ## Exercise 6
 
 Let's talk about what is not in the modell that makes. 
-
-## Exercices
-
-1. Model check `Termination` property
-2. Model check `NoGhostMessages` invariant
-3. Model check `NoDuplicationProperites` invariant
-4. Analyze a sample trance in which property is violated
-
-
-
- 
