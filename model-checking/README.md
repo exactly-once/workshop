@@ -82,10 +82,9 @@ Let's verify that the model does not allow for duplicated processing of the same
 ```
 ## Exercise 5
 
-Let's remove the atomicity between database updates and sending outgoing messages
- * Keep current properites but remove the atomicity between database updates and sending out messages 
- * We will make a change to the specification to model that eventually (possibly after many retires) any message gets processed.
- * Add `Fails(c)` expression just after `CONSTANTS` definition.
+Let's remove the atomicity between database updates and sending outgoing messages. We want to keep current properites but remove the atomicity between database updates and sending out messages: 
+ * First, we will make a change to the specification to model that eventually (possibly after many retires) any message gets processed.
+ * Add `Fails(c)` definition just after `CONSTANTS` definition.
 
 ```tla+
 Fails(c) == IF c > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
@@ -97,8 +96,8 @@ macro Fail() begin
     goto MainLoop;
 end macro;
 ```
-
- * Change specification in the `UpdateDb` and `Send` lables to model the fact that the failure can happen at most `MaxFailures` times. E.g:
+ * Split `UpdateDbAndSend` lable back to two separate labels.
+ * Change specification in the `UpdateDb` and `Send` and `AckInMsg` labels to model the fact that the failure can happen at most `MaxFailures` times. E.g:
 
 ```tla+
 UpdateDb:
@@ -112,7 +111,10 @@ UpdateDb:
         end if;
     end with;
 ```
- 
+ * Parse and model check the specification.
+
+ HINT: do we need `If ~\E chg \in db: ...` check in the message sending step?
+
 ## Exercise 6
 
 Let's make the model a bit bigger

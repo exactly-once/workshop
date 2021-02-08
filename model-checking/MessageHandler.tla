@@ -3,6 +3,7 @@ EXTENDS FiniteSets, Naturals
 CONSTANTS MaxFailures
 
 MaxQueue == 1
+Fails(c) == IF c <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 
 (*--algorithm outbox
 variables
