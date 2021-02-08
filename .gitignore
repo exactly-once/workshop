@@ -32,3 +32,6 @@ _ReSharper*/
 packages/
 .learningtransport/
 .vscode/
+
+model-checking/states/
+*.old
