@@ -1,8 +1,8 @@
 ---- MODULE MessageHandler ----
 EXTENDS FiniteSets, Naturals
-CONSTANTS MaxQueue
+CONSTANTS MaxFailures
 
-Range(T) == { T[x] : x \in DOMAIN T }
+MaxQueue == 1
 
 (*--algorithm outbox
 variables
