@@ -14,7 +14,7 @@ Model-checking with TLA+ requires two elements, a specification (`MessageHandler
 
 To run the model checker we need to:
  * Parse the specification: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: parse module`
- * Check the model: <kbr>Ctrl</kbr>+<kbr>Shift</kbr>+<kbr>P</kbr> -> `TLA+: check the model with TLC`
+ * Check the model: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: check the model with TLC`
 
  This opens `TLA+ model checking` window that shows the model checking status and the final result.
 
