@@ -28,11 +28,13 @@ class AddItemHandler : IHandleMessages<AddItem>
         order.Lines.Add(line);
         log.Info($"Item {message.Filling} added.");
 
-        await orderRepository.Store(order);
-
         await context.PublishImmediately(
             new ItemAdded(message.OrderId, message.Filling));
+
+        await orderRepository.Store(order);
+
     }
+
 
     static readonly ILog log = LogManager.GetLogger<AddItemHandler>();
 }

@@ -26,7 +26,12 @@ class Program
 
         var config = new EndpointConfiguration("OnlyOnce.Demo0.Orders");
         config.UseTransport<LearningTransport>();
-        config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
+
+        config.Pipeline.Register(
+            new BrokerErrorSimulatorBehavior(), 
+            "Simulates broker errors");
+
+
         var orderRepository = new OrderRepository();
         config.RegisterComponents(c =>
         {
