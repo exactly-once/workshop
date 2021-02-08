@@ -3,7 +3,7 @@ EXTENDS FiniteSets, Naturals
 CONSTANTS MaxFailures
 
 MaxQueue == 1
-Fails(c) == IF c > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+Fails(c) == IF c <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 
 (*--algorithm outbox
 variables
@@ -38,7 +38,7 @@ define
     Finishes == <>(/\ pc[1] = "Receive"
                    /\ Cardinality(queueIn) = 1)
     
-end define;
+    end define;
 
 macro Fail() begin
     goto MainLoop;
@@ -58,7 +58,7 @@ MainLoop:
         await Cardinality(queueIn) > 0; 
         with m \in queueIn do msg := m; end with; 
         c := c+1;
-    
+        
     UpdateDb:
         with fails \in Fails(c) do
             if fails then
@@ -69,8 +69,8 @@ MainLoop:
                 end if;
             end if;
         end with;
-
-    Send: (* update data base and send output messages - can fail *)
+    
+    Send:
         with fails \in Fails(c) do
             if fails then
                 Fail()
@@ -83,7 +83,7 @@ MainLoop:
         with fails \in Fails(c) do
             if fails then
                 Fail()
-            else 
+            else
                 queueIn := {m \in queueIn: m /= msg};
                 processed := processed \union {msg};
             end if;
