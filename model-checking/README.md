@@ -135,6 +135,15 @@ ConsistentOutput == \A m1 \in queueOut:
 ```
 
  * Add the `ConsistentOutput` formula definition to the specification.
+ * Add `ConsistentOutput` to the `INVARIANTS` section.
  * Parse and model check the specification.
  * Analyze the failing trace.
  * Change the `Send` label part to make sure that the output messages are sent with consistent version based on the DB state.
+
+ HINT: You can get the version of the DB change for given message id using `with` statement:
+
+ ``` tla+
+with chg \in {chg \in db : chg.id = msg.id} do
+    (* chg is available in this block *)
+end with;
+ ```
