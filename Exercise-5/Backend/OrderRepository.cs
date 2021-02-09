@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Messages;
 
@@ -12,10 +11,6 @@ class OrderRepository : ConsistentInMemoryStore<Order>
 
     public Task Store(Order order)
     {
-        if (order.Lines.Any(i => i.Filling == Filling.SwissCheese))
-        {
-            throw new DatabaseErrorException();
-        }
         return Put(order);
     }
 }

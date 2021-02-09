@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
@@ -16,17 +17,12 @@ class AddItemHandler : IHandleMessages<AddItem>
     public async Task Handle(AddItem message, 
         IMessageHandlerContext context)
     {
-        var order = await orderRepository.Load(message.OrderId);
+        log.Info($"Adding item {message.Filling} to order {message.OrderId}.");
 
-        if (order.Lines.Any(x => x.Filling == message.Filling))
-        {
-            log.Info("Duplicate AddItem message detected. Ignoring.");
-            return;
-        }
+        var order = await orderRepository.Load(message.OrderId);
 
         var line = new OrderLine(message.Filling);
         order.Lines.Add(line);
-        log.Info($"Item {message.Filling} added.");
 
         await context.PublishImmediately(
             new ItemAdded(message.OrderId, message.Filling));

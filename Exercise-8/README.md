@@ -1,7 +1,11 @@
-# Exercise 8: Deterministic IDs
+# Exercise 8: ID-based de-duplication
 
-As you recall, the non-deterministic nature of ID generation made it impossible for the downstream endpoints to de-duplicate messages based on the ID. In this exercise we will attempt to fix the problem of non-deterministic message IDs by changing the ID generation strategy.  
+In the previous exercise we've seen that idempotent data structures do not guarantee correctness of the behavior if messages can be re-ordered in transit. In this exercise we are going solve this problem by to fundamentally altering the way we process messages. Instead of relying on the idempotence of data structures, we will employ synthetic message IDs. 
 
-- Use `Utils` class to generate the GUID-like ID based on the hash of the incoming message ID and the name of the processing endpoint
-- Modify the handlers of `AddItem` and `RemoveItem` commands to use `PublishWithId` instead of `Publish`
-- Test the solution
+- Add a `ProcessedMessages` property to `Order` that contains a list of IDs of processed messages (each ID is a string)
+- In `AddItemHandler` and `RemoveItemHandler` replace the filling-based de-duplication check with one based on processed messages
+  - message handling context (`IMessageHandlerContext`) has a property containing the message ID
+  - check if the message ID is already in the `ProcessedMessages` collection. If so, the message is a duplicate
+
+- Before persisting changes done to `Order` ensure that the ID of the current message is added to the `ProcessedMessages` collection
+- Leave the message publishing code as-is

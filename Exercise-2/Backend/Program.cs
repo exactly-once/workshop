@@ -24,8 +24,12 @@ class Program
 
         Console.Title = "Orders";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Orders");
-        config.UseTransport<LearningTransport>();
+        var config = new EndpointConfiguration("Orders");
+        config.UseSerialization<XmlSerializer>();
+        config.UsePersistence<InMemoryPersistence>();
+        var transport = config.UseTransport<AzureStorageQueueTransport>();
+        transport.ConnectionString("TODO");
+
         config.RegisterComponents(c =>
         {
             c.RegisterSingleton(new OrderRepository());

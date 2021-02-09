@@ -18,12 +18,6 @@ class AddItemHandler : IHandleMessages<AddItem>
     {
         var order = await orderRepository.Load(message.OrderId);
 
-        if (order.Lines.Any(x => x.Filling == message.Filling))
-        {
-            log.Info("Duplicate AddItem message detected. Ignoring.");
-            return;
-        }
-
         var line = new OrderLine(message.Filling);
         order.Lines.Add(line);
         log.Info($"Item {message.Filling} added.");
@@ -32,9 +26,7 @@ class AddItemHandler : IHandleMessages<AddItem>
             new ItemAdded(message.OrderId, message.Filling));
 
         await orderRepository.Store(order);
-
     }
-
 
     static readonly ILog log = LogManager.GetLogger<AddItemHandler>();
 }

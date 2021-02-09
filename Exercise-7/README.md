@@ -1,11 +1,9 @@
-# Exercise 7: ID-based de-duplication
+# Exercise 7: Bring in more chaos
 
-In the previous exercise we've seen that idempotent data structures do not guarantee correctness of the behavior if messages can be re-ordered in transit. In this exercise we are going solve this problem by to fundamentally altering the way we process messages. Instead of relying on the idempotence of data structures, we will employ synthetic message IDs. 
+In this exercise we are going to add some delay in our chaos monkey to simulate how messages can be be re-ordered in transit. Previously when the user issued `AddItem` and `RemoveItem` commands, the receiver was guaranteed to see the following sequence: `AddItem`, `AddItem`, `RemoveItem`, `RemoveItem`. With we add delay sequences such as `AddItem`, `RemoveItem`, `RemoveItem`, `AddItem` will be possible.
 
-- Add a `ProcessedMessages` property to `Order` that contains a list of IDs of processed messages (each ID is a string)
-- In `AddItemHandler` and `RemoveItemHandler` replace the filling-based de-duplication check with one based on processed messages
-  - message handling context (`IMessageHandlerContext`) has a property containing the message ID
-  - check if the message ID is already in the `ProcessedMessages` collection. If so, the message is a duplicate
-
-- Before persisting changes done to `Order` ensure that the ID of the current message is added to the `ProcessedMessages` collection
-- Leave the message publishing code as-is
+- In the `Frontend` endpoint implement sending in a fire-and-forget manner by wrapping the `endpoint.Send` call in a `Task.Run`.
+  - Ignore the warning
+- Modify the behavior that duplicates outgoing messages
+  - If the `Item` type is `Mushrooms` execute code that waits for 10 seconds (via `Task.Delay`) and then creates a duplicate (by invoking `await next()`)
+- Test the system by requesting adding and removal of `Mushrooms` quickly

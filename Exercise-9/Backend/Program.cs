@@ -37,7 +37,6 @@ class Program
         config.Recoverability().AddUnrecoverableException<DatabaseErrorException>();
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();
-        config.LimitMessageProcessingConcurrencyTo(8);
 
         var endpoint = await Endpoint.Start(config).ConfigureAwait(false);
 

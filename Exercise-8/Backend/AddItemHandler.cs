@@ -18,7 +18,7 @@ class AddItemHandler : IHandleMessages<AddItem>
     {
         var order = await orderRepository.Load(message.OrderId);
 
-        if (order.ProcessedMessages.Contains(context.MessageId))
+        if (order.Lines.Any(x => x.Filling == message.Filling))
         {
             log.Info("Duplicate AddItem message detected.");
         }
@@ -27,7 +27,7 @@ class AddItemHandler : IHandleMessages<AddItem>
             var line = new OrderLine(message.Filling);
             order.Lines.Add(line);
             log.Info($"Item {message.Filling} added.");
-            order.ProcessedMessages.Add(context.MessageId);
+
             await orderRepository.Store(order);
         }
 

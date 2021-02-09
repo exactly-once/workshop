@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
@@ -14,8 +15,7 @@ class Program
         Start().GetAwaiter().GetResult();
     }
 
-    static readonly Regex submitExpr = new Regex("submit ([A-Za-z]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    static readonly Regex addExpr = new Regex($"add ({string.Join("|", Enum.GetNames(typeof(Filling)))}) to ([A-Za-z]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    static readonly Regex addExpr = new Regex($"submit ([A-Za-z]+) with ({string.Join("|", Enum.GetNames(typeof(Filling)))})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     static async Task Start()
     {
@@ -28,18 +28,35 @@ class Program
 
         Console.Title = "Frontend";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Frontend");
-        config.Pipeline.Register(new DuplicateMessagesBehavior(), "Duplicates outgoing messages");
+        var config = new EndpointConfiguration("Frontend");
         config.SendFailedMessagesTo("error");
-        var routing = config.UseTransport<LearningTransport>().Routing();
-        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "OnlyOnce.Demo0.Orders");
+        var transport = config.UseTransport<LearningTransport>();
+        var routing = transport.Routing();
+        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "Orders");
 
         config.EnableInstallers();
 
         var endpoint = await Endpoint.Start(config).ConfigureAwait(false);
+        var tokenSource = new CancellationTokenSource();
 
-        Console.WriteLine("'submit <order-id>' to create a new order.");
-        Console.WriteLine($"'add ({string.Join("|", Enum.GetNames(typeof(Filling)))}) to <order-id>' to add item with selected filling.");
+        var store = new ConsistentInMemoryStore<Order>();
+        var importerTask = Task.Run(async () =>
+        {
+            while (!tokenSource.IsCancellationRequested)
+            {
+                try
+                {
+                    await Importer.ImportOrders(store, endpoint);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                await Task.Delay(2000, tokenSource.Token);
+            }
+        }, tokenSource.Token);
+
+        Console.WriteLine($"'submit <order-id> with ({string.Join("|", Enum.GetNames(typeof(Filling)))})' to add an order with selected filling");
 
         while (true)
         {
@@ -50,33 +67,25 @@ class Program
                 break;
             }
 
-            var match = submitExpr.Match(command);
+            var match = addExpr.Match(command);
             if (match.Success)
             {
                 var orderId = match.Groups[1].Value;
-                var message = new SubmitOrder
+                var filling = match.Groups[2].Value;
+
+                await store.Put(new Order
                 {
-                    OrderId = orderId
-                };
-                await endpoint.Send(message).ConfigureAwait(false);
-                continue;
-            }
-            match = addExpr.Match(command);
-            if (match.Success)
-            {
-                var filling = match.Groups[1].Value;
-                var orderId = match.Groups[2].Value;
-                var message = new AddItem
-                {
-                    OrderId = orderId,
-                    Filling = (Filling)Enum.Parse(typeof(Filling), filling)
-                };
-                await endpoint.Send(message).ConfigureAwait(false);
+                    Filling = (Filling) Enum.Parse(typeof(Filling), filling),
+                    Id = orderId
+                });
+
                 continue;
             }
             Console.WriteLine("Unrecognized command.");
         }
 
+        tokenSource.Cancel();
+        await importerTask.ConfigureAwait(false);
         await endpoint.Stop().ConfigureAwait(false);
     }
 }

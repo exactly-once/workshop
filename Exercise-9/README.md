@@ -1,5 +1,7 @@
-# Exercise 9: Deterministic message generation
+# Exercise 9: Deterministic IDs
 
-In this exercise we are going to extend the `BrokerErrorSimulatorBehavior` by adding another `if` clause that checks if the outgoing message is of type `FirstItemAdded`. In that case we will simulate a timeout error by waiting for 10 seconds and then throwing an exception. We hope that his is exactly what the operations team have seen in production.
+As you recall, the non-deterministic nature of ID generation made it impossible for the downstream endpoints to de-duplicate messages based on the ID. In this exercise we will attempt to fix the problem of non-deterministic message IDs by changing the ID generation strategy.  
 
-We will examine the behavior of our code by using a brand new type of pierogi. Try adding two items of type `Strawberry` quickly. What happens?
+- Use `Utils` class to generate the GUID-like ID based on the hash of the incoming message ID and the name of the processing endpoint
+- Modify the handlers of `AddItem` and `RemoveItem` commands to use `PublishWithId` instead of `Publish`
+- Test the solution

@@ -1,4 +1,4 @@
-# Exercise 4: Simulate broker problems
+# Exercise 6: Simulate broker problems
 
 Follow up:
 - Modify the handler for the `AddItem` command so that:

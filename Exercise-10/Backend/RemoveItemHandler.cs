@@ -18,23 +18,23 @@ class RemoveItemHandler : IHandleMessages<RemoveItem>
     {
         var order = await orderRepository.Load(message.OrderId);
 
-        var lineToRemove = order.Lines.FirstOrDefault(x => x.Filling == message.Filling);
-
-        if (lineToRemove == null)
+        if (order.ProcessedMessages.Contains(context.MessageId))
         {
             log.Info("Potential duplicate RemoveItem message detected.");
         }
         else
         {
+            var lineToRemove = order.Lines.FirstOrDefault(x => x.Filling == message.Filling);
             order.Lines.Remove(lineToRemove);
-
+            order.ProcessedMessages.Add(context.MessageId);
             await orderRepository.Store(order);
 
             log.Info($"Item {message.Filling} removed.");
         }
 
-        await context.PublishImmediately(
-            new ItemRemoved(message.OrderId, message.Filling));
+        await context.PublishWithId(
+            new ItemRemoved(message.OrderId, message.Filling),
+            Utils.DeterministicGuid(context.MessageId, "Orders").ToString());
 
     }
 

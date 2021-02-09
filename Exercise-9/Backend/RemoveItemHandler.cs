@@ -32,9 +32,8 @@ class RemoveItemHandler : IHandleMessages<RemoveItem>
             log.Info($"Item {message.Filling} removed.");
         }
 
-        await context.PublishWithId(
-            new ItemRemoved(message.OrderId, message.Filling),
-            Utils.DeterministicGuid(context.MessageId, "Orders").ToString());
+        await context.PublishImmediately(
+            new ItemRemoved(message.OrderId, message.Filling));
 
     }
 

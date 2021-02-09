@@ -1,5 +1,4 @@
-﻿using System.Data.SqlClient;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
@@ -17,7 +16,6 @@ class SubmitOrderHandler : IHandleMessages<SubmitOrder>
     {
         if (await orderRepository.Load(message.OrderId) != null)
         {
-            log.Info("Duplicate SubmitOrder message detected. Ignoring");
             return;
         }
 

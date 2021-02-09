@@ -24,15 +24,17 @@ class Program
 
         Console.Title = "Orders";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Orders");
-        config.UseTransport<LearningTransport>();
+        var config = new EndpointConfiguration("Orders");
+        config.UseSerialization<XmlSerializer>();
+        config.UsePersistence<InMemoryPersistence>();
+        var transport = config.UseTransport<LearningTransport>();
+
         config.RegisterComponents(c =>
         {
             c.RegisterSingleton(new OrderRepository());
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
-        config.Recoverability().AddUnrecoverableException<DatabaseErrorException>();
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();
 

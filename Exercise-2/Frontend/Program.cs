@@ -28,10 +28,14 @@ class Program
 
         Console.Title = "Frontend";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Frontend");
+        var config = new EndpointConfiguration("Frontend");
         config.SendFailedMessagesTo("error");
-        var routing = config.UseTransport<LearningTransport>().Routing();
-        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "OnlyOnce.Demo0.Orders");
+        config.UseSerialization<XmlSerializer>();
+        config.UsePersistence<InMemoryPersistence>();
+        var transport = config.UseTransport<AzureStorageQueueTransport>();
+        transport.ConnectionString("TODO");
+        var routing = transport.Routing();
+        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "Orders");
 
         config.EnableInstallers();
 

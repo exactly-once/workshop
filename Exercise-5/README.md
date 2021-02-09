@@ -1,9 +1,8 @@
-# Exercise 6: Bring in more chaos
+# Exercise 5: Simulate database problems
 
-In this exercise we are going to add some delay in our chaos monkey to simulate how messages can be be re-ordered in transit. Previously when the user issued `AddItem` and `RemoveItem` commands, the receiver was guaranteed to see the following sequence: `AddItem`, `AddItem`, `RemoveItem`, `RemoveItem`. With we add delay sequences such as `AddItem`, `RemoveItem`, `RemoveItem`, `AddItem` will be possible.
+In this exercise we are going to continue using principles of *chaos engineering* to add another chaos monkey. This time the monkey is going to simulate database connection failure when committing the transaction for a specific type of `Item`.
 
-- In the `Frontend` endpoint implement sending in a fire-and-forget manner by wrapping the `endpoint.Send` call in a `Task.Run`.
-  - Ignore the warning
-- Modify the behavior that duplicates outgoing messages
-  - If the `Item` type is `Mushrooms` execute code that waits for 10 seconds (via `Task.Delay`) and then creates a duplicate (by invoking `await next()`)
-- Test the system by requesting adding and removal of `Mushrooms` quickly
+- In the `OrderRepository` class in the `Store` method check if a given order contains item of type `SwissCheese`. If so, throw `DatabaseErrorException` to simulate database problems.
+- Run the solution
+  - What happened?
+  - Go to [follow up](https://github.com/exactly-once/workshop/blob/master/Short/Ex3/follow-up.md) section to continue

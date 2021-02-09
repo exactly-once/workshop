@@ -1,8 +1,11 @@
-# Exercise 3: Simulate database problems
+# Exercise 3: Message duplication on the sender side
 
-In this exercise we are going to continue using principles of *chaos engineering* to add another chaos monkey. This time the monkey is going to simulate database connection failure when committing the transaction for a specific type of `Item`.
+In this exercise we are going to experience message duplication again. This time our task is to build a piece of code that imports *pierogi* orders from an external system. Fortunately that system supports only one item per order.
 
-- In the `OrderRepository` class in the `Store` method check if a given order contains item of type `SwissCheese`. If so, throw `DatabaseErrorException` to simulate database problems.
-- Run the solution
-  - What happened?
-  - Go to [follow up](https://github.com/exactly-once/workshop/blob/master/Short/Ex3/follow-up.md) section to continue
+The console accepts commands in form of `submit <order-id> with <filling>`. Each such command stores a record in the database. Every two seconds all existing records are loaded and passed to import method (the `Importer` class. There is an error handling mechanism built-in that catches all import exceptions and prints them to the console.
+
+The import logic is supposed to send two commands for each record from the database:
+ - `SubmitOrder`
+ - `AddItem`
+
+How can we make sure the same order is not processed multiple times?

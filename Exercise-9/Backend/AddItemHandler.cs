@@ -31,16 +31,8 @@ class AddItemHandler : IHandleMessages<AddItem>
             await orderRepository.Store(order);
         }
 
-        if (order.Lines.Count == 1)
-        {
-            await context.PublishWithId(
-                new FirstItemAdded(message.OrderId), 
-                Utils.DeterministicGuid(context.MessageId, "Orders").ToString());
-        }
-
-        await context.PublishWithId(
-            new ItemAdded(message.OrderId, message.Filling),
-            Utils.DeterministicGuid(context.MessageId, "Orders").ToString());
+        await context.PublishImmediately(
+            new ItemAdded(message.OrderId, message.Filling));
     }
 
     static readonly ILog log = LogManager.GetLogger<AddItemHandler>();
