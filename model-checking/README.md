@@ -124,3 +124,17 @@ Let's make the model a bit bigger
 ## Exercise 7
 
 Let's talk about what is not in the model :).
+
+## (*) Exercise 8
+
+Let's check that the handler returns a consistent output using following formula:
+
+``` tla+
+ConsistentOutput == \A m1 \in queueOut:
+                        ~\E m2 \in queueOut: m1.id = m2.id /\ m1.ver = m2.ver
+```
+
+ * Add the `ConsistentOutput` formula definition to the specification.
+ * Parse and model check the specification.
+ * Analyze the failing trace.
+ * Change the `Send` label part to make sure that the output messages are sent with consistent version based on the DB state.
