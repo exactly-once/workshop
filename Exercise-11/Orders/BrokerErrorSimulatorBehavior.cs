@@ -12,14 +12,14 @@ class BrokerErrorSimulatorBehavior : Behavior<IOutgoingLogicalMessageContext>
         if (!failed && context.Message.Instance is ItemAdded itemAdded && itemAdded.Filling == Filling.QuarkAndPotatoes)
         {
             failed = true;
-            throw new Exception();
+            throw new Exception("Broker failure");
         }
 
         if (!failed && context.Message.Instance is FirstItemAdded firstItem)
         {
-            await Task.Delay(10000);
             failed = true;
-            throw new Exception();
+            await Task.Delay(10000);
+            throw new Exception("Timeout");
         }
         await next();
     }

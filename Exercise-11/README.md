@@ -1,7 +1,42 @@
-# Exercise 10: Deterministic message generation
+# Exercise 11: Deterministic message generation
 
-After our previous change, the system behaves stable. Mostly. In response to new requirements an additional event type has been added -- `FirstItemAdded`. This event is published when the customer adds first item to their orders. It is used by the marketing department to study the buying habits. Unfortunately from time to time they notice the lack of `FirstItemAdded` event. What could have gone wrong? The problem seems to be correlated with timeouts. We are going to investigate this by first trying to reproduce the problem using another *chaos monkey*. 
+In the last exercise we are going to bring back the order, once and for all. The only practical way of ensuring messages are generated in a deterministic way is to store them as part of our business transactions.
 
-In this exercise we are going to extend the `BrokerErrorSimulatorBehavior` by adding another `if` clause that checks if the outgoing message is of type `FirstItemAdded`. In that case we will simulate a timeout error by waiting for 10 seconds and then throwing an exception. We hope that his is exactly what the operations team have seen in production.
+Let's pause here for a moment and think about the following statement.
 
-We will examine the behavior of our code by using a brand new type of *pierogi*. Try adding two items of type `Strawberry` quickly. What happens?
+> Message handles should be idempotent
+
+What we usually think about is how to modify the data in such a way that when we run the code multiple times, the data continues to be in the same state as after the first modification.
+
+We don't don't think about what happens if, between re-running our logic the data is modified by someone else. We also don't think about the messages we are sending out.
+
+Let's repeat what we said: the only practical way of ensuring messages are generated in a deterministic way is to store them as part of our business transactions. We are going to do just that.
+
+OK, now let's get our hands dirty with code. 
+
+- Navigate the `Order` class and add a new property `OutgoingMessages` of type `Dictionary<string, object>`. This property is going to store our generated messages.
+- Navigate to the `AddItemHandler` class. You should feel familiar here by now.
+- Invert the `if` statement in the beginning of the method and remove `else` branch (the one that does the logging).
+- Move the `PublishWithId` statements up to the business logic part, between `order.ProcessedMessages.Add` and `orderRepository.Store`.
+- Replace the deterministic ID generation with `Guid.NewGuid()`. 
+- Replace the `context.PublishWithId` calls with `order.OutgoingMessages.Add(messageId, messageObject)`.
+
+After these changes your business logic should be correctly _storing_ the outgoing messages. But it does not yet send them out. For that we need to add the _dispatching_ code below. Here's how it should look:
+
+```c#
+if (order.OutgoingMessages.Any())
+{
+    foreach (var kvp in order.OutgoingMessages)
+    {
+        await context.PublishWithId(kvp.Value, kvp.Key);
+    }
+    order.OutgoingMessages.Clear();
+    await orderRepository.Store(order);
+}
+```
+
+As you can see, we are pushing all the messages from the `OutgoingMessages` collection, erasing them and updating our order.
+
+Now run the solution and try submitting and order with two items of *pierogi* with strawberries. Remember, last time this caused the `FirstItemAdded` event to be omitted due to a simulated timeout.
+
+What happens this time? Can you explain why the `FirstItemAdded` reaches the marketing service _before_ the timeout happens?
