@@ -26,9 +26,9 @@ class Program
 
         LogManager.Use<SerilogFactory>();
 
-        Console.Title = "Frontend";
+        Console.Title = "Importer";
 
-        var config = new EndpointConfiguration("Frontend");
+        var config = new EndpointConfiguration("Importer");
         config.SendFailedMessagesTo("error");
         var transport = config.UseTransport<LearningTransport>();
         var routing = transport.Routing();

@@ -24,7 +24,7 @@ class Program
 
         Console.Title = "Orders";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Orders");
+        var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
         config.RegisterComponents(c =>
         {
@@ -32,6 +32,7 @@ class Program
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
+        config.Recoverability().AddUnrecoverableException<DatabaseErrorException>();
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();
 

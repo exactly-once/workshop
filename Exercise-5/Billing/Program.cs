@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
 using Serilog;
+using Serilog.Filters;
 
 class Program
 {
@@ -16,31 +18,26 @@ class Program
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
-            .Enrich.With(new ExceptionMessageEnricher())
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{ExceptionMessage}{NewLine}")
+            .WriteTo.Console()
             .CreateLogger();
 
         LogManager.Use<SerilogFactory>();
 
-        Console.Title = "Orders";
+        Console.Title = "Billing";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Orders");
+        var config = new EndpointConfiguration("Billing");
         config.UseTransport<LearningTransport>();
-        config.RegisterComponents(c =>
-        {
-            c.RegisterSingleton(new OrderRepository());
-        });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
-        config.Recoverability().AddUnrecoverableException<DatabaseErrorException>();
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();
 
         var endpoint = await Endpoint.Start(config).ConfigureAwait(false);
 
-        Console.WriteLine("Press <enter> to exit.");
-        Console.ReadLine();
-
-        await endpoint.Stop().ConfigureAwait(false);
+        while (true)
+        {
+            Console.WriteLine("Press <enter> to exit.");
+            Console.ReadLine();
+        }
     }
 }
