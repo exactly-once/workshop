@@ -17,7 +17,7 @@ namespace Messaging.IntegrationTests.System
             Console.ReadKey();
         }
 
-        public static async Task<(IEndpointInstance, OrderStore)> StartEndpoint()
+        public static async Task<(IEndpointInstance, OrderStore)> StartEndpoint(Action<EndpointConfiguration> configure = null)
         {
             var endpointName = "IntegrationTests.Endpoint";
             
@@ -28,6 +28,8 @@ namespace Messaging.IntegrationTests.System
 
             var orderStore = new OrderStore();
             configuration.RegisterComponents(cc => cc.RegisterSingleton(orderStore));
+
+            configure?.Invoke(configuration);
 
             var endpoint = await Endpoint.Start(configuration).ConfigureAwait(false);
 
