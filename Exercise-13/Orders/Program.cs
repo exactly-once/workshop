@@ -28,12 +28,13 @@ class Program
         var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
         config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
-        config.Pipeline.Register(b => new OutboxBehavior(b.Build<OrderRepository>(), b.Build<IDispatchMessages>()),
+        config.Pipeline.Register(b => new OutboxBehavior(b.Build<OrderRepository>(), b.Build<IDispatchMessages>(), b.Build<IInboxStore>()),
             "Deduplicates incoming messages");
         var orderRepository = new OrderRepository();
         config.RegisterComponents(c =>
         {
             c.RegisterSingleton(orderRepository);
+            c.RegisterSingleton(new InMemoryInboxStore());
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
