@@ -14,34 +14,37 @@ class AddItemHandler : IHandleMessages<AddItem>
         this.orderRepository = orderRepository;
     }
 
-    public async Task Handle(AddItem message,
+    public async Task Handle(AddItem message, 
         IMessageHandlerContext context)
     {
         var order = await orderRepository.Load(message.OrderId);
 
-        if (order.ProcessedMessages.Contains(context.MessageId))
-        {
-            log.Info("Duplicate AddItem message detected.");
-        }
-        else
+        if (!order.ProcessedMessages.Contains(context.MessageId))
         {
             var line = new OrderLine(message.Filling);
             order.Lines.Add(line);
             log.Info($"Item {message.Filling} added.");
+
             order.ProcessedMessages.Add(context.MessageId);
+            order.OutgoingMessages.Add(Guid.NewGuid().ToString(), new ItemAdded(message.OrderId, message.Filling));
+            if (order.Lines.Count == 1)
+            {
+                order.OutgoingMessages.Add(Guid.NewGuid().ToString(),
+                    new FirstItemAdded(message.OrderId));
+            }
+
             await orderRepository.Store(order);
         }
 
-        if (order.Lines.Count == 1)
+        if (order.OutgoingMessages.Any())
         {
-            await context.PublishWithId(
-                new FirstItemAdded(message.OrderId),
-                Utils.DeterministicGuid(context.MessageId, "Orders-FirstItemAdded").ToString());
+            foreach (var kvp in order.OutgoingMessages)
+            {
+                await context.PublishWithId(kvp.Value, kvp.Key);
+            }
+            order.OutgoingMessages.Clear();
+            await orderRepository.Store(order);
         }
-
-        await context.PublishWithId(
-            new ItemAdded(message.OrderId, message.Filling),
-            Utils.DeterministicGuid(context.MessageId, "Orders-ItemAdded").ToString());
     }
 
     static readonly ILog log = LogManager.GetLogger<AddItemHandler>();
