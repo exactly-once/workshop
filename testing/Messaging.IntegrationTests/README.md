@@ -1,10 +1,10 @@
 ## Conversation based integration tests
 
-When writing integration tests for message-based systems it's common to make assertions on the results of the whole conversation and not the initial command alone. This part of the tutorial shows how to instrument message handling endpoints so that it's possible for the testing logic to run assetions only after all messages in the conversation have been processed. 
+When writing integration tests for message-based systems it's common to make assertions on the results of the whole conversation and not the initial command alone. This part of the tutorial shows how to instrument message handling endpoints so that it's possible for the testing logic to run assertions only after all messages in the conversation have been processed. 
 
 ### Goal
 
-The goal of this exercise is to write a single integration tests that depends on the result of processing the last message in a conversation. The conversation starts with `PlaceOrder` command that has 50/50 chance of triggering the final `FinalizeOrder` command or re-sending the same command with `1` seconds delay:
+The goal of this exercise is to write a single integration test that depends on the result of processing the last message in a conversation. The conversation starts with `PlaceOrder` command that has a 50/50 chance of triggering the final `FinalizeOrder` command or re-sending the same command with `1` seconds delay:
 
 ```csharp
 if (new Random().Next(0, 2) == 0)
@@ -20,7 +20,7 @@ else
 }
 ```
 
-This in turn causes flakyness in the sample integration test:
+This, in turn, causes flakiness in the sample integration test:
 
 ```csharp
 [Test]
@@ -37,11 +37,11 @@ public async Task PlaceOrder()
 
 ### Step 1
 
-Can we solve the problem with brute-force? Can we add `Task.Delay` in out test to make it pass consistently and not make it take couple of minutes to pass?
+Can we solve the problem with brute-force? Can we add `Task.Delay` in our test to make it pass consistently and not make it take a couple of minutes to pass?
 
 ### Step 2
 
-Let's add a behavior to message processing pipeline in our endpoint so that for every incoming message and all messages that are generated we capture their identifiers and sent this data off to a dedicated queue for further processing using `TracingBehavior`:
+Let's add behavior to the message processing pipeline in our endpoint so that for every incoming message and all messages that are generated we capture their identifiers and sent this data off to a dedicated queue for further processing using `TracingBehavior`:
 
 ```csharp 
  (endpoint, store) = await Program.StartEndpoint(c =>
@@ -50,7 +50,7 @@ Let's add a behavior to message processing pipeline in our endpoint so that for 
 });
 ```
 
-TASK: Add a missing piece of logic the `TracingBehavior` to capture outgoing message identifers in the `OutgoingMessageIds` property of the `TracingMessage`. Run the test in the `Debug` mode to make sure the data is being captured.
+TASK: Add a missing piece of logic to the `TracingBehavior` to capture outgoing message identifiers in the `OutgoingMessageIds` property of the `TracingMessage`. Run the test in the `Debug` mode to make sure the data is being captured.
 
 ### Step 3
 
@@ -60,9 +60,6 @@ TASK: Create an instance of the `Tracer` class in the `Setup` method of the test
 
 ### Step 4
 
-`Tracer` provides logic to setup conversation tracking and later to wait until the conversation finishes. In order, to setup the conversation one needs to call the `Prepare` method which returns `conversationId` and `SendOptions` tuple.
+`Tracer` provides logic to setup conversation tracking and later to wait until the conversation finishes. In order, to set up, the conversation one needs to call the `Prepare` method which returns `conversationId` and `SendOptions` tuple.
 
 TASK: Extend the test code by calling the `tracer.Prepare` and `tracer.WaitUntilFinished` to make sure that test asserts are called at the right time.
-
-
-
