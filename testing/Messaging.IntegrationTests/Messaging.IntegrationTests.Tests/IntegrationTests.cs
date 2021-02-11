@@ -18,9 +18,7 @@ namespace Messaging.IntegrationTests.Tests
         {
             (endpoint, store) = await Program.StartEndpoint(c =>
             {
-                c.Pipeline.Register(
-                    new TracingBehavior(),
-                    "Trace message processed.");
+                c.Pipeline.Register(new TracingBehavior(), "Trace input and output messages.");
             });
 
             await tracer.Start();
