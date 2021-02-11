@@ -9,7 +9,9 @@ namespace Messaging.IntegrationTests.System
     {
         static async Task Main(string[] args)
         {
-            await StartEndpoint();
+            var (endpoint, _) = await StartEndpoint();
+
+            await endpoint.SendLocal(new PlaceOrder());
 
             Console.WriteLine("Press any <key> to exit.");
             Console.ReadKey();
@@ -64,19 +66,11 @@ namespace Messaging.IntegrationTests.System
         {
             Console.WriteLine("Order received");
 
-            if (new Random().Next(0, 20) == 0)
-            {
-                Console.WriteLine("Delaying order processing");
+            var options = new SendOptions();
+            options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
+            options.RouteReplyToThisInstance();
 
-                var options = new SendOptions();
-                options.DelayDeliveryWith(TimeSpan.FromSeconds(10));
-
-                await context.Send(message, options);
-            }
-            else
-            {
-                await context.SendLocal(new FinalizeOrder{Id = message.Id});
-            }
+            await context.SendLocal(new FinalizeOrder{Id = message.Id});
         }
 
         public Task Handle(FinalizeOrder message, IMessageHandlerContext context)

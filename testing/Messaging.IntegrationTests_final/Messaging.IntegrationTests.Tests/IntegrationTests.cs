@@ -10,35 +10,39 @@ namespace Messaging.IntegrationTests.Tests
     {
         IEndpointInstance endpoint;
         OrderStore store;
+        
+        Tracer tracer = new Tracer();
 
         [SetUp]
         public async Task Setup()
         {
             (endpoint, store) = await Program.StartEndpoint(c =>
             {
-                /*TODO: register tracing behavior */
+                c.Pipeline.Register(new TracingBehavior(), "Trace input and output messages.");
             });
 
-            /*TODO: create tracer instance and start it*/
+            await tracer.Start();
         }
 
         [TearDown]
         public async Task CleanUp()
         {
             await endpoint.Stop();
-
-            /*TODO: stop the tracer */
+            await tracer.Stop();
         }
 
         [Test]
-        [Repeat(25)]
         public async Task PlaceOrder()
         {
+            var (conversationId, options) = tracer.Prepare();
+
             var message = new PlaceOrder {Id = Guid.NewGuid()};
 
-            await endpoint.Send(message);
+            await endpoint.Send(message, options);
 
-            Assert.Contains(message.Id, store.PlacedOrders, "PlaceOrder ");
+            await tracer.WaitUntilFinished(conversationId);
+
+            Assert.Contains(message.Id, store.PlacedOrders);
         }
     }
 }

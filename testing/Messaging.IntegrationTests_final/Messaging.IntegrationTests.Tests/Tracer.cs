@@ -20,9 +20,11 @@ namespace Messaging.IntegrationTests.Tests
             tracer = await Endpoint.Start(configuration);
         }
 
-        public Task WaitUntilFinished(Guid conversationId)
+        public Task WaitUntilFinished(Guid conversationId, int timeout = 5)
         {
-            return conversationTracker.WaitForConversationToFinish(conversationId);
+            return Task.WhenAny(
+                conversationTracker.WaitForConversationToFinish(conversationId),
+                Task.Delay(TimeSpan.FromSeconds(timeout)));
         }
 
         public (Guid, SendOptions) Prepare()
