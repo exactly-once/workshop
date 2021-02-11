@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
 using Serilog;
+using Serilog.Filters;
 
 class Program
 {
@@ -16,36 +18,26 @@ class Program
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
-            .Enrich.With(new ExceptionMessageEnricher())
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{ExceptionMessage}{NewLine}")
+            .WriteTo.Console()
             .CreateLogger();
 
         LogManager.Use<SerilogFactory>();
 
-        Console.Title = "Orders";
+        Console.Title = "Marketing";
 
-        var config = new EndpointConfiguration("Orders");
+        var config = new EndpointConfiguration("ExactlyOnce.Marketing");
         config.UseTransport<LearningTransport>();
-        config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
-        var orderRepository = new OrderRepository();
-        config.RegisterComponents(c =>
-        {
-            c.RegisterSingleton(orderRepository);
-        });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
-        config.Recoverability().AddUnrecoverableException<DatabaseErrorException>();
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();
-        config.LimitMessageProcessingConcurrencyTo(8);
 
         var endpoint = await Endpoint.Start(config).ConfigureAwait(false);
 
         while (true)
         {
-            Console.WriteLine("Press <enter> to dump database.");
+            Console.WriteLine("Press <enter> to exit.");
             Console.ReadLine();
-            orderRepository.Dump(Console.Out);
         }
     }
 }

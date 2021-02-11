@@ -24,6 +24,26 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
             await next();
             return;
         }
+
+        var order = await orderRepository.Load(orderMessage.OrderId)
+                    ?? new Order {Id = orderMessage.OrderId};
+
+        if (!order.OutboxState.TryGetValue(context.MessageId, out var outboxState))
+        {
+            context.Extensions.Set(order);
+            var messages = await InvokeMessageHandler(context, next);
+            outboxState = new OutboxState {OutgoingMessages = messages.Serialize()};
+            order.OutboxState[context.MessageId] = outboxState;
+            await orderRepository.Store(order);
+        }
+
+        if (outboxState != null)
+        {
+            var toDispatch = outboxState.OutgoingMessages.Deserialize();
+            await Dispatch(toDispatch, context);
+            order.OutboxState[context.MessageId] = null;
+            await orderRepository.Store(order);
+        }
     }
 
     Task Dispatch(TransportOperation[] transportOperations, IExtendable context)

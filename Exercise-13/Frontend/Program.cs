@@ -29,11 +29,11 @@ class Program
 
         Console.Title = "Frontend";
 
-        var config = new EndpointConfiguration("Frontend");
+        var config = new EndpointConfiguration("OnlyOnce.Demo0.Frontend");
         config.Pipeline.Register(new DuplicateMessagesBehavior(), "Duplicates outgoing messages");
         config.SendFailedMessagesTo("error");
         var routing = config.UseTransport<LearningTransport>().Routing();
-        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "Orders");
+        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "OnlyOnce.Demo0.Orders");
 
         config.EnableInstallers();
 

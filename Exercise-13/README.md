@@ -3,7 +3,7 @@
 In the previous exercise we implemented the Outbox pattern inline in the handler of the `AddItem` message. While it did solve our problem, it is not ideal from the code reuse perspective. Who would like to have the same code copied over and over again? In this exercise we are going to extract that piece of code and make it more generic. In order to achieve this we will use the *behavior* extension system of NServiceBus; the same one that we previously used to simulated various failure conditions.
 
 - Open the `OutboxBehavior` class. Notice this class already has some scaffolding code prepared. The `Invoke` code filters out messages that do not carry the order ID on them. This is important because (for now) out generic outbox is going to support only messages addressed to an `Order`. Secondly, there is `InvokeMessageHandler` method that takes care of capturing the messages generated as part of message processing.
-- Open the `Order` class. We need to adjust it a bit. Currently it contains two outbox-related properties: `ProcessedMessages` and `OutgoingMessages`. We will replaced them with a single property `OutboxState` of type `Dictionary<string, OutboxState>`. The `OutboxState` is a simple class that holds an array of serializable outgoing messages.
+- Open the `Order` class. We need to adjust it a bit. Currently it contains two outbox-related properties: `ProcessedMessages` and `OutgoingMessages`. We will replaced them with a single property `OutboxState` of type `Dictionary<string, OutboxState>`. The `OutboxState` is a simple class that holds an array of serilizable outgoing messages.
 
 If for a given value of message ID the `OutboxState` dictionary contains a non-null value, the messages have not been dispatched. If it contains `null` then that message have been processed and outgoing messages dispatched. If it does not contain that value, the message has not been processed.
 
@@ -30,11 +30,3 @@ If for a given value of message ID the `OutboxState` dictionary contains a non-n
   - Remove the dispatching code entirely.
 - The code should now look nice and clean.
 - Repeat the same steps for the `RemoveItemHandler` class or remove it entirely. We are not going to use it.
-
-- Finally, run the solution and verify if it works
-  - Try creating and order and adding two Strawberry items to it quickly. Let's see how the `FirstItemAdded` event is handled.
-  - Add another order with one item of meat *pierogi*.
-
-Wow! That was a lot of work. Let's take a moment to celebrate what we achieved. We have build a working implementation of the *Outbox*.
-
-Ok. That's enough. Now let's be a bit more critical. Can you find any problems with this solution?
