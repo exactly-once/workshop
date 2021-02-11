@@ -25,7 +25,7 @@ class Program
 
         Console.Title = "Marketing";
 
-        var config = new EndpointConfiguration("ExactlyOnce.Marketing");
+        var config = new EndpointConfiguration("Marketing");
         config.UseTransport<LearningTransport>();
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));

@@ -25,7 +25,7 @@ class Program
 
         Console.Title = "Orders";
 
-        var config = new EndpointConfiguration("OnlyOnce.Demo0.Orders");
+        var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
         config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
         config.Pipeline.Register(b => new OutboxBehavior(b.Build<OrderRepository>(), b.Build<IDispatchMessages>()),
