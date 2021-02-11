@@ -5,6 +5,7 @@ using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
 
+
 class AddItemHandler : IHandleMessages<AddItem>
 {
     OrderRepository orderRepository;
