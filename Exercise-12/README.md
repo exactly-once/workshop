@@ -14,13 +14,16 @@ If for a given value of message ID the `OutboxState` dictionary contains a non-n
   - To do the first part, invoke our helper method `var messages = await InvokeMessageHandler(context, next);`
   - Then create a new instance of the `OutboxState` containing these messages: `outboxState = new OutboxState {OutgoingMessages = messages.Serialize()};`
   - Finally, set that state in the `Order`: `order.OutboxState[context.MessageId] = outboxState;` and update the database: `await orderRepository.Store(order)`.
+
 - The next part is dispatching of the store operations. This is going to happen regardless of the `if` condition but we need to be careful. If the condition was `false` (we have already seen this message) the `outboxState` can be `null`. We need to account for this by guarding the entire dispatch code with `if (outboxState != null)` condition.
   - Messages to be dispatched need to be deserialized from the outbox state `var toDispatch = outboxState.OutgoingMessages.Deserialize();`
   - Next, they need to be dispatched using a helper method: `await Dispatch(toDispatch, context);`
   - We need to update the state of the order to mark them as dispatched: `order.OutboxState[context.MessageId] = null;`
   - Finally we need to update the order value in the database: `await orderRepository.Store(order)`. 
+
 - The `OutboxBehavior` seems to be ready now but there is one more thing we need to do. The `AddItemHandler` now can't load the `Order` by itself. It needs to work on the `Order` loaded by the behavior.
   - Find the line just before we invoke the message handler and add code to put the loaded `Order` instance on the message handling context: `context.Extensions.Set(order);`
+  
 - Now we can focus on `AddItemHandler`.
   - Replace the repository usage with retrieving the `Order` from the context: `var order = context.Extensions.Get<Order>();`.
   - Remove the `if` and the curly braces.
