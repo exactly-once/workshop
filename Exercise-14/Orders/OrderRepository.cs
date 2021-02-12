@@ -1,21 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Messages;
+﻿using Microsoft.Azure.Cosmos;
 
-class OrderRepository : ConsistentInMemoryStore<Order>
+class OrderRepository : Repository<Order>
 {
-    public Task<Order> Load(string orderId)
+    public OrderRepository(CosmosClient cosmosClient, string databaseId) : base(cosmosClient, databaseId)
     {
-        return Get(orderId);
-    }
-
-    public Task Store(Order order)
-    {
-        if (order.Lines.Any(i => i.Filling == Filling.SwissCheese))
-        {
-            throw new DatabaseErrorException();
-        }
-        return Put(order);
     }
 }

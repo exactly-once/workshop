@@ -1,54 +1,56 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Messages;
 using NServiceBus;
 using NServiceBus.Extensibility;
 using NServiceBus.Pipeline;
 using NServiceBus.Transport;
 
-class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
+public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
+    where T : Entity, new()
 {
-    OrderRepository orderRepository;
-    IDispatchMessages dispatcher;
-    IInboxStore inboxStore;
+    readonly Repository<T> repository;
+    readonly IDispatchMessages dispatcher;
+    readonly IInboxStore inboxStore;
+    readonly Func<object, string> getId;
 
-    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher, IInboxStore inboxStore)
+    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, IInboxStore inboxStore, Func<object, string> getId)
     {
-        this.orderRepository = orderRepository;
+        this.repository = repository;
         this.dispatcher = dispatcher;
         this.inboxStore = inboxStore;
+        this.getId = getId;
     }
 
     public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
     {
-        if (!(context.Message.Instance is IOrderMessage orderMessage))
+        var id = getId(context.Message.Instance);
+        if (id == null)
         {
             await next();
             return;
         }
 
-        var order = await orderRepository.Load(orderMessage.OrderId)
-                    ?? new Order { Id = orderMessage.OrderId };
+        var (entity, version) = await repository.Get(id);
 
         var hasBeenProcessed = await inboxStore.HasBeenProcessed(context.MessageId);
         if (hasBeenProcessed)
         {
-            if (order.OutboxState.ContainsKey(context.MessageId))
+            if (entity.OutboxState.ContainsKey(context.MessageId))
             {
-                order.OutboxState.Remove(context.MessageId);
-                await orderRepository.Store(order);
+                entity.OutboxState.Remove(context.MessageId);
+                await repository.Put(entity, version);
             }
-
             return; //Duplicate
         }
 
-        if (!order.OutboxState.TryGetValue(context.MessageId, out var outboxState))
+        if (!entity.OutboxState.TryGetValue(context.MessageId, out var outboxState))
         {
-            context.Extensions.Set(order);
+            context.Extensions.Set(entity);
             var messages = await InvokeMessageHandler(context, next);
             outboxState = new OutboxState { OutgoingMessages = messages.Serialize() };
-            order.OutboxState[context.MessageId] = outboxState;
-            await orderRepository.Store(order);
+            entity.OutboxState[context.MessageId] = outboxState;
+
+            version = await repository.Put(entity, version);
         }
 
         var toDispatch = outboxState.OutgoingMessages.Deserialize();
@@ -56,8 +58,8 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
 
         await inboxStore.MarkProcessed(context.MessageId);
 
-        order.OutboxState.Remove(context.MessageId);
-        await orderRepository.Store(order);
+        entity.OutboxState.Remove(context.MessageId);
+        await repository.Put(entity, version);
     }
 
     Task Dispatch(TransportOperation[] transportOperations, IExtendable context)

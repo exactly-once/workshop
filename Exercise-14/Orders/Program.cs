@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Messages;
+using Microsoft.Azure.Cosmos;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
@@ -25,31 +27,43 @@ class Program
 
         Console.Title = "Orders";
 
+        var endpointUri = "https://localhost:8081";
+        //TODO: Update key
+        var primaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+        var cosmosClient = new CosmosClient(endpointUri, primaryKey);
+
+        var repository = new OrderRepository(cosmosClient, "Ex14");
+        var inbox = new InboxStore(cosmosClient, "Ex14");
+
+        await repository.Initialize();
+        await inbox.Initialize();
+
+
         var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
-        config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
-        config.Pipeline.Register(b => new OutboxBehavior(b.Build<OrderRepository>(), b.Build<IDispatchMessages>(), b.Build<IInboxStore>()),
+        config.Pipeline.Register(b => new OutboxBehavior<Order>(repository, b.Build<IDispatchMessages>(), inbox,
+                m =>
+                {
+                    if (m is SubmitOrder submit)
+                    {
+                        return submit.OrderId;
+                    }
+
+                    return null;
+                }),
             "Deduplicates incoming messages");
-        var orderRepository = new OrderRepository();
-        config.RegisterComponents(c =>
-        {
-            c.RegisterSingleton(orderRepository);
-            c.RegisterSingleton(new InMemoryInboxStore());
-        });
+
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
-        config.Recoverability().AddUnrecoverableException<DatabaseErrorException>();
         config.SendFailedMessagesTo("error");
         config.EnableInstallers();
         config.LimitMessageProcessingConcurrencyTo(8);
 
         var endpoint = await Endpoint.Start(config).ConfigureAwait(false);
 
-        while (true)
-        {
-            Console.WriteLine("Press <enter> to dump database.");
-            Console.ReadLine();
-            orderRepository.Dump(Console.Out);
-        }
+        Console.WriteLine("Press <enter> to exit.");
+        Console.ReadLine();
+
+        await endpoint.Stop();
     }
 }

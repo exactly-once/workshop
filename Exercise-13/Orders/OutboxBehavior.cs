@@ -10,11 +10,13 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
 {
     OrderRepository orderRepository;
     IDispatchMessages dispatcher;
+    IInboxStore inboxStore;
 
-    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher)
+    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher, IInboxStore inboxStore)
     {
         this.orderRepository = orderRepository;
         this.dispatcher = dispatcher;
+        this.inboxStore = inboxStore;
     }
 
     public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)

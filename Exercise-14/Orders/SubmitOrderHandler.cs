@@ -1,33 +1,19 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
 
 class SubmitOrderHandler : IHandleMessages<SubmitOrder>
 {
-    OrderRepository orderRepository;
-
-    public SubmitOrderHandler(OrderRepository orderRepository)
+    public Task Handle(SubmitOrder message, IMessageHandlerContext context)
     {
-        this.orderRepository = orderRepository;
-    }
-
-    public async Task Handle(SubmitOrder message, IMessageHandlerContext context)
-    {
-        if (await orderRepository.Load(message.OrderId) != null)
-        {
-            log.Info("Duplicate SubmitOrder message detected. Ignoring");
-            return;
-        }
-
-        var order = new Order
-        {
-            Id = message.OrderId
-        };
-
-        await orderRepository.Store(order);
+        var order = context.Extensions.Get<Order>();
+        order.Lines = message.Items.Select(x => new OrderLine(x)).ToList();
 
         log.Info($"Order {message.OrderId} created.");
+
+        return Task.CompletedTask;
     }
 
     static readonly ILog log = LogManager.GetLogger<SubmitOrderHandler>();
