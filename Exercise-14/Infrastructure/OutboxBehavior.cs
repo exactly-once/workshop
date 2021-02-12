@@ -10,14 +10,14 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
 {
     readonly Repository<T> repository;
     readonly IDispatchMessages dispatcher;
-    readonly ITokenStore tokenStore;
+    readonly IInboxStore inboxStore;
     readonly Func<object, string> getId;
 
-    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, ITokenStore tokenStore, Func<object, string> getId)
+    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, IInboxStore inboxStore, Func<object, string> getId)
     {
         this.repository = repository;
         this.dispatcher = dispatcher;
-        this.tokenStore = tokenStore;
+        this.inboxStore = inboxStore;
         this.getId = getId;
     }
 
@@ -30,26 +30,17 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
             return;
         }
 
-        context.Headers.TryGetValue("TokenId", out var tokenId);
-
         var (entity, version) = await repository.Get(id);
 
-        string tokenVersion = null;
-        if (tokenId != null)
+        var hasBeenProcessed = await inboxStore.HasBeenProcessed(context.MessageId);
+        if (hasBeenProcessed)
         {
-            bool tokenExists;
-            (tokenExists, tokenVersion) = await tokenStore.Exists(tokenId);
-            if (!tokenExists)
+            if (entity.OutboxState.ContainsKey(context.MessageId))
             {
-                //Cleanup
-                if (entity.OutboxState.ContainsKey(context.MessageId))
-                {
-                    entity.OutboxState.Remove(context.MessageId);
-                    await repository.Put(entity, version);
-                }
-
-                return; //Duplicate
+                entity.OutboxState.Remove(context.MessageId);
+                await repository.Put(entity, version);
             }
+            return; //Duplicate
         }
 
         if (!entity.OutboxState.TryGetValue(context.MessageId, out var outboxState))
@@ -62,25 +53,10 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
             version = await repository.Put(entity, version);
         }
 
-        if (!outboxState.TokensGenerated)
-        {
-            foreach (var message in outboxState.OutgoingMessages)
-            {
-                message.Headers["TokenId"] = Guid.NewGuid().ToString();
-                await tokenStore.Create(message.Headers["TokenId"]);
-            }
-
-            outboxState.TokensGenerated = true;
-            version = await repository.Put(entity, version);
-        }
-
         var toDispatch = outboxState.OutgoingMessages.Deserialize();
         await Dispatch(toDispatch, context);
 
-        if (tokenId != null)
-        {
-            await tokenStore.Delete(tokenId, tokenVersion);
-        }
+        await inboxStore.MarkProcessed(context.MessageId);
 
         entity.OutboxState.Remove(context.MessageId);
         await repository.Put(entity, version);

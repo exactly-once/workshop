@@ -33,7 +33,7 @@ class Program
         var cosmosClient = new CosmosClient(endpointUri, primaryKey);
 
         var repository = new OrderRepository(cosmosClient, "Ex14");
-        var inbox = new TokenStore(cosmosClient, "Ex14");
+        var inbox = new InboxStore(cosmosClient, "Ex14");
 
         await repository.Initialize();
         await inbox.Initialize();
