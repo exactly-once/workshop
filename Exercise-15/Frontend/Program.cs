@@ -25,7 +25,8 @@ class Program
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
-            .WriteTo.Console()
+            .Enrich.With(new ExceptionMessageEnricher())
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{ExceptionMessage}{NewLine}")
             .CreateLogger();
 
         LogManager.Use<SerilogFactory>();
@@ -37,27 +38,28 @@ class Program
         var primaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         var cosmosClient = new CosmosClient(endpointUri, primaryKey);
 
-        var repository = new ShoppingCartRepository(cosmosClient, "Ex14");
-        var inbox = new InboxStore(cosmosClient, "Ex14");
+        var repository = new ShoppingCartRepository(cosmosClient, "Ex15");
+        var inbox = new InboxStore(cosmosClient, "Ex15");
+        var outbox = new OutboxStore(cosmosClient, "Ex15");
 
         await repository.Initialize();
         await inbox.Initialize();
+        await outbox.Initialize();
 
         var config = new EndpointConfiguration("Frontend");
         config.Pipeline.Register(new DuplicateMessagesBehavior(), "Duplicates outgoing messages");
         config.SendFailedMessagesTo("error");
         var routing = config.UseTransport<LearningTransport>().Routing();
         routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "Orders");
-        config.Pipeline.Register(b => new OutboxBehavior<ShoppingCart>(repository, b.Build<IDispatchMessages>(), inbox,
-            m =>
+        config.Pipeline.Register(b => new OutboxBehavior<ShoppingCart>(repository, b.Build<IDispatchMessages>(), inbox, outbox, m =>
+        {
+            if (m is SendSubmitOrder sendSubmit)
             {
-                if (m is SendSubmitOrder sendSubmit)
-                {
-                    return sendSubmit.OrderId;
-                }
+                return sendSubmit.OrderId;
+            }
 
-                return null;
-            }), "Deduplicates incoming messages");
+            return null;
+        }), "Deduplicates incoming messages");
 
 
         config.EnableInstallers();

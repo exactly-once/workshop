@@ -11,14 +11,17 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
     readonly Repository<T> repository;
     readonly IDispatchMessages dispatcher;
     readonly IInboxStore inboxStore;
+    readonly IOutboxStore outboxStore;
     readonly Func<object, string> getId;
 
-    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, IInboxStore inboxStore, Func<object, string> getId)
+    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, IInboxStore inboxStore,
+        IOutboxStore outboxStore, Func<object, string> getId)
     {
         this.repository = repository;
         this.dispatcher = dispatcher;
         this.inboxStore = inboxStore;
         this.getId = getId;
+        this.outboxStore = outboxStore;
     }
 
     public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
@@ -30,35 +33,49 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
             return;
         }
 
+        OutboxState outboxState;
+
         var (entity, version) = await repository.Get(id);
 
         var hasBeenProcessed = await inboxStore.HasBeenProcessed(context.MessageId);
         if (hasBeenProcessed)
         {
-            if (entity.OutboxState.ContainsKey(context.MessageId))
+            if (entity.TransactionIds.ContainsKey(context.MessageId))
             {
-                entity.OutboxState.Remove(context.MessageId);
+                entity.TransactionIds.Remove(context.MessageId);
                 await repository.Put(entity, version);
             }
-            return; //Duplicate
+            return;
         }
 
-        if (!entity.OutboxState.TryGetValue(context.MessageId, out var outboxState))
+        if (!entity.TransactionIds.TryGetValue(context.MessageId, out var transactionId))
         {
+            transactionId = Guid.NewGuid().ToString();
+
             context.Extensions.Set(entity);
             var messages = await InvokeMessageHandler(context, next);
             outboxState = new OutboxState { OutgoingMessages = messages.Serialize() };
-            entity.OutboxState[context.MessageId] = outboxState;
 
+            await outboxStore.Put(transactionId, outboxState);
+
+            entity.TransactionIds[context.MessageId] = transactionId;
             version = await repository.Put(entity, version);
         }
+        else
+        {
+            outboxState = await outboxStore.Get(transactionId);
+        }
 
-        var toDispatch = outboxState.OutgoingMessages.Deserialize();
-        await Dispatch(toDispatch, context);
+        if (outboxState != null)
+        {
+            var toDispatch = outboxState.OutgoingMessages.Deserialize();
+            await Dispatch(toDispatch, context);
+            await outboxStore.Delete(transactionId);
+        }
 
         await inboxStore.MarkProcessed(context.MessageId);
 
-        entity.OutboxState.Remove(context.MessageId);
+        entity.TransactionIds.Remove(context.MessageId);
         await repository.Put(entity, version);
     }
 

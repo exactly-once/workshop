@@ -32,16 +32,17 @@ class Program
         var primaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         var cosmosClient = new CosmosClient(endpointUri, primaryKey);
 
-        var repository = new OrderRepository(cosmosClient, "Ex14");
-        var inbox = new InboxStore(cosmosClient, "Ex14");
+        var repository = new OrderRepository(cosmosClient, "Ex15");
+        var inbox = new InboxStore(cosmosClient, "Ex15");
+        var outbox = new OutboxStore(cosmosClient, "Ex15");
 
         await repository.Initialize();
         await inbox.Initialize();
-
+        await outbox.Initialize();
 
         var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
-        config.Pipeline.Register(b => new OutboxBehavior<Order>(repository, b.Build<IDispatchMessages>(), inbox,
+        config.Pipeline.Register(b => new OutboxBehavior<Order>(repository, b.Build<IDispatchMessages>(), inbox, outbox,
                 m =>
                 {
                     if (m is SubmitOrder submit)

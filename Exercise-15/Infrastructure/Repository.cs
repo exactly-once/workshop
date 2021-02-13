@@ -61,13 +61,25 @@ public class Repository<T>
         return (state, response.Headers.ETag);
     }
 
-    public async Task Delete(T value, string version)
+    public async Task Delete(string id, string version)
     {
         var container = await PrepareContainer();
-        await container.DeleteItemStreamAsync(value.Id, new PartitionKey(value.Id), new ItemRequestOptions
+        if (version != null)
         {
-            IfMatchEtag = version
-        });
+            await container.DeleteItemStreamAsync(id, new PartitionKey(id), new ItemRequestOptions
+            {
+                IfMatchEtag = version
+            });
+        }
+        else
+        {
+            await container.DeleteItemStreamAsync(id, new PartitionKey(id));
+        }
+    }
+
+    public Task Delete(T value, string version)
+    {
+        return Delete(value.Id, version);
     }
 
     public async Task<string> Put(T doc, string version)

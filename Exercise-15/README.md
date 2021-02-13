@@ -1,33 +1,25 @@
-# Exercise 14: Token-based deduplication
+# Exercise 15: Out-of-document outbox - part 1
 
-We have just discussed the idea of sync-async boundary. As a reminder, this boundary delimits the part of the system which is highly interactive and the part that is not. On one side the synchronous communication allows users to efficiently work with the system. On the other side asynchronous communication allows build complex business processed with simple and loosely coupled message-driven components.
+In this exercise we are going to attempt to minimize the footprint of the outbox algorithm. The previous implementation required to have the outbox state dictionary as part of the entity. This approach might not be feasible for databases that impose strict limits on entity size (e.g. Cosmos DB). Let's start with a bold statement:
 
-We have also discussed how our past approaches to deduplication are non-deterministic in nature. In our next exercise we are going to explore an alternative approach -- one that is deterministic.
+> We can make the algorithm work based only on a single `string` field in the entity.
 
-This approach is based on inverting the *is duplicate* check. Instead of a positive check
+As a first step towards that bold goal, let's try to remove the need to store the bulky outbox state within the entity. We will use an external outbox store. The definition and the implementation of that store is already part of the codebase.
 
-> a message is a duplicate is there exist evidence for processing it
+First, we'll introduce the concept of *transaction ID*. Transaction is an attempt at processing a message. We are going to store the outbox state documents under transaction ID and the same transaction ID will be persisted as part of the entity.
 
-we are going to use a negative check
+Go to the `Entity` class and remove the `OutboxState` dictionary. Add a new property called `TransactionIds` as `Dictionary<string, string>`.
 
-> a message is a duplicate is if a token required for processing it does not exist
+Generate a new transaction ID as a first thing inside the *is not processed yet* condition: `transactionId = Guid.NewGuid().ToString();`. Replace `entity.OutboxState[context.MessageId]` with:
+ - Storing the actual value: `await outboxStore.Put(transactionId, outboxState)`.
+ - Assigning the transaction ID: `entity.TransactionIds[context.MessageId] = transactionId;` 
 
-This approach guarantees that the deduplication data has bounded size (proportional to the number of in-flight messages) and that deduplication checks are not dependent on the wall clock.
+Now let's update the condition. It needs to be based on the transaction ID dictionary. You probably noticed that the bottom part of the method won't work because the `outboxState` property is not assigned if the transaction ID has been found in the dictionary.
 
-First, let's create a token store. Instead of creating one from scratch, we will reuse the `InboxStore` class.
- - Rename `IInboxStore` to `ITokenStore` and `InboxStore` to `TokenStore`
- - Rename `InboxItem` to `Token`
- - Rename `HasBeenProcessed` to `Exists` and the parameter name to `tokenId`
- - Rename `MarkProcessed` to `Create` and the parameter name `tokenId`
+Add the `else` branch loading the outbox state by transaction ID: `outboxState = await outboxStore.Get(transactionId);`.
 
-We are also going to need a `Delete` method. It is already defined on the `Repository` class so we only need to add it to `ITokenStore`. To make it more convenient let's use `Task Delete(string tokenId, string version)` signature. Now you probably ask where are we going to get the version from. The `Repository` returns the version value from `Get` but our `Exists` method does not return it. Let's fix that and make `Exists` return a tuple `(bool, string)`.
+In the bottom part itself we need to replace the outbox state cleanup with transaction ID dictionary cleanup. We also need to remove the outbox state from the store. It is safe to do it right after dispatching the messages.
 
-Now go to the `OutboxBehavior` and invert the check that now calls the token store. Store the token version in a variable. We will need it. You may ask if it is OK that we pass the message ID as a parameter we called `tokenId`. And it actually is not OK but we will deal with that later. Now turn your attention to the bottom part of the method where we used to populate the inbox. After our renames it contains the `tokenStore.Create` call. We need to invert this one also. It becomes `tokenStore.Delete` and we need to pass our token version here.
+Now let's focus on the top part. The case when an inbox entry exists needs to be adjusted to use the transaction ID dictionary.
 
-Are we done? From the perspective of this endpoint, yes. But what about dispatching messages to the downstream endpoints? There is no code that creates tokens for them so they would not be processed. Let's fix that.
-
-Add a `foreach` clause that iterates over `outboxState.OutgoingMessages` before the dispatch code and add a `TokenId` header containing a Guid value. Don't forget to also created this token via `tokenStore.Create`. Now go back to the `Exist` check and replace the message ID parameter with the value of the `TokenId` header on the incoming message: `context.Headers.TryGetValue("TokenId", out var tokenId)`. Do the same in the `tokenStore.Delete` call. 
-
-What if there is no token ID on a message? The `SendSubmitOrder` message won't contain the token because it is sent from outside of a handler. In this case we don't want to treat the message as a duplicate and we don't want to delete the token (that does not exist). Let's add guard statements `tokenId != null`.
-
-Are we done? Almost. Consider what happens if the code fails right after dispatching the messages.
+Finally take a look again at the bottom part where we dispatch messages and clean up the outbox. These two operations create an opportunity for a partial failure case. How should we handle it?
