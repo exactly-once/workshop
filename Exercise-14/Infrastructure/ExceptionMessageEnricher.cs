@@ -2,7 +2,7 @@ using System;
 using Serilog.Core;
 using Serilog.Events;
 
-class ExceptionMessageEnricher : ILogEventEnricher
+public class ExceptionMessageEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {

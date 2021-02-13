@@ -25,7 +25,8 @@ class Program
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
-            .WriteTo.Console()
+            .Enrich.With(new ExceptionMessageEnricher())
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{ExceptionMessage}{NewLine}")
             .CreateLogger();
 
         LogManager.Use<SerilogFactory>();

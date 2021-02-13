@@ -5,5 +5,5 @@ public abstract class Entity
 {
     [JsonProperty("id")] public string Id { get; set; }
 
-    public Dictionary<string, string> TransactionIds { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, OutboxState> OutboxState { get; set; } = new Dictionary<string, OutboxState>();
 }

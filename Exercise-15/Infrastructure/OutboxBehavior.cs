@@ -33,49 +33,35 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
             return;
         }
 
-        OutboxState outboxState;
-
         var (entity, version) = await repository.Get(id);
 
         var hasBeenProcessed = await inboxStore.HasBeenProcessed(context.MessageId);
         if (hasBeenProcessed)
         {
-            if (entity.TransactionIds.ContainsKey(context.MessageId))
+            if (entity.OutboxState.ContainsKey(context.MessageId))
             {
-                entity.TransactionIds.Remove(context.MessageId);
+                entity.OutboxState.Remove(context.MessageId);
                 await repository.Put(entity, version);
             }
-            return;
+            return; //Duplicate
         }
 
-        if (!entity.TransactionIds.TryGetValue(context.MessageId, out var transactionId))
+        if (!entity.OutboxState.TryGetValue(context.MessageId, out var outboxState))
         {
-            transactionId = Guid.NewGuid().ToString();
-
             context.Extensions.Set(entity);
             var messages = await InvokeMessageHandler(context, next);
             outboxState = new OutboxState { OutgoingMessages = messages.Serialize() };
+            entity.OutboxState[context.MessageId] = outboxState;
 
-            await outboxStore.Put(transactionId, outboxState);
-
-            entity.TransactionIds[context.MessageId] = transactionId;
             version = await repository.Put(entity, version);
         }
-        else
-        {
-            outboxState = await outboxStore.Get(transactionId);
-        }
 
-        if (outboxState != null)
-        {
-            var toDispatch = outboxState.OutgoingMessages.Deserialize();
-            await Dispatch(toDispatch, context);
-            await outboxStore.Delete(transactionId);
-        }
+        var toDispatch = outboxState.OutgoingMessages.Deserialize();
+        await Dispatch(toDispatch, context);
 
         await inboxStore.MarkProcessed(context.MessageId);
 
-        entity.TransactionIds.Remove(context.MessageId);
+        entity.OutboxState.Remove(context.MessageId);
         await repository.Put(entity, version);
     }
 
