@@ -32,7 +32,7 @@ In the recent years logs, and especially distributed replicated logs, became ver
 
 First, logs are usually not monolithic. They contain separate independent *streams* and usually (EventStore is a notable exception here) there is no total order between *streams*. Second, *streams* are divided into partitions so there might not be a total order even within a single *stream* (depending on technology). 
 
-Where the logs have advantage over queues is the receiver side. Because logs don't push items at the consumer but rather allow consumers to consume at their own pace and using their own algorithms, the receiver can be built in such a way that it consumer log entries in order. Such a consumer would have to be single-threaded and use a blocking failure handling strategy. It means that whenever consuming a log entry results in a non-transient issue, the consumer would have to be blocked until the issue is resolved, likely by manual intervention. Such a strategy makes sense in certain specific cases (like LMax).
+Where the logs have advantage over queues is the receiver side. Because logs don't push items at the consumer but rather allow consumers to consume at their own pace and using their own algorithms, the receiver can be built in such a way that it consumes log entries in order. Such a consumer would have to be single-threaded and use a blocking failure handling strategy. It means that whenever consuming a log entry results in a non-transient issue, the consumer would have to be blocked until the issue is resolved, likely by manual intervention. Such a strategy makes sense in certain specific cases.
 
 ## Total order
 

@@ -1,6 +1,6 @@
 # Outbox
 
-What we have just experienced showed us that we were missing one critical thing since the very beginning of our journey. We didn't really pay much attention to how we are generating the outgoing messages. It seemed quite obvious that processing an `AddItem` command should result in an `ItemAdded` event. We were (at least some of us, maybe) a bit surprised when we realized that these events have to be given deterministic IDs but that was expected to do the trick. Not really.
+What we have just experienced showed us that we were missing one critical thing since the very beginning of our journey. We didn't really pay much attention to how we are generating the outgoing messages. It seemed quite obvious that processing an `AddItem` command should result in an `ItemAdded` event. We were (at least some of us, maybe) a bit surprised when we realized that these events have to be given deterministic IDs but that was expected to do the trick. To our surprise it did not solve the problem entirely.
 
 ### Re-publish but what?
 
