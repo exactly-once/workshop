@@ -2,38 +2,44 @@
    * VS 2020 and .net472
    * Visual Studio Code and TLA+ extension
    * NServiceBus 7
+   * CosmosDB Emulator
 
 ### Agenda
+
 * Day 1
-  * 3.5h
-    * P: Why do we need to distribute our code
-    * P: Synchronous vs asynchronous communication.
-    * Ex: Writing you first message handler (maybe creating pairs of participants)
-    * Q: AhaSlides
-    * P: How does message duplicates happen
-    * Ex: Show duplicated behavior (maybe with a too short Time-to-Process)
-  * 1h - lunch
-  * 3.5h
-    * P: Basic message deduplication techniques
-        * Ex 3-8 from the 1-day worshop
-    * 
+   - "Why distributed and asynchronous"
+   - "Definitions"
+   - Ex 1
+   - "Sources of duplication" (includes ex 2 and 3)
+   - Ex 4 - simulated duplication
+   - Ex 5 - db failure
+   - Ex 6 - broker failure - run
+   - "Partial failures"
+   - Ex 6 - follow up (fix code)
+   - "Messages are delivered in-order"
+   - Ex 7 - out of order
+   - "Message ID"
+   - Ex 8 - implement id-based deduplication
+   - Ex 8 - follow up (downstream)
+   - Ex 9 - deterministic ID
+   - Ex 10 - deterministic messages
+   - "Outbox" (TODO: add publishing logic in the code snippet)
+   - Ex 11 - implement outbox
 * Day 2
-  * Designing and testing distributed algorithms
-    * How to write reliable att for message based systems
-  * Intuition and heuristics for writing reliable message based systems
-  * TLA+
-    * Mob programming with testing some of ideas and running through failure stacks
-  * Commertial tools
-  * 1h - lunch
-  * Advanced deduplication techniques for infinite-scale databases
-    * Implement outbox store
-    * Implement messaging system integration
-    * Side-effects modelling
-  * P: Deterministic (token-based) deduplication
-  * P: HTTP communication/demo
-
-
-TODO:
- * Go through ex and figure out how to add slides/quizes
- * TLA+ one of the algorithms from day 1 showing failing trace
- * Advanced deduplication techniques
+   - Acceptance testing (TODO: slides)
+   - TLA+ (TODO: slides, check order of labels, CosmosDB characteristics)
+   - Ex 12 - Make outbox generic
+   - Ex 13 - Introduce inbox
+   - L8 - sync-async boundary
+   - Ex 14 - Switch to token store
+     - Switch to sync-async boundary
+     - Switch from inbox checks to token store checks
+     - Add section for creating tokens for outgoing messages
+   - Ex 15 - Externalize outbox part 1 - transaction ID dictionary
+   - Ex 16 - Externalize outbox part 2 - single transaction ID
+   - Ex 16 - External outbox in Cosmos DB
+     - implement store
+   - Ex 17 - External outbox in Cosmos DB with Azure Functions
+     - side-effects
+     - http boundary
+ 

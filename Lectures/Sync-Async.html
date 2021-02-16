@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Sync-Async boundary</title>
+		<meta name="description" content="Sync-Async boundary">
+		<meta name="author" content="Szymon Pobiega Tomasz Masternak">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<style media="screen" type="text/css">
+			.reveal section img { background:none; border:none; box-shadow:none; }
+
+			.reveal table {
+			  margin: auto;
+			  border-collapse: collapse;
+			  border-spacing: 0;
+			}
+
+			.reveal table th {
+			  font-weight: bold;
+			}
+
+			.reveal table th,
+			.reveal table td {
+			  text-align: left;
+			  padding: 0.2em 0.5em 0.2em 0.5em;
+			  border-bottom: 1px solid;
+			}
+
+			.highlight-inline {
+            	background:yellow;
+            	color:black;
+			}
+			
+			.highlight-inline span {
+				background:inherit;
+				color:inherit;
+			}
+
+			.reveal pre code {
+				font-size: 1.3em;
+				line-height: 1.2;
+			}
+
+			section img {
+				padding-bottom: 50px;
+				padding-top: 50px;
+			}
+
+			img.zoom-island {
+				transform: translate(0, -15%);
+			}
+
+			img.zoom-centre {
+				transform: scale(2.1) translate(0, 0);
+			}
+			
+			img.zoom-left-centre {
+				transform: scale(2.2) translate(25%, 0);
+			}
+
+			img.zoom-left-top {
+				transform: scale(2.2) translate(25%, 30%);
+			}
+
+			img.zoom-left-bottom {
+				transform: scale(2.2) translate(25%, -25%);
+			}
+
+			img.zoom-right-centre {
+				transform: scale(1.8) translate(-25%, 0);
+			}
+
+			img.zoom-right-top {
+				transform: scale(2.4) translate(-25%, 20%);
+			}
+
+			img.zoom-right-centre-top {
+				transform: scale(2.4) translate(-25%, 0);
+			}
+
+			img.zoom-right-bottom {
+				transform: scale(2.4) translate(-25%, -25%);
+			}
+			#footer-left {
+				position: absolute;
+				bottom: 5%;
+				left: 2%;
+			}
+			.container{
+				display: flex;
+			}
+			.col{
+				flex: 1;
+			}
+			pre {
+				tab-size: 3;
+			}
+			span.line-icon {
+				display: none;
+			}
+			span.line-annotation {
+				display: none;
+			}
+			code.highlight-line-icon tr.highlight-line span.line-icon {
+				display: inline;
+			}
+			.particular-logo {
+				position: fixed;
+				height: 80px;
+				z-index: 30;
+				left: 20px;
+				bottom: 20px;
+			}
+			.twitter-blog {
+				position: fixed;
+				height: 80px;
+				z-index: 30;
+				right: 20px;
+				bottom: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="reveal">
+			<aside class="particular-logo">
+				<img src="images/particular-logo-2.svg" height="100em"/>
+			</aside>
+			<aside class="twitter-blog">
+				<div>@Masternak | @SzymonPobiega | exactly-once.github.io</div>
+			</aside>
+			<div class="slides">
+				<section>
+					<h2>Sync-Async boundary</h2>
+					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
+				</section>
+				<section>
+					<h1>Why asynchronous?</h1>
+				</section>
+				<section>
+					<img src="images/sync-async-1.png" class="stretch"/>
+				</section>
+				<section>
+					<h2>Why does adding an item take so long?</h2>
+				</section>
+				<section>
+					<img src="images/sync-async-1.png" class="stretch"/>
+				</section>
+				<section>
+					<h2>How do I deduplicate AddItem messages?</h2>
+				</section>
+				<section>
+					<img src="images/sync-async-2.png" class="stretch"/>
+				</section>
+				<section>
+					<h2>How do I deduplicate Submit messages?</h2>
+				</section>
+				<section>
+					<h3>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="1|4|5|10|11|4|5|7">
+public Task Handle(SendSubmit message,
+	IMessageHandlingContext context)
+{ 
+	var cart = repository.Load(message.Id);
+	if (cart.IsSubmitted)
+	{
+		log.Info("Duplicate");
+		return;
+	}
+	cart.Submitted = true;
+	context.Send(new Submit());
+}
+					</code></pre>
+					</h3>
+				</section>
+				<section>
+					<h2>State-based deduplication</h2>
+				</section>
+				<section data-transition="slide-in fade-out">
+					<img src="images/sync-async-2.png" class="stretch"/>
+				</section>
+				<section data-transition="fade-in slide-out">
+					<img src="images/sync-async-3.png" class="stretch"/>
+				</section>
+				<section>
+					<h1>Sync</h1>
+					<hr>
+					<h1>Async</h1>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="lib/js/jquery-2.1.4.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+		$(function() {
+
+			$('img.demo').each(function(i, img){
+				var $img = $(img);
+				var prefix = $img.data('img-prefix');
+				var frames = $img.data('frames');
+				var suffix = $img.data('suffix') || '.jpg';
+				if (typeof frames !== 'undefined') {
+					var div = $('<div></div>')
+					for (var i = 1; i < frames; i++) {
+						div.append('<span class="fragment imgsrc" data-src="'+prefix+'-'+i+suffix+'"/>')
+					}
+					$img.after(div);
+				}
+				$img.attr('src', prefix+'-'+0+suffix)
+			})
+		});
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: false,
+				progress: true,
+				history: true,
+				center: true,
+
+				margin: 0,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				math: {
+					// mathjax: 'http://cdn.mathjax.org/mathjax/latest/MathJax.js',
+					config: 'TeX-AMS_HTML-full'
+				},
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { 
+						hljs.initHighlightingOnLoad(); 
+						hljs.configure({tabReplace: '   '})
+						} },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+
+			function fadeImage($el) {
+				// Get image DOM element
+				$img = $el.parent().prev();
+
+				$img.removeClass();
+				$img.addClass('demo');
+
+				var src = $el.data('src');
+				if (typeof src !== `undefined`) {
+					$img.attr('src', src)
+				}
+
+				var index = $el.data('index');
+				if (typeof index !== `undefined`) {
+					var prefix = $img.data('img-prefix');
+					var suffix = $img.data('suffix') || '.jpg';
+					if (typeof prefix !== `undefined`) {
+						$img.attr('src', prefix+'-'+index+suffix)
+					}
+				}
+
+				var transform = $el.data('transform');
+				if (typeof transform !== `undefined`) {
+					$img.addClass(transform);
+				}
+			}
+
+			Reveal.addEventListener( 'slidechanged', function( event ) {
+				var $slide = $(event.currentSlide);
+				var $img = $slide.children('img');
+				var prefix = $img.data('img-prefix');
+				var suffix = $img.data('suffix') || '.jpg';
+				if (typeof prefix !== `undefined`) {
+					$img.attr('src', prefix+'-'+0+suffix)
+				}
+			} );
+
+			// var header = $('#header').html();
+			// if ( window.location.search.match( /print-pdf/gi ) ) {
+			// 	Reveal.addEventListener( 'ready', function( event ) {
+			// 		$('.slide-background').append(header);
+			// 	});
+			// }
+			// else {
+			// 	$('div.reveal').append(header);
+			// }
+
+			Reveal.addEventListener('fragmentshown', function(event) {
+				// Get DOM element of current fragment
+				var $el = $(event.fragment);
+
+				// Check if current fragment is of 'type' imgsrc
+				// If yes: fade image with source of current element
+				if($el.hasClass('imgsrc'))
+					fadeImage($el);
+			});
+
+			Reveal.addEventListener('fragmenthidden', function(event) {
+				// Get DOM element of current fragment
+				var $el = $(event.fragment);
+
+				// Check if current fragment is of 'type' imgsrc
+				// If yes: fade image with source of previous element
+				if($el.hasClass('imgsrc')) {
+					fadeImage($el.prev());
+				}
+			});
+
+		</script>
+
+	</body>
+</html>
