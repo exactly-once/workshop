@@ -33,9 +33,9 @@ class Program
         config.UseSerialization<XmlSerializer>();
         config.UsePersistence<InMemoryPersistence>();
         var transport = config.UseTransport<AzureStorageQueueTransport>();
-        transport.ConnectionString("TODO");
+        transport.ConnectionString("TODO:connection-string");
         var routing = transport.Routing();
-        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "Orders");
+        routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "TODO:endpoint-name");
 
         config.EnableInstallers();
 

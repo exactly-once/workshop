@@ -24,11 +24,11 @@ class Program
 
         Console.Title = "Orders";
 
-        var config = new EndpointConfiguration("Orders");
+        var config = new EndpointConfiguration("TODO:endpoint-name");
         config.UseSerialization<XmlSerializer>();
         config.UsePersistence<InMemoryPersistence>();
         var transport = config.UseTransport<AzureStorageQueueTransport>();
-        transport.ConnectionString("TODO");
+        transport.ConnectionString("TODO:connection-string");
 
         config.RegisterComponents(c =>
         {
