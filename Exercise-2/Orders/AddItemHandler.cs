@@ -29,8 +29,6 @@ class AddItemHandler : IHandleMessages<AddItem>
 
         await orderRepository.Store(order);
 
-        await Task.Delay(TimeSpan.FromSeconds(40));
-
         log.Info($"Item {message.Filling} added.");
     }
 
