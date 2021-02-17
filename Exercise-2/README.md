@@ -4,8 +4,8 @@ In this exercise we are going to experience the message duplication first-hand. 
 
 Provide configuration options:
  - Search for "TODO" strings
- - Enter ASQ connection string value,
- - Set the endpoint name value to "Orders-<yourname>".
+ - Enter ASQ connection string value
+ - Set the endpoint name value to "Orders-_yourname_"
  
 In the previous exercise we have created our first message handler. The code in this exercise is very similar but uses a "real" message queue that we have set up in the cloud. Start by running the solution (`Frontend` and `Orders` projects).
 
