@@ -5,5 +5,5 @@ In this exercise we are going to add some delay in our chaos monkey to simulate 
 - In the `Frontend` endpoint implement sending in a fire-and-forget manner by wrapping the `endpoint.Send` call in a `Task.Run`.
   - Ignore the warning
 - Modify the behavior that duplicates outgoing messages
-  - If the `Item` type is `Mushrooms` execute code that waits for 10 seconds (via `Task.Delay`) and then creates a duplicate (by invoking `await next()`)
+  - If the message is `AddItem` and `Item` type is `Mushrooms` execute code that waits for 10 seconds (via `Task.Delay`) and then creates a duplicate (by invoking `await next()`)
 - Test the system by requesting adding and removal of `Mushrooms` quickly
