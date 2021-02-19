@@ -27,20 +27,20 @@
    - Ex 8 - implement id-based deduplication
    - _Break_
    - Ex 8 - follow up (downstream)
+* Day 2
    - Ex 9 - deterministic ID
    - Ex 10 - deterministic messages
    - _Break_
    - "Outbox"
    - Ex 11 - implement outbox
    - (T) CosmosDB
-* Day 2
-   - Q/A 
+   - _break_ 
    - (T) TLA+
-   - _break_
    - (T) Acceptance testing (slides + ex)
+   - _break_ (longer)
    - (T) Ex 12 - Make outbox generic
    - (T) Ex 13 - Introduce inbox
-   - _break_ (longer)
+   - _break_ 
    - (S) L8 - sync-async boundary
    - (S) Ex 14 - Switch to token store
      - Switch to sync-async boundary
