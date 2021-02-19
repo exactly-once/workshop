@@ -3,6 +3,9 @@
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [TLA+ extensions](https://github.com/alygin/vscode-tlaplus/wiki/How-to-Install)
  
+## Setup
+
+In the exercise we won't check for deadlocks and we want to prevent the model checker from checking that. In Visual Studio Code go to TLA extension settings and in `Tla Plus > Tlc > Model checker` field specify `-deadlock` parameter. 
 
 ## Introduction
 
