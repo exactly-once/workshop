@@ -51,11 +51,11 @@ NoLostMessages == \A m \in processed :
  * The check fails with:
     > Invariant NoGhostMessages is violated.
  * Analyze the trace to understand what happened
- * Change the atomicity of the steps to prevent outgoing message loss
+ * Let's patch the problem temporarily and change the atomicity of the steps (this models 2PC) to prevent outgoing message loss
 
 ```tla+
 UpdateDbAndSend: (* update data base and send output messages - can fail *)
-    either Fail();
+    either Fail(msg.id);
     or db := db \union {[id |-> msg.id, ver |-> c]}; 
        queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
     end either;
@@ -82,28 +82,29 @@ end if;
 ```
 ## Exercise 5
 
-Let's remove the atomicity between database updates and sending outgoing messages. We want to keep current properties but remove the atomicity between database updates and sending out messages: 
- * First, we will make a change to the specification to model that eventually (possibly after many retires) any message gets processed.
- * Add `Fails(c)` definition just after `CONSTANTS` definition.
+Now we want to keep current properties but remove the atomicity between database updates and sending out messages: 
+ * First, we will make a change to the specification. Currently, our model allows for a message to be partially processed due to failures. We will change it so that every message is eventually processed - possibly with some failures. 
+ * Add `Fails(messageId)` definition at the top of the `define` section.
 
 ```tla+
-Fails(c) == IF c > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+Fails(messageId) == IF messageId > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 ```
- * Change the `Fail` macro to simply jump back to the `MainLoop` label
+ * Change the `Fail` macro to update the number of failures for a given message and jump back to the `MainLoop` label
 
 ```tla+
-macro Fail() begin
+macro Fail(messageId) begin
+    failures[messageId] := failures[messageId]+1;
     goto MainLoop;
 end macro;
 ```
- * Split `UpdateDbAndSend` lable back to two separate labels.
- * Change specification in the `UpdateDb` and `Send` and `AckInMsg` labels to model the fact that the failure can happen at most `MaxFailures` times. E.g:
+ * Split `UpdateDbAndSend` lables back into two separate labels.
+ * Change specification in the `UpdateDb` and `Send` and `AckInMsg` labels to model the fact that there can be up to`MaxFailuers` for any given message. E.g:
 
 ```tla+
 UpdateDb:
-    with fails \in Fails(c) do
+    with fails \in Fails(msg.id) do
         if fails then
-            Fail()
+            Fail(msg.id)
         else
             if ~\E chg \in db : chg.id = msg.id then
                 db := db \union {[id |-> msg.id, ver |-> c]}; 
@@ -113,7 +114,7 @@ UpdateDb:
 ```
  * Parse and model-check the specification.
 
- HINT: do we need `If ~\E chg \in db: ...` check in the message sending step?
+ HINT: Should we do `if ~\E chg \in db: ...` check in the message sending step?
 
 ## Exercise 6
 
@@ -123,15 +124,11 @@ Let's make the model a bit bigger
 
 ## Exercise 7
 
-Let's talk about what is not in the model :).
-
-## (*) Exercise 8
-
 Let's check that the handler returns a consistent output using following formula:
 
 ``` tla+
 ConsistentOutput == \A m1 \in queueOut:
-                        ~\E m2 \in queueOut: m1.id = m2.id /\ m1.ver = m2.ver
+                        ~\E m2 \in queueOut: m1.id = m2.id /\ m1.ver /= m2.ver
 ```
 
  * Add the `ConsistentOutput` formula definition to the specification.
@@ -147,3 +144,7 @@ with chg \in {chg \in db : chg.id = msg.id} do
     (* chg is available in this block *)
 end with;
  ```
+
+## Exercise 8
+
+Let's talk about what is not in the model :).
