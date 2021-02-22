@@ -2,14 +2,14 @@
 EXTENDS FiniteSets, Naturals
 CONSTANTS MaxFailures, NoHandlers, NoMessages
 
-Fails(failures) == IF failures <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
-
 (*--algorithm outbox
 variables
-    queueIn = { [id |-> x] : x \in 1..NoMessages },
+    queueIn = { [id |-> x] : x \in MessageIds },
     queueOut = { },
     db = {},
-    processed = {}
+    processed = {},
+    failures = [ msgId \in MessageIds |-> 0],
+    txId = 0,
 
 define 
     MessageIds == 1..NoMessages
@@ -39,10 +39,12 @@ define
     
     end define;
 
-macro Fail() begin
-    if c > MaxFailures then 
+macro Fail(messageId) begin
+    if failures[messageId] = MaxFailures then 
         queueIn := {m \in queueIn: m /= msg};
         processed := processed \union {msg};
+    else
+        failures[messageId] := failures[messageId] + 1;
     end if;
 
     goto MainLoop;
@@ -53,28 +55,29 @@ variables
     msg,
     c, 
 begin
-Start:
-    c := 0;
 MainLoop:
     while TRUE do
     
     Receive: (* wait for a message and store in msg vairable *)
         await Cardinality(queueIn) > 0; 
         with m \in queueIn do msg := m; end with; 
-        c := c+1;
+    
+    Process:
+        c := txId;
+        txId := txId + 1;
 
     SendOutgoingMsg:  (*send output messages - can fail *)
-        either Fail();
+        either Fail(msg.id);
         or queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
         end either;
         
     UpdateDb: (* update data base - can fail *)
-        either Fail();
+        either Fail(msg.id);
         or db := db \union {[id |-> msg.id, ver |-> c]}; 
         end either;
 
     AckInMsg: (* remove message from the input queue - can fail *)
-        either Fail();
+        either Fail(msg.id);
         or 
             queueIn := {m \in queueIn: m /= msg};
             processed := processed \union {msg};
@@ -86,7 +89,7 @@ end process;
 end algorithm; *)
 \* BEGIN TRANSLATION
 CONSTANT defaultInitValue
-VARIABLES queueIn, queueOut, db, processed, pc
+VARIABLES queueIn, queueOut, db, processed, failures, txId, pc
 
 (* define statement *)
 MessageIds == 1..NoMessages
@@ -116,89 +119,89 @@ Finishes == <>(/\ pc[1] = "Receive"
 
 VARIABLES msg, c
 
-vars == << queueIn, queueOut, db, processed, pc, msg, c >>
+vars == << queueIn, queueOut, db, processed, failures, txId, pc, msg, c >>
 
 ProcSet == {1}
 
 Init == (* Global variables *)
-        /\ queueIn = { [id |-> x] : x \in 1..NoMessages }
+        /\ queueIn = { [id |-> x] : x \in MessageIds }
         /\ queueOut = { }
         /\ db = {}
         /\ processed = {}
+        /\ failures = [ msgId \in MessageIds |-> 0]
+        /\ txId = 0
         (* Process Handler *)
         /\ msg = defaultInitValue
         /\ c = defaultInitValue
-        /\ pc = [self \in ProcSet |-> "Start"]
-
-Start == /\ pc[1] = "Start"
-         /\ c' = 0
-         /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
-         /\ UNCHANGED << queueIn, queueOut, db, processed, msg >>
+        /\ pc = [self \in ProcSet |-> "MainLoop"]
 
 MainLoop == /\ pc[1] = "MainLoop"
             /\ pc' = [pc EXCEPT ![1] = "Receive"]
-            /\ UNCHANGED << queueIn, queueOut, db, processed, msg, c >>
+            /\ UNCHANGED << queueIn, queueOut, db, processed, failures, txId, 
+                            msg, c >>
 
 Receive == /\ pc[1] = "Receive"
            /\ Cardinality(queueIn) > 0
            /\ \E m \in queueIn:
                 msg' = m
-           /\ c' = c+1
+           /\ pc' = [pc EXCEPT ![1] = "Process"]
+           /\ UNCHANGED << queueIn, queueOut, db, processed, failures, txId, c >>
+
+Process == /\ pc[1] = "Process"
+           /\ c' = txId
+           /\ txId' = txId + 1
            /\ pc' = [pc EXCEPT ![1] = "SendOutgoingMsg"]
-           /\ UNCHANGED << queueIn, queueOut, db, processed >>
+           /\ UNCHANGED << queueIn, queueOut, db, processed, failures, msg >>
 
 SendOutgoingMsg == /\ pc[1] = "SendOutgoingMsg"
-                   /\ \/ /\ IF c > MaxFailures
+                   /\ \/ /\ IF failures[(msg.id)] = MaxFailures
                                THEN /\ queueIn' = {m \in queueIn: m /= msg}
                                     /\ processed' = (processed \union {msg})
-                               ELSE /\ TRUE
+                                    /\ UNCHANGED failures
+                               ELSE /\ failures' = [failures EXCEPT ![(msg.id)] = failures[(msg.id)] + 1]
                                     /\ UNCHANGED << queueIn, processed >>
                          /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                          /\ UNCHANGED queueOut
                       \/ /\ queueOut' = (queueOut \union {[id |-> msg.id, ver |-> c]})
                          /\ pc' = [pc EXCEPT ![1] = "UpdateDb"]
-                         /\ UNCHANGED <<queueIn, processed>>
-                   /\ UNCHANGED << db, msg, c >>
+                         /\ UNCHANGED <<queueIn, processed, failures>>
+                   /\ UNCHANGED << db, txId, msg, c >>
 
 UpdateDb == /\ pc[1] = "UpdateDb"
-            /\ \/ /\ IF c > MaxFailures
+            /\ \/ /\ IF failures[(msg.id)] = MaxFailures
                         THEN /\ queueIn' = {m \in queueIn: m /= msg}
                              /\ processed' = (processed \union {msg})
-                        ELSE /\ TRUE
+                             /\ UNCHANGED failures
+                        ELSE /\ failures' = [failures EXCEPT ![(msg.id)] = failures[(msg.id)] + 1]
                              /\ UNCHANGED << queueIn, processed >>
                   /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                   /\ db' = db
                \/ /\ db' = (db \union {[id |-> msg.id, ver |-> c]})
                   /\ pc' = [pc EXCEPT ![1] = "AckInMsg"]
-                  /\ UNCHANGED <<queueIn, processed>>
-            /\ UNCHANGED << queueOut, msg, c >>
+                  /\ UNCHANGED <<queueIn, processed, failures>>
+            /\ UNCHANGED << queueOut, txId, msg, c >>
 
 AckInMsg == /\ pc[1] = "AckInMsg"
-            /\ \/ /\ IF c > MaxFailures
+            /\ \/ /\ IF failures[(msg.id)] = MaxFailures
                         THEN /\ queueIn' = {m \in queueIn: m /= msg}
                              /\ processed' = (processed \union {msg})
-                        ELSE /\ TRUE
+                             /\ UNCHANGED failures
+                        ELSE /\ failures' = [failures EXCEPT ![(msg.id)] = failures[(msg.id)] + 1]
                              /\ UNCHANGED << queueIn, processed >>
                   /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                \/ /\ queueIn' = {m \in queueIn: m /= msg}
                   /\ processed' = (processed \union {msg})
                   /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
-            /\ UNCHANGED << queueOut, db, msg, c >>
+                  /\ UNCHANGED failures
+            /\ UNCHANGED << queueOut, db, txId, msg, c >>
 
-Handler == Start \/ MainLoop \/ Receive \/ SendOutgoingMsg \/ UpdateDb
+Handler == MainLoop \/ Receive \/ Process \/ SendOutgoingMsg \/ UpdateDb
               \/ AckInMsg
 
-(* Allow infinite stuttering to prevent deadlock on termination. *)
-Terminating == /\ \A self \in ProcSet: pc[self] = "Done"
-               /\ UNCHANGED vars
-
 Next == Handler
-           \/ Terminating
 
 Spec == /\ Init /\ [][Next]_vars
         /\ WF_vars(Handler)
-
-Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 \* END TRANSLATION
 
