@@ -1,19 +1,18 @@
 ---- MODULE MessageHandler ----
 EXTENDS FiniteSets, Naturals
-CONSTANTS MaxFailures
+CONSTANTS MaxFailures, NoHandlers, NoMessages
 
-MaxQueue == 1
-Fails(c) == IF c <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+Fails(failures) == IF failures <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 
 (*--algorithm outbox
 variables
-    queueIn = { [id |-> x] : x \in 1..MaxQueue },
+    queueIn = { [id |-> x] : x \in 1..NoMessages },
     queueOut = { },
     db = {},
     processed = {}
 
 define 
-    MessageIds == 1..MaxQueue
+    MessageIds == 1..NoMessages
     TypeInvariant == 
         /\ queueIn \in SUBSET [id : MessageIds]
         /\ queueOut \in SUBSET [id : MessageIds, ver : Nat]
@@ -36,7 +35,7 @@ define
     Safety == NoGhostMessages /\ NoDuplicatedProcessings
 
     Finishes == <>(/\ pc[1] = "Receive"
-                   /\ Cardinality(queueIn) = 1)
+                   /\ Cardinality(queueIn) = NoMessages)
     
     end define;
 
@@ -90,7 +89,7 @@ CONSTANT defaultInitValue
 VARIABLES queueIn, queueOut, db, processed, pc
 
 (* define statement *)
-MessageIds == 1..MaxQueue
+MessageIds == 1..NoMessages
 TypeInvariant ==
     /\ queueIn \in SUBSET [id : MessageIds]
     /\ queueOut \in SUBSET [id : MessageIds, ver : Nat]
@@ -113,7 +112,7 @@ NoDuplicatedProcessings == \A a \in db:
 Safety == NoGhostMessages /\ NoDuplicatedProcessings
 
 Finishes == <>(/\ pc[1] = "Receive"
-               /\ Cardinality(queueIn) = 1)
+               /\ Cardinality(queueIn) = NoMessages)
 
 VARIABLES msg, c
 
@@ -122,7 +121,7 @@ vars == << queueIn, queueOut, db, processed, pc, msg, c >>
 ProcSet == {1}
 
 Init == (* Global variables *)
-        /\ queueIn = { [id |-> x] : x \in 1..MaxQueue }
+        /\ queueIn = { [id |-> x] : x \in 1..NoMessages }
         /\ queueOut = { }
         /\ db = {}
         /\ processed = {}
