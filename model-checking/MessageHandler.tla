@@ -1,6 +1,6 @@
 ---- MODULE MessageHandler ----
 EXTENDS FiniteSets, Naturals
-CONSTANTS MaxFailures, NoHandlers, NoMessages
+CONSTANTS MaxFailures, NoMessages
 
 (*--algorithm outbox
 variables
