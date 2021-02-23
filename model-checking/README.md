@@ -56,8 +56,8 @@ NoLostMessages == \A m \in processed :
 ```tla+
 UpdateDbAndSend: (* update data base and send output messages - can fail *)
     either Fail(msg.id);
-    or db := db \union {[id |-> msg.id, ver |-> c]}; 
-       queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
+    or db := db \union {[id |-> msg.id, txId |-> txId]}; 
+       queueOut := queueOut \union {[id |-> msg.id, txId |-> txId]};
     end either;
 ```
 
@@ -67,7 +67,7 @@ Let's verify that the model does not allow for duplicated processing of the same
 
 ```tla+
 NoDuplicatedProcessings == \A a \in db:
-                            ~ \E b \in db : a.id = b.id /\ a.ver /= b.ver
+                            ~ \E b \in db : a.id = b.id /\ a.txId /= b.txId
 ```
 
  * Open `MessageHandler.cfg` and add `NoDuplicatedProcessings` in the `INVARIANTS` sections.
@@ -107,7 +107,7 @@ UpdateDb:
             Fail(msg.id)
         else
             if ~\E chg \in db : chg.id = msg.id then
-                db := db \union {[id |-> msg.id, ver |-> c]}; 
+                db := db \union {[id |-> msg.id, txId |-> txId]}; 
             end if;
         end if;
     end with;
@@ -128,14 +128,14 @@ Let's check that the handler returns a consistent output using following formula
 
 ``` tla+
 ConsistentOutput == \A m1 \in queueOut:
-                        ~\E m2 \in queueOut: m1.id = m2.id /\ m1.ver /= m2.ver
+                        ~\E m2 \in queueOut: m1.id = m2.id /\ m1.txId /= m2.txId
 ```
 
  * Add the `ConsistentOutput` formula definition to the specification.
  * Add `ConsistentOutput` to the `INVARIANTS` section.
  * Parse and model check the specification.
  * Analyze the failing trace.
- * Change the `Send` label part to make sure that the output messages are sent with consistent version based on the DB state.
+ * Change the `Send` label part to make sure that the output messages are sent are based on the DB state with consistent transaction id.
 
  HINT: You can get the version of the DB change for given message id using `with` statement:
 
