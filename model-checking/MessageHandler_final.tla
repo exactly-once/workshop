@@ -8,11 +8,11 @@ variables
     queueOut = { },
     db = {},
     processed = {},
-    failures = [ msgId \in MessageIds |-> 0],
+    failures = 0,
     txCounter = 0,
 
 define 
-    Fails(messageId) == IF messageId > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+    Fails == IF failures <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
     MessageIds == 1..NoMessages
     TypeInvariant == 
         /\ queueIn \in SUBSET [id : MessageIds]
@@ -43,8 +43,8 @@ define
     
     end define;
 
-macro Fail(messageId) begin
-    failures[messageId] := failures[messageId]+1;
+macro Fail() begin
+    failures := failures+1;
     goto MainLoop;
 end macro;
 
@@ -64,9 +64,9 @@ MainLoop:
         txCounter := txCounter + 1;
         
     Update: (* update data base - can fail *)
-        with fails \in Fails(msg.id) do
+        with fails \in Fails do
             if fails then
-                Fail(msg.id)
+                Fail()
             else
                 if ~\E chg \in db : chg.id = msg.id then
                     db := db \union {[id |-> msg.id, txId |-> txId]}; 
@@ -75,9 +75,9 @@ MainLoop:
         end with;
 
     Send:
-        with fails \in Fails(msg.id) do
+        with fails \in Fails do
             if fails then
-                Fail(msg.id)
+                Fail()
             else
                 with chg \in {chg \in db : chg.id = msg.id} do
                     queueOut := queueOut \union {[id |-> msg.id, txId |-> chg.txId]};
@@ -86,9 +86,9 @@ MainLoop:
         end with;
 
     AckInMsg: (* remove message from the input queue - can fail *)
-        with fails \in Fails(msg.id) do
+        with fails \in Fails do
             if fails then
-                Fail(msg.id)
+                Fail()
             else
                 queueIn := {m \in queueIn: m /= msg};
                 processed := processed \union {msg};
@@ -104,7 +104,7 @@ CONSTANT defaultInitValue
 VARIABLES queueIn, queueOut, db, processed, failures, txCounter, pc
 
 (* define statement *)
-Fails(messageId) == IF messageId > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+Fails == IF failures <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 MessageIds == 1..NoMessages
 TypeInvariant ==
     /\ queueIn \in SUBSET [id : MessageIds]
@@ -145,7 +145,7 @@ Init == (* Global variables *)
         /\ queueOut = { }
         /\ db = {}
         /\ processed = {}
-        /\ failures = [ msgId \in MessageIds |-> 0]
+        /\ failures = 0
         /\ txCounter = 0
         (* Process Handler *)
         /\ msg = defaultInitValue
@@ -167,9 +167,9 @@ Receive == /\ pc[1] = "Receive"
            /\ UNCHANGED << queueIn, queueOut, db, processed, failures >>
 
 Update == /\ pc[1] = "Update"
-          /\ \E fails \in Fails(msg.id):
+          /\ \E fails \in Fails:
                IF fails
-                  THEN /\ failures' = [failures EXCEPT ![(msg.id)] = failures[(msg.id)]+1]
+                  THEN /\ failures' = failures+1
                        /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                        /\ db' = db
                   ELSE /\ IF ~\E chg \in db : chg.id = msg.id
@@ -181,9 +181,9 @@ Update == /\ pc[1] = "Update"
           /\ UNCHANGED << queueIn, queueOut, processed, txCounter, msg, txId >>
 
 Send == /\ pc[1] = "Send"
-        /\ \E fails \in Fails(msg.id):
+        /\ \E fails \in Fails:
              IF fails
-                THEN /\ failures' = [failures EXCEPT ![(msg.id)] = failures[(msg.id)]+1]
+                THEN /\ failures' = failures+1
                      /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                      /\ UNCHANGED queueOut
                 ELSE /\ \E chg \in {chg \in db : chg.id = msg.id}:
@@ -193,9 +193,9 @@ Send == /\ pc[1] = "Send"
         /\ UNCHANGED << queueIn, db, processed, txCounter, msg, txId >>
 
 AckInMsg == /\ pc[1] = "AckInMsg"
-            /\ \E fails \in Fails(msg.id):
+            /\ \E fails \in Fails:
                  IF fails
-                    THEN /\ failures' = [failures EXCEPT ![(msg.id)] = failures[(msg.id)]+1]
+                    THEN /\ failures' = failures+1
                          /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                          /\ UNCHANGED << queueIn, processed >>
                     ELSE /\ queueIn' = {m \in queueIn: m /= msg}

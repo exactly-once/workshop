@@ -87,7 +87,7 @@ Now we want to keep current properties but remove the atomicity between database
  * Add `Fails(messageId)` definition at the top of the `define` section.
 
 ```tla+
-Fails(messageId) == IF messageId > MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+Fails(messageId) == IF failures[messageId] <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 ```
  * Change the `Fail` macro to update the number of failures for a given message and jump back to the `MainLoop` label
 
@@ -118,12 +118,6 @@ UpdateDb:
 
 ## Exercise 6
 
-Let's make the model a bit bigger
- * Change model to allow for up to 4 failures.
- * Parse and check the specification.
-
-## Exercise 7
-
 Let's check that the handler returns a consistent output using following formula:
 
 ``` tla+
@@ -144,6 +138,18 @@ with chg \in {chg \in db : chg.id = msg.id} do
     (* chg is available in this block *)
 end with;
  ```
+
+## Exercise 7
+
+Let's make the model a bigger by changing model parameters
+ * Change model to allow for `3` failures per-message and start with `3` messages in the input queue.
+ * Parse and check the specification.
+ * Capture number of states checked.
+
+The model is getting big so let's put it on a diet:
+ * Merge the `Process` label with `Receive`.
+ * Instead of per-message failure, let's move to a single "total failures" counter. Tweak the `Fail` macro and `Fails` formula to depend on the global `failures` variable.
+ * Compare size of the model before and after the changes.
 
 ## Exercise 8
 
