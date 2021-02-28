@@ -149,6 +149,13 @@ Let's make the model a bigger by changing model parameters
 The model is getting big so let's put it on a diet:
  * Merge the `Process` label with `Receive`.
  * Instead of per-message failure, let's move to a single "total failures" counter. Tweak the `Fail` macro and `Fails` formula to depend on the global `failures` variable.
+
+``` tla+
+macro Fail() begin
+    failures := failures+1;
+    goto MainLoop;
+end macro;
+```
  * Compare size of the model before and after the changes.
 
 ## Exercise 8
