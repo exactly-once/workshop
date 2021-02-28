@@ -1,23 +1,23 @@
 ---- MODULE MessageHandler ----
 EXTENDS FiniteSets, Naturals
-CONSTANTS MaxFailures
-
-MaxQueue == 1
-Fails(c) == IF c <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+CONSTANTS MaxFailures, NoMessages
 
 (*--algorithm outbox
 variables
-    queueIn = { [id |-> x] : x \in 1..MaxQueue },
+    queueIn = { [id |-> x] : x \in MessageIds },
     queueOut = { },
     db = {},
-    processed = {}
+    processed = {},
+    failures = 0,
+    txCounter = 0,
 
 define 
-    MessageIds == 1..MaxQueue
+    Fails == IF failures <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+    MessageIds == 1..NoMessages
     TypeInvariant == 
         /\ queueIn \in SUBSET [id : MessageIds]
-        /\ queueOut \in SUBSET [id : MessageIds, ver : Nat]
-        /\ db \in SUBSET [id : MessageIds, ver : Nat]
+        /\ queueOut \in SUBSET [id : MessageIds, txId : Nat]
+        /\ db \in SUBSET [id : MessageIds, txId : Nat]
     
     NoGhostMessages == \A m \in processed : 
                         \/ ~ \E msg \in queueOut : msg.id = m.id
@@ -31,56 +31,62 @@ define
                     \E chg \in db: chg.id = m.id
     
     NoDuplicatedProcessings == \A a \in db:
-                               ~ \E b \in db : a.id = b.id /\ a.ver /= b.ver
-     
+                               ~ \E b \in db : a.id = b.id /\ a.txId /= b.txId
+    
+    ConsistentOutput == \A m1 \in queueOut:
+                        ~\E m2 \in queueOut: m1.id = m2.id /\ m1.txId /= m2.txId
+    
     Safety == NoGhostMessages /\ NoDuplicatedProcessings
 
     Finishes == <>(/\ pc[1] = "Receive"
-                   /\ Cardinality(queueIn) = 1)
+                   /\ Cardinality(queueIn) = NoMessages)
     
     end define;
 
 macro Fail() begin
+    failures := failures+1;
     goto MainLoop;
 end macro;
 
 fair process Handler = 1
 variables
     msg,
-    c, 
+    txId, 
 begin
-Start:
-    c := 0;
 MainLoop:
     while TRUE do
     
     Receive: (* wait for a message and store in msg vairable *)
         await Cardinality(queueIn) > 0; 
         with m \in queueIn do msg := m; end with; 
-        c := c+1;
+    
+        txId := txCounter;
+        txCounter := txCounter + 1;
         
-    UpdateDb:
-        with fails \in Fails(c) do
+    Update: (* update data base - can fail *)
+        with fails \in Fails do
             if fails then
                 Fail()
             else
                 if ~\E chg \in db : chg.id = msg.id then
-                    db := db \union {[id |-> msg.id, ver |-> c]}; 
+                    db := db \union {[id |-> msg.id, txId |-> txId]}; 
                 end if;
             end if;
         end with;
-    
+
     Send:
-        with fails \in Fails(c) do
+        with fails \in Fails do
             if fails then
                 Fail()
             else
-                queueOut := queueOut \union {[id |-> msg.id, ver |-> c]};
+                with chg \in {chg \in db : chg.id = msg.id} do
+                    queueOut := queueOut \union {[id |-> msg.id, txId |-> chg.txId]};
+                end with;
             end if;
         end with;
 
     AckInMsg: (* remove message from the input queue - can fail *)
-        with fails \in Fails(c) do
+        with fails \in Fails do
             if fails then
                 Fail()
             else
@@ -95,14 +101,15 @@ end process;
 end algorithm; *)
 \* BEGIN TRANSLATION
 CONSTANT defaultInitValue
-VARIABLES queueIn, queueOut, db, processed, pc
+VARIABLES queueIn, queueOut, db, processed, failures, txCounter, pc
 
 (* define statement *)
-MessageIds == 1..MaxQueue
+Fails == IF failures <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
+MessageIds == 1..NoMessages
 TypeInvariant ==
     /\ queueIn \in SUBSET [id : MessageIds]
-    /\ queueOut \in SUBSET [id : MessageIds, ver : Nat]
-    /\ db \in SUBSET [id : MessageIds, ver : Nat]
+    /\ queueOut \in SUBSET [id : MessageIds, txId : Nat]
+    /\ db \in SUBSET [id : MessageIds, txId : Nat]
 
 NoGhostMessages == \A m \in processed :
                     \/ ~ \E msg \in queueOut : msg.id = m.id
@@ -116,90 +123,93 @@ NoLostWrite == \A m \in processed:
                 \E chg \in db: chg.id = m.id
 
 NoDuplicatedProcessings == \A a \in db:
-                           ~ \E b \in db : a.id = b.id /\ a.ver /= b.ver
+                           ~ \E b \in db : a.id = b.id /\ a.txId /= b.txId
+
+ConsistentOutput == \A m1 \in queueOut:
+                    ~\E m2 \in queueOut: m1.id = m2.id /\ m1.txId /= m2.txId
 
 Safety == NoGhostMessages /\ NoDuplicatedProcessings
 
 Finishes == <>(/\ pc[1] = "Receive"
-               /\ Cardinality(queueIn) = 1)
+               /\ Cardinality(queueIn) = NoMessages)
 
-VARIABLES msg, c
+VARIABLES msg, txId
 
-vars == << queueIn, queueOut, db, processed, pc, msg, c >>
+vars == << queueIn, queueOut, db, processed, failures, txCounter, pc, msg, 
+           txId >>
 
 ProcSet == {1}
 
 Init == (* Global variables *)
-        /\ queueIn = { [id |-> x] : x \in 1..MaxQueue }
+        /\ queueIn = { [id |-> x] : x \in MessageIds }
         /\ queueOut = { }
         /\ db = {}
         /\ processed = {}
+        /\ failures = 0
+        /\ txCounter = 0
         (* Process Handler *)
         /\ msg = defaultInitValue
-        /\ c = defaultInitValue
-        /\ pc = [self \in ProcSet |-> "Start"]
-
-Start == /\ pc[1] = "Start"
-         /\ c' = 0
-         /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
-         /\ UNCHANGED << queueIn, queueOut, db, processed, msg >>
+        /\ txId = defaultInitValue
+        /\ pc = [self \in ProcSet |-> "MainLoop"]
 
 MainLoop == /\ pc[1] = "MainLoop"
             /\ pc' = [pc EXCEPT ![1] = "Receive"]
-            /\ UNCHANGED << queueIn, queueOut, db, processed, msg, c >>
+            /\ UNCHANGED << queueIn, queueOut, db, processed, failures, 
+                            txCounter, msg, txId >>
 
 Receive == /\ pc[1] = "Receive"
            /\ Cardinality(queueIn) > 0
            /\ \E m \in queueIn:
                 msg' = m
-           /\ c' = c+1
-           /\ pc' = [pc EXCEPT ![1] = "UpdateDb"]
-           /\ UNCHANGED << queueIn, queueOut, db, processed >>
+           /\ txId' = txCounter
+           /\ txCounter' = txCounter + 1
+           /\ pc' = [pc EXCEPT ![1] = "Update"]
+           /\ UNCHANGED << queueIn, queueOut, db, processed, failures >>
 
-UpdateDb == /\ pc[1] = "UpdateDb"
-            /\ \E fails \in Fails(c):
-                 IF fails
-                    THEN /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
-                         /\ db' = db
-                    ELSE /\ IF ~\E chg \in db : chg.id = msg.id
-                               THEN /\ db' = (db \union {[id |-> msg.id, ver |-> c]})
-                               ELSE /\ TRUE
-                                    /\ db' = db
-                         /\ pc' = [pc EXCEPT ![1] = "Send"]
-            /\ UNCHANGED << queueIn, queueOut, processed, msg, c >>
+Update == /\ pc[1] = "Update"
+          /\ \E fails \in Fails:
+               IF fails
+                  THEN /\ failures' = failures+1
+                       /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
+                       /\ db' = db
+                  ELSE /\ IF ~\E chg \in db : chg.id = msg.id
+                             THEN /\ db' = (db \union {[id |-> msg.id, txId |-> txId]})
+                             ELSE /\ TRUE
+                                  /\ db' = db
+                       /\ pc' = [pc EXCEPT ![1] = "Send"]
+                       /\ UNCHANGED failures
+          /\ UNCHANGED << queueIn, queueOut, processed, txCounter, msg, txId >>
 
 Send == /\ pc[1] = "Send"
-        /\ \E fails \in Fails(c):
+        /\ \E fails \in Fails:
              IF fails
-                THEN /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
+                THEN /\ failures' = failures+1
+                     /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                      /\ UNCHANGED queueOut
-                ELSE /\ queueOut' = (queueOut \union {[id |-> msg.id, ver |-> c]})
+                ELSE /\ \E chg \in {chg \in db : chg.id = msg.id}:
+                          queueOut' = (queueOut \union {[id |-> msg.id, txId |-> chg.txId]})
                      /\ pc' = [pc EXCEPT ![1] = "AckInMsg"]
-        /\ UNCHANGED << queueIn, db, processed, msg, c >>
+                     /\ UNCHANGED failures
+        /\ UNCHANGED << queueIn, db, processed, txCounter, msg, txId >>
 
 AckInMsg == /\ pc[1] = "AckInMsg"
-            /\ \E fails \in Fails(c):
+            /\ \E fails \in Fails:
                  IF fails
-                    THEN /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
+                    THEN /\ failures' = failures+1
+                         /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
                          /\ UNCHANGED << queueIn, processed >>
                     ELSE /\ queueIn' = {m \in queueIn: m /= msg}
                          /\ processed' = (processed \union {msg})
                          /\ pc' = [pc EXCEPT ![1] = "MainLoop"]
-            /\ UNCHANGED << queueOut, db, msg, c >>
+                         /\ UNCHANGED failures
+            /\ UNCHANGED << queueOut, db, txCounter, msg, txId >>
 
-Handler == Start \/ MainLoop \/ Receive \/ UpdateDb \/ Send \/ AckInMsg
-
-(* Allow infinite stuttering to prevent deadlock on termination. *)
-Terminating == /\ \A self \in ProcSet: pc[self] = "Done"
-               /\ UNCHANGED vars
+Handler == MainLoop \/ Receive \/ Update \/ Send \/ AckInMsg
 
 Next == Handler
-           \/ Terminating
 
 Spec == /\ Init /\ [][Next]_vars
         /\ WF_vars(Handler)
-
-Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 \* END TRANSLATION
 
