@@ -2,13 +2,14 @@
 
 In the previous exercise we implemented the Outbox pattern inline in the handler of the `AddItem` message. While it did solve our problem, it is not ideal from the code reuse perspective. Who would like to have the same code copied over and over again? In this exercise we are going to extract that piece of code and make it more generic. In order to achieve this we will use the *behavior* extension system of NServiceBus; the same one that we previously used to simulated various failure conditions.
 
-- Open the `OutboxBehavior` class. Notice this class already has some scaffolding code prepared. The `Invoke` code filters out messages that do not carry the order ID on them. This is important because (for now) out generic outbox is going to support only messages addressed to an `Order`. Secondly, there is `InvokeMessageHandler` method that takes care of capturing the messages generated as part of message processing.
-- Open the `Order` class. We need to adjust it a bit. Currently it contains two outbox-related properties: `ProcessedMessages` and `OutgoingMessages`. We will replace them with a single property `OutboxState` of type `Dictionary<string, OutboxState>`. The `OutboxState` is a simple class that holds an array of serializable outgoing messages.
-
-The deduplication is based on the following rule:
+To recap, the deduplication is based on the following rule:
 
 **If the `OutboxState` dictionary contains a non-null value for a message ID, that message has been processed but the resulting outgoing messages have not been dispatched. If it contains `null` then that message have been processed and resulting outgoing messages dispatched. If it does not contain that value, the message has not been processed.**
 
+Now let's get our hands dirty.
+
+- Open the `OutboxBehavior` class. Notice this class already has some scaffolding code prepared. The `Invoke` code filters out messages that do not carry the order ID on them. This is important because (for now) out generic outbox is going to support only messages addressed to an `Order`. Secondly, there is `InvokeMessageHandler` method that takes care of capturing the messages generated as part of message processing.
+- Open the `Order` class. We need to adjust it a bit. Currently it contains two outbox-related properties: `ProcessedMessages` and `OutgoingMessages`. We will replace them with a single property `OutboxState` of type `Dictionary<string, OutboxState>`. The `OutboxState` is a simple class that holds an array of serializable outgoing messages.
 - Now the `AddItemHandler` class no longer compiles. Don't worry, we are going to move code from this class to `OutboxBehavior`, line by line.
 - First, let's move the code for loading the entity. In case `Load` returns `null`, create a new order and set its ID.
 - Next, the `ProcessedMessages.Contains` condition. Let's move it to `OutboxBehavior` and replace `Contains` with `TryGetValue`. The new condition should be `!order.OutboxState.TryGetValue(context.MessageId, out var outboxState))`.
