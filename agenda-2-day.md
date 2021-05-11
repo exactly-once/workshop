@@ -11,12 +11,12 @@
    - [Why distributed and asynchronous](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.html)
    - Intro to the projectt with [Exercise 1](https://github.com/exactly-once/workshop/tree/master/Exercise-1)
    - _Break_
-   - [Sources of duplication"](file:///C:/git/exactly-once/workshop/Lectures/Sources%20of%20duplication.html#/5) 
+   - [Sources of duplication](https://github.com/exactly-once/workshop/Lectures/Sources%20of%20duplication.html#/5) 
    - Receiver-side duplication - [Exercise 2](https://github.com/exactly-once/workshop/tree/master/Exercise-2)
    - Sender-side duplication - [Exercise 3](https://github.com/exactly-once/workshop/tree/master/Exercise-3)
    - Simulated duplication - [Exercise 4](https://github.com/exactly-once/workshop/tree/master/Exercise-4)
    - _Break_
-   - DB failure simulation - [Exercise 5]((https://github.com/exactly-once/workshop/tree/master/Exercise-5)
+   - DB failure simulation - [Exercise 5](https://github.com/exactly-once/workshop/tree/master/Exercise-5)
    - Broker failure simulation - [Exercise 6](https://github.com/exactly-once/workshop/tree/master/Exercise-6)
    - [Partial failures](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.html)
    - Follow-up to [Exercise 6](https://github.com/exactly-once/workshop/blob/master/Exercise-6/follow-up.md)
