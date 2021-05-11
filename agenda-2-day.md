@@ -9,7 +9,7 @@
 * Day 1
    - [Introduction](https://github.com/exactly-once/workshop/blob/master/Lectures/Intro.html)   
    - [Why distributed and asynchronous](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.html)
-   - Intro to the projectt with [Exercise 1](https://github.com/exactly-once/workshop/tree/master/Exercise-1)
+   - Intro to the project with [Exercise 1](https://github.com/exactly-once/workshop/tree/master/Exercise-1)
    - _Break_
    - [Sources of duplication](https://github.com/exactly-once/workshop/Lectures/Sources%20of%20duplication.html#/5) 
    - Receiver-side duplication - [Exercise 2](https://github.com/exactly-once/workshop/tree/master/Exercise-2)
