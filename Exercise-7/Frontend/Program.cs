@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Messages;
@@ -41,6 +41,7 @@ class Program
 
         Console.WriteLine("'submit <order-id>' to create a new order.");
         Console.WriteLine($"'add ({string.Join("|", Enum.GetNames(typeof(Filling)))}) to <order-id>' to add item with selected filling.");
+        Console.WriteLine($"'remove ({string.Join("|", Enum.GetNames(typeof(Filling)))}) from <order-id>' to remove item with selected filling.");
 
         while (true)
         {
