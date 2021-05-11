@@ -7,28 +7,28 @@
 ### Agenda
 
 * Day 1
-   - Introduction
-     - lunch break   
-   - (S) "Why distributed and asynchronous"
-   - (S) "Definitions"
-   - (S) Ex 1
+   - [Introduction](https://github.com/exactly-once/workshop/blob/master/Lectures/Intro.html)   
+   - [Why distributed and asynchronous](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.html)
+   - Intro to the projectt with [Exercise 1](https://github.com/exactly-once/workshop/tree/master/Exercise-1)
    - _Break_
-   - (T) "Sources of duplication" (includes ex 2 and 3)
-   - (T) Ex 4 - simulated duplication
+   - [Sources of duplication"](file:///C:/git/exactly-once/workshop/Lectures/Sources%20of%20duplication.html#/5) 
+   - Receiver-side duplication - [Exercise 2](https://github.com/exactly-once/workshop/tree/master/Exercise-2)
+   - Sender-side duplication - [Exercise 3](https://github.com/exactly-once/workshop/tree/master/Exercise-3)
+   - Simulated duplication - [Exercise 4](https://github.com/exactly-once/workshop/tree/master/Exercise-4)
    - _Break_
-   - (S) Ex 5 - db failure
-   - (S) Ex 6 - broker failure - run
-   - (S) "Partial failures"
-   - (S) Ex 6 - follow up (fix code)
-   - _Break_ (lunch break)
-   - (T) "Messages are delivered in-order"
-   - (T) Ex 7 - out of order
-   - (T) "Message ID"
-   - (T) Ex 8 - implement id-based deduplication
+   - DB failure simulation - [Exercise 5]((https://github.com/exactly-once/workshop/tree/master/Exercise-5)
+   - Broker failure simulation - [Exercise 6](https://github.com/exactly-once/workshop/tree/master/Exercise-6)
+   - [Partial failures](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.html)
+   - Follow-up to [Exercise 6](https://github.com/exactly-once/workshop/blob/master/Exercise-6/follow-up.md)
+   - _Lunch Break_
+   - [Messages are delivered in-order](https://github.com/exactly-once/workshop/blob/master/Lectures/Messages%20are%20delivered%20in-order.html)
+   - Out of order - [Exercise 7](https://github.com/exactly-once/workshop/tree/master/Exercise-7)
+   - [Message ID](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.html)
+   - Id-based deduplication - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
    - _Break_
-   - Ex 8 - follow up (downstream)
-   - Ex 9 - deterministic ID
-   - Ex 10 - deterministic messages
+   - Follow up - Ex 8 - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
+   - Deterministic ID - [Exercise 9](https://github.com/exactly-once/workshop/tree/master/Exercise-9)
+   - Deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
 
 * Day 2 
    - (T) CosmosDB
