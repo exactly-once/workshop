@@ -1,10 +1,6 @@
 # Exercise 12: Generic outbox
 
-In the previous exercise we implemented the Outbox pattern inline in the handler of the `AddItem` message. While it did solve our problem, it is not ideal from the code reuse perspective. Who would like to have the same code copied over and over again? In this exercise we are going to extract that piece of code and make it more generic. In order to achieve this we will use the *behavior* extension system of NServiceBus; the same one that we previously used to simulated various failure conditions.
-
-To recap, the deduplication is based on the following rule:
-
-**If the `OutboxState` dictionary contains a non-null value for a message ID, that message has been processed but the resulting outgoing messages have not been dispatched. If it contains `null` then that message have been processed and resulting outgoing messages dispatched. If it does not contain that value, the message has not been processed.**
+In the previous exercise we implemented the Outbox pattern inline in the handler of the `AddItem` message. While it did solve our problem, it is not ideal from the code reuse perspective. Who would like to have the same code copied over and over again? In this exercise we are going to extract that piece of code and make it more generic. In order to achieve this we will use the *behavior* extension system of NServiceBus; the same one that we previously used to simulate various failure conditions.
 
 Now let's get our hands dirty. First move the repository to the behavior
 
@@ -19,29 +15,31 @@ Now let's get our hands dirty. First move the repository to the behavior
 
 - Move the code responsible for pushing out generated messages to the `OutboxBehavior`
   - Remove (cut) the last section of code from the `AddItemHandler` where messages are published and cleared from the collection
-  - Add (paste) that code at the end of the `Invoke` method of the `OutboxBehavior`
+  - Add (paste) that code just above the `orderRepository.Store` in the `Invoke` method of the `OutboxBehavior`
   - Notice that now the last call to `orderRepository.Store` can be moved from the `AddItemHandler` to the `OutboxBehavior`. When the message handler finishes, the invocation resumes just after the call to `next()` in the behavior. Move the `Store` call there.
   - Remove the references to the `OrderRepository` from the `AddItemHandler`
 
 Looks better, doesn't it? Event better, it compiles and works. Let's now take care of the last bit of the handler that is related to the deduplication -- the check if a message has been processed.
 
-Remove the `!order.ProcessedMessages.Contains(context.MessageId)` from the handler and move it to the `OutboxBehavior` to guard the call to `next()` and following `orderRepository.Store`.
+Remove the `!order.ProcessedMessages.Contains(context.MessageId)` from the handler and move it to the `OutboxBehavior` to guard the calls to `next()` and `orderRepository.Store`.
 
-## It is alive
+## It is alive!
 
 The solution works perfectly. You can be proud of yourselves. Let's take a moment to apprieciate that. What we have implemented is in fact the cutting-edge deduplication approach used by multiple commercial and open-source frameworks. That has been a long and tough journey but we made it! From now one we are going to be entering a much less known territory and the algorithms we are going to talk about are not yet available from production-ready tools. But that's good, right? 
 
-But before we go there, there is one last bit... So far we stored our business messages in the outbox. The downside of that is that headers, which are an essential parts of a message, were missing. Let's now fix that.
+But before we go there, there is one last bit... So far we stored our business messages in the outbox. The downside of that is that headers, which are an essential parts of a message, were missing. We'll fix that now.
 
-Let's start by combining `ProcessedMessages` and `OutgoingMessages` collections into a single one.
+Let's start by combining `ProcessedMessages` and `OutgoingMessages` collections into a single one. The goal is to implement the following logic:
+
+**If the `OutgoingMessages` dictionary contains a non-null value for a message ID, that message has been processed but the resulting outgoing messages have not been dispatched. If it contains `null` then that message have been processed and resulting outgoing messages dispatched. If it does not contain that value, the message has not been processed.**
 
 - Change the type for the `OutgoingMessages` property of the `Order` to `Dictionary<string, OutboxState>`. The `OutboxState` type represents a collection of complete serialized messages (including the headers). This is a significant change since from now on the key is going to be the ID of the **incoming message** while the ID of the outgoing message is going to be part of the value
 - Change the _has been processed_ condition `!order.ProcessedMessages.Contains(context.MessageId)` to use the `OutgoingMessages` property: `!order.OutgoingMessages.ContainsKey(context.MessageId)`
-- Change the _mark as processed_ statement in the `AddItemHandler` to use the `OutgoingMessages` property: `var outboxState = new OutboxState(); order.OutgoingMessages.Add(context.MessageId, outboxState)`
+- Change the _mark as processed_ statement (`order.ProcessedMessages.Add(context.MessageId);`) in the `AddItemHandler` to use the `OutgoingMessages` property: `var outboxState = new OutboxState(); order.OutgoingMessages.Add(context.MessageId, outboxState)`
 - Notice that this statement can be moved to the `OutboxBehavior` just prior to the call to `next()`. Do that. Then put the `outboxState` into the context by doing `context.Extensions.Set(outboxState)`
 - Retrieve the `outboxState` in the `AddItemHandler` via `context.Extensions.Get<OutboxState>();`
 - Replace the calls to `order.OutgoingMessages.Add` for publishing messages with `outboxState.OutgoingMessages.Add(new Message(...`
-- Change the condition for dispatching outgoing messages to take into account the new structure of `OutgingMessages`. Change `if (order.OutgoingMessages.Any())` to `order.OutgoingMessages[context.MessageId] != null`. Notice that we don't need to check if the value for the key exists because the structure code guarantees that.
+- Change the condition for dispatching outgoing messages to take into account the new structure of `OutgoingMessages`. Change `if (order.OutgoingMessages.Any())` to `order.OutgoingMessages[context.MessageId] != null`. Notice that we don't need to check if the value for the key exists because the structure code guarantees that.
 - Replace the `order.OutgoingMessages` with `order.OutgoingMessages[context.MessageId].OutgoingMessages` in the `foreach`
 - Replace the reference to `Value` with `Payload` and `Key` with `Id`.
 - Replace the `order.OutgoingMessages.Clear()` with `order.OutgoingMessages[context.MessageId] = null` to prevent removing the information about all processed messages
@@ -54,7 +52,7 @@ Run the solution to check if it works. Now it is time for the last final step --
 - Replace the `forach` loop with a call to `Dispatch`.
 - Replace the calls to `outboxState.OutgoingMessages.Add` in the `AddItemHandler` to `context.Publish`. Drop the ID. The framework will generate one for you. Remember to `await` this call.
 - You can remove the `outboxState` from the `AddItemHandler` now. That's quite an achievement! There is no more deduplication logic in the message handler!
-- Now we need to intercept the results of these `Publish` calls so that messages are not dispatched immediately. In order to do so, replace the `next()` call in the `OutboxBehavior` with a call to `InvokeMessageHandler`.
+
 
 
 
