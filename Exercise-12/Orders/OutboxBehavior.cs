@@ -24,6 +24,7 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
             await next();
             return;
         }
+        await next();
     }
 
     Task Dispatch(TransportOperation[] transportOperations, IExtendable context)
