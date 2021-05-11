@@ -36,8 +36,13 @@
    - _break_
    - (T) TLA+ (slides + ex)
    - _break_
-   - (T) External outbox in Cosmos DB with Azure Functions
+   - Outbox with Ex 11, ex 12
+   - _break_
+   - Ex 13, 15, 16
+   - _break_
    - Sync-async boundary
+   - External outbox in Cosmos DB with Azure Functions
+    
    
  * Other
    - Ex 11 - implement outbox
