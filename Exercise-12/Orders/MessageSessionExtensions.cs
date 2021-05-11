@@ -3,7 +3,7 @@ using NServiceBus;
 
 static class MessageSessionExtensions
 {
-    public static Task PublishWithId(this IMessageHandlerContext messageSession, object message, string id)
+    public static Task PublishWithId(this IPipelineContext messageSession, object message, string id)
     {
         var options = new PublishOptions();
         options.SetMessageId(id);
