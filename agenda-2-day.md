@@ -33,7 +33,9 @@
   - Block 5
     - Follow up - Ex 8 - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
     - Deterministic ID - [Exercise 9](https://github.com/exactly-once/workshop/tree/master/Exercise-9)
-    - Deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
+    - Non-deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
+    - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
+    - Deterministic message generation - [Exercise 11](https://github.com/exactly-once/workshop/tree/master/Exercise-11)
 
 * Day 2 
   - Block 1 
@@ -44,8 +46,6 @@
     - [Introduction to model-checking with TLA+](https://github.com/exactly-once/workshop/blob/master/Lectures/tla.pptx)
     - Model-checking outbox - [Exercise](https://github.com/exactly-once/workshop/tree/master/model-checking)
   - Block 3
-    - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
-    - Deterministic message generation - [Exercise 11](https://github.com/exactly-once/workshop/tree/master/Exercise-11) 
     - Generic Outbox - [Exercise 12](https://github.com/exactly-once/workshop/tree/master/Exercise-12)
   - Block 4
     - Inbox - [Exercise 13](https://github.com/exactly-once/workshop/tree/master/Exercise-13)
