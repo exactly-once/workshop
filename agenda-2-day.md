@@ -36,42 +36,22 @@
     - Deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
 
 * Day 2 
-   - (T) CosmosDB
-   - (T) Acceptance testing (slides + ex)
-   - _break_
-   - (T) TLA+ (slides + ex)
-   - _break_
-   - Outbox with Ex 11, ex 12
-   - _break_
-   - Ex 13, 15, 16
-   - _break_
-   - Sync-async boundary
-   - External outbox in Cosmos DB with Azure Functions
-    
-   
- * Other
-   - Ex 11 - implement outbox
-   - (T) CosmosDB
-   - _break_ 
-   - (T) TLA+
-   - Ex 12 - generic Outbox 
-   - Ex 15, 16 - out of document Outbox 
-   - _break_ (longer)
-   - (T) Ex 12 - Make outbox generic
-   - (T) Ex 13 - Introduce inbox
-   - _break_ 
-   - (S) L8 - sync-async boundary
-   - (S) Ex 14 - Switch to token store
-     - Switch to sync-async boundary
-     - Switch from inbox checks to token store checks
-     - Add section for creating tokens for outgoing messages
-   - _break_
-  
-   - _break_
-   - Ex 16 - External outbox in Cosmos DB
-     - implement store
-   - _break_ 
-   - (T) Ex 17 - External outbox in Cosmos DB with Azure Functions
-     - side-effects
-     - http boundary
-   - Q/A
+  - Block 1 
+    - [NoSql Storages - CosmosDB](https://github.com/exactly-once/workshop/blob/master/Lectures/cosmosdb.pptx)
+    - [Integration testing messaging systems](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
+    - Predictable integration tests - [Exercise](https://github.com/exactly-once/workshop/tree/master/testing/Messaging.IntegrationTests)
+  - Block 2
+    - [Introduction to model-checking with TLA+](https://github.com/exactly-once/workshop/blob/master/Lectures/tla.pptx)
+    - Model-checking outbox - [Exercise](https://github.com/exactly-once/workshop/tree/master/model-checking)
+  - Block 3
+    - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
+    - Deterministic message generation - [Exercise 11](https://github.com/exactly-once/workshop/tree/master/Exercise-11) 
+    - Generic Outbox - [Exercise 12](https://github.com/exactly-once/workshop/tree/master/Exercise-12)
+  - Block 4
+    - Inbox - [Exercise 13](https://github.com/exactly-once/workshop/tree/master/Exercise-13)
+    - Out of document Outbox. Part 1 - [Exercise 15](https://github.com/exactly-once/workshop/tree/master/Exercise-15)
+    - Out of document Outbox. Part 2 - [Exercise 16](https://github.com/exactly-once/workshop/tree/master/Exercise-16)
+  - Block 5
+    - [Sync-async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
+    - [Http on the boundaries](https://github.com/exactly-once/workshop/blob/master/Lectures/azure-functions-http-boundaries.pptx)
+    - [Azure Functions and CosmosDB case study](https://github.com/exactly-once/workshop/tree/master/Exercise-17)
