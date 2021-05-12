@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -7,6 +9,8 @@ namespace ExactlyOnce.AzureFunctions.Sample
 {
     public class ShootingRange
     {
+        static HttpClient httpClient = new HttpClient();
+
         [FunctionName(nameof(HandleFireAt))]
         [return: Queue("attempt-updates")]
         public async Task<AttemptMade> HandleFireAt(
@@ -15,7 +19,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
             IOnceExecutor<ShootingRangeState> execute,
             ILogger log)
         {
-            log.LogInformation($"Processed FireAt: gameId={fireAt.GameId}, position={fireAt.Position}");
+            var timestamp = await ExecuteHttpRequest();
 
             var message = await execute.Once(sr =>
             {
@@ -39,8 +43,12 @@ namespace ExactlyOnce.AzureFunctions.Sample
                     attemptMade.IsHit = false;
                 }
 
+                attemptMade.Timestamp = timestamp;
+
                 return attemptMade;
             });
+
+            log.LogWarning($"Processed FireAt: gameId={fireAt.GameId}, position={fireAt.Position}, timestamp={message.Timestamp}");
 
             return message;
         }
@@ -51,7 +59,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
             [ExactlyOnce("{gameId}", "{gameId}")] IOnceExecutor<ShootingRangeState> execute,
             ILogger log)
         {
-            log.LogInformation($"Processed startGame:gameId={startGame.GameId}");
+            log.LogWarning($"Processed startGame:gameId={startGame.GameId}");
 
             await execute.Once(sr =>
             {
@@ -67,12 +75,21 @@ namespace ExactlyOnce.AzureFunctions.Sample
             [ExactlyOnce("{gameId}", "{gameId}")] IOnceExecutor<ShootingRangeState> execute,
             ILogger log)
         {
-            log.LogInformation($"Processed endGame:gameId={startGame.GameId}");
+            log.LogWarning($"Processed endGame:gameId={startGame.GameId}");
 
             await execute.Once(sr =>
             {
                 sr.IsActive = false;
             });
+        }
+
+        async Task<DateTime> ExecuteHttpRequest()
+        {
+            var result = await httpClient.GetAsync("http://localhost:7071/api/RequestTimestamp");
+
+            var content = await result.Content.ReadAsStringAsync();
+
+            return DateTime.Parse(content, CultureInfo.InvariantCulture);
         }
 
         public class ShootingRangeState : State

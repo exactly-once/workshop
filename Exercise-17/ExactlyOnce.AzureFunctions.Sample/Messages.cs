@@ -24,6 +24,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
         public Guid AttemptId { get; set; }
         public bool IsHit { get; set; }
         public Guid GameId { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 
     public class GameFinished

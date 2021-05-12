@@ -13,7 +13,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
             [ExactlyOnce(requestId: "{attemptId}", stateId: "{gameId}")] IOnceExecutor<LeaderBoardState> execute,
             ILogger log)
         {
-            log.LogInformation($"Processing attempt result: gameId={attempt.GameId}, isHit={attempt.IsHit}");
+            log.LogWarning($"Processing attempt result: gameId={attempt.GameId}, isHit={attempt.IsHit}");
 
             await execute.Once(board =>
                 {

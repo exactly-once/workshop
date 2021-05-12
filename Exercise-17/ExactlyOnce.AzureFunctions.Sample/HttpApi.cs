@@ -15,7 +15,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
             [Queue("fire-at")] ICollector<FireAt> collector,
             ILogger log)
         {
-            log.LogInformation($"Processing FireAt: requestId={request.RequestId}");
+            log.LogWarning($"Processing FireAt: requestId={request.RequestId}");
 
             var fireAt = await execute.Once(
                 () => new FireAt
@@ -39,11 +39,12 @@ namespace ExactlyOnce.AzureFunctions.Sample
             [Queue("start-game")] ICollector<StartNewGame> collector,
             ILogger log)
         {
-            log.LogInformation($"Processing StartNewGame: gameId={request.GameId}");
+            log.LogWarning($"Processing StartNewGame: gameId={request.GameId}");
 
             var startNewGame = await execute.Once(
                 () => new StartNewGame
                 {
+                    //TODO: add timestamp field
                     GameId = request.GameId.ToGuid()
                 }
             );
@@ -61,7 +62,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
             [Queue("end-game")] ICollector<EndGame> collector,
             ILogger log)
         {
-            log.LogInformation($"Processing EndGame: gameId={request.GameId}");
+            log.LogWarning($"Processing EndGame: gameId={request.GameId}");
 
             var endGame = await execute.Once(
                 () => new EndGame
