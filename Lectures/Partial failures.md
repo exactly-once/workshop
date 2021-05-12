@@ -30,7 +30,7 @@ Another difference is the most likely cause of persistent rejection. For a datab
 
 There are obviously two possible orders of execution of *update data* (U) and *publish messages* (P) actions: UP and PU. Our goal here is to minimize the likelihood and duration of states in which one of the actions is applied and the other is not: U or P. 
 
-Given that P is less likely to fail persistently, we should favour UP, not PU. There is one more reason why UP is more desirable. In UP, if P is persistently rejected then we are dealing with a business process that remains correct but stuck at one of the stages. If we adopted PU and U was rejected persistently then we would have an uninterrupted business process execution but that process would be in an inconsistent state. In most real-life scenarios it is much better to be stuck than wrong.
+Given that P is less likely to fail persistently, we should favour UP, not PU. There is one more reason why UP is more desirable. In UP, if P is persistently rejected then we are dealing with a business process that remains correct but stuck at one of the stages. If we adopted PU and U was rejected persistently then we would have an uninterrupted business process execution but that process would be in an inconsistent state. **In most real-life scenarios it is much better to be stuck than wrong**.
 
 Now I think we are ready to define the structure of a handler logic.
  - Check if a given data change has already been applied (does the order have an item of that type?)
