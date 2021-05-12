@@ -10,7 +10,7 @@ So, we are hired there to build a system for processing Pierogi delivery orders.
 
 ## Dictionary
 
-Before we jump head-fist into implementation let me clarify some terms I am going to use. 
+Before we jump head-first into implementation let me clarify some terms I am going to use. 
 
 ### Endpoint
 
