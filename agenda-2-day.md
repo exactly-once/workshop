@@ -47,11 +47,12 @@
     - Model-checking outbox - [Exercise](https://github.com/exactly-once/workshop/tree/master/model-checking)
   - Block 3
     - Generic Outbox - [Exercise 12](https://github.com/exactly-once/workshop/tree/master/Exercise-12)
+    - [Sync-async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
+    - Token-based deduplication - [Exercise 14](https://github.com/exactly-once/workshop/tree/master/Exercise-14)
   - Block 4
     - Inbox - [Exercise 13](https://github.com/exactly-once/workshop/tree/master/Exercise-13)
     - Out of document Outbox. Part 1 - [Exercise 15](https://github.com/exactly-once/workshop/tree/master/Exercise-15)
     - Out of document Outbox. Part 2 - [Exercise 16](https://github.com/exactly-once/workshop/tree/master/Exercise-16)
   - Block 5
-    - [Sync-async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
     - [Http on the boundaries](https://github.com/exactly-once/workshop/blob/master/Lectures/azure-functions-http-boundaries.pptx)
     - [Azure Functions and CosmosDB case study](https://github.com/exactly-once/workshop/tree/master/Exercise-17)
