@@ -7,33 +7,33 @@
 ### Agenda
 
 * Day 1
- - Block 1
-   - [Introduction](https://exactly-once.github.io/workshop/Lectures/Intro.html)   
-   - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html)
-   - Intro to the project with [Exercise 1](https://github.com/exactly-once/workshop/tree/master/Exercise-1)
-   - _Break_
- - Block 2
-   - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html#/5) 
-   - Receiver-side duplication - [Exercise 2](https://github.com/exactly-once/workshop/tree/master/Exercise-2)
-   - Sender-side duplication - [Exercise 3](https://github.com/exactly-once/workshop/tree/master/Exercise-3)
-   - Simulated duplication - [Exercise 4](https://github.com/exactly-once/workshop/tree/master/Exercise-4)
-   - _Break_
- - Block 3
-   - DB failure simulation - [Exercise 5](https://github.com/exactly-once/workshop/tree/master/Exercise-5)
-   - Broker failure simulation - [Exercise 6](https://github.com/exactly-once/workshop/tree/master/Exercise-6)
-   - [Partial failures](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html)
-   - Follow-up to [Exercise 6](https://github.com/exactly-once/workshop/blob/master/Exercise-6/follow-up.md)
-   - _Lunch Break_
- - Block 4
-   - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html)
-   - Out of order - [Exercise 7](https://github.com/exactly-once/workshop/tree/master/Exercise-7)
-   - [Message ID](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.html)
-   - Id-based deduplication - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
-   - _Break_
- - Block 5
-   - Follow up - Ex 8 - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
-   - Deterministic ID - [Exercise 9](https://github.com/exactly-once/workshop/tree/master/Exercise-9)
-   - Deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
+  - Block 1
+    - [Introduction](https://exactly-once.github.io/workshop/Lectures/Intro.html)   
+    - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html)
+    - Intro to the project with [Exercise 1](https://github.com/exactly-once/workshop/tree/master/Exercise-1)
+    - _Break_
+  - Block 2
+    - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html#/5) 
+    - Receiver-side duplication - [Exercise 2](https://github.com/exactly-once/workshop/tree/master/Exercise-2)
+    - Sender-side duplication - [Exercise 3](https://github.com/exactly-once/workshop/tree/master/Exercise-3)
+    - Simulated duplication - [Exercise 4](https://github.com/exactly-once/workshop/tree/master/Exercise-4)
+    - _Break_
+  - Block 3
+    - DB failure simulation - [Exercise 5](https://github.com/exactly-once/workshop/tree/master/Exercise-5)
+    - Broker failure simulation - [Exercise 6](https://github.com/exactly-once/workshop/tree/master/Exercise-6)
+    - [Partial failures](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html)
+    - Follow-up to [Exercise 6](https://github.com/exactly-once/workshop/blob/master/Exercise-6/follow-up.md)
+    - _Lunch Break_
+  - Block 4
+    - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html)
+    - Out of order - [Exercise 7](https://github.com/exactly-once/workshop/tree/master/Exercise-7)
+    - [Message ID](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.html)
+    - Id-based deduplication - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
+    - _Break_
+  - Block 5
+    - Follow up - Ex 8 - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
+    - Deterministic ID - [Exercise 9](https://github.com/exactly-once/workshop/tree/master/Exercise-9)
+    - Deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
 
 * Day 2 
    - (T) CosmosDB
