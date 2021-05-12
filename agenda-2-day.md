@@ -47,10 +47,10 @@
     - Model-checking outbox - [Exercise](https://github.com/exactly-once/workshop/tree/master/model-checking)
   - Block 3
     - Generic Outbox - [Exercise 12](https://github.com/exactly-once/workshop/tree/master/Exercise-12)
-    - [Sync-async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
-    - Token-based deduplication - [Exercise 14](https://github.com/exactly-once/workshop/tree/master/Exercise-14)
-  - Block 4
     - Inbox - [Exercise 13](https://github.com/exactly-once/workshop/tree/master/Exercise-13)
+    - [Sync-async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
+  - Block 4
+    - Token-based deduplication - [Exercise 14](https://github.com/exactly-once/workshop/tree/master/Exercise-14)
     - Out of document Outbox. Part 1 - [Exercise 15](https://github.com/exactly-once/workshop/tree/master/Exercise-15)
     - Out of document Outbox. Part 2 - [Exercise 16](https://github.com/exactly-once/workshop/tree/master/Exercise-16)
   - Block 5
