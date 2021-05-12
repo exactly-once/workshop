@@ -4,4 +4,4 @@ After our previous change, the system behaves stable. Mostly. In response to new
 
 In this exercise we are going to extend the `BrokerErrorSimulatorBehavior` by adding another `if` clause that checks if the outgoing message is of type `FirstItemAdded`. In that case we will simulate a timeout error by waiting for 10 seconds **and then throwing an exception**. We hope that this is exactly what the operations team have seen in production.
 
-We will examine the behavior of our code by using a brand new type of *pierogi*. Try adding two items of type `Strawberry` quickly. What happens?
+We will examine the behavior of our code by using a brand new type of *pierogi*. Try adding two items of type `Strawberry`. Be quick! What happens?
