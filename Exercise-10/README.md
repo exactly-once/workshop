@@ -1,4 +1,4 @@
-# Exercise 10: Non-deterministic message generation
+# Exercise 10: State-derived messages
 
 After our previous change, the system behaves stable. Mostly. In response to new requirements an additional event type has been added -- `FirstItemAdded`. This event is published when the customer adds first item to their orders. It is used by the marketing department to study the buying habits. Unfortunately from time to time they notice the lack of `FirstItemAdded` event. What could have gone wrong? The problem seems to be correlated with timeouts. We are going to investigate this by first trying to reproduce the problem using another *chaos monkey*. 
 
