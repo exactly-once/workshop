@@ -1,6 +1,6 @@
-﻿using NServiceBus.Outbox;
+﻿using System.Collections.Generic;
 
 public class OutboxState
 {
-    public TransportOperation[] OutgoingMessages { get; set; }
+    public List<Message> OutgoingMessages { get; set; } = new List<Message>();
 }
