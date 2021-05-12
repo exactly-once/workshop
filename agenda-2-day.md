@@ -27,7 +27,7 @@
   - Block 4
     - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html)
     - Out of order - [Exercise 7](https://github.com/exactly-once/workshop/tree/master/Exercise-7)
-    - [Message ID](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.html)
+    - [Message ID](https://exactly-once.github.io/workshop/Lectures/Message%20ID.html)
     - Id-based deduplication - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
     - _Break_
   - Block 5
