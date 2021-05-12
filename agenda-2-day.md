@@ -1,5 +1,5 @@
 ### Prerequisites
-   * VS 2020 and .net472
+   * VS 2019 and .net472
    * Visual Studio Code and TLA+ extension
    * NServiceBus 7
    * CosmosDB Emulator
