@@ -52,7 +52,7 @@ NoLostMessages == \A m \in processed :
  * Open `MessageHandler.cfg` and add `NoLostMessages` in the `INVARIANTS` sections.
  * Parse and model check the specification.
  * The check fails with:
-    > Invariant NoGhostMessages is violated.
+    > Invariant NoLostMessages is violated.
  * Analyze the trace to understand what happened
  * Let's patch the problem temporarily and change the atomicity of the steps (this models 2PC) to prevent outgoing message loss
 
