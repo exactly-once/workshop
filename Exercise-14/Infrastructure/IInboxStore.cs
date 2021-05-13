@@ -13,7 +13,7 @@ public interface ITokenStore
     //GET
     Task<(bool, string)> HasNotBeenProcessed(string messageId);
     //DELETE
-    Task MarkProcessed(string messageId);
+    Task MarkProcessed(string messageId, string version);
     //PUT
     Task Create(string messageId);
 }

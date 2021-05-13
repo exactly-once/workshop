@@ -39,12 +39,12 @@ public class TokenStore : Repository<TokenStore.Token>, ITokenStore
         return (token != null, version);
     }
 
-    public Task MarkProcessed(string messageId)
+    public Task MarkProcessed(string messageId, string version)
     {
         return Delete(new Token
         {
             Id = messageId
-        }, null);
+        }, version);
     }
 
     public Task Create(string messageId)
