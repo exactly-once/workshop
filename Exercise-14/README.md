@@ -14,20 +14,28 @@ we are going to use a negative check
 
 This approach guarantees that the deduplication data has bounded size (proportional to the number of in-flight messages) and that deduplication checks are not dependent on the wall clock.
 
-First, let's create a token store. Instead of creating one from scratch, we will reuse the `InboxStore` class.
- - Rename `IInboxStore` to `ITokenStore` and `InboxStore` to `TokenStore`
- - Rename `InboxItem` to `Token`
- - Rename `HasBeenProcessed` to `Exists` and the parameter name to `tokenId`
- - Rename `MarkProcessed` to `Create` and the parameter name `tokenId`
+To see how the inverted marking logic is supposed to work, navigate to the `IInboxStore` file. In now contains also an interface for the token store. To make the comparison easier we included the HTTP verbs that match the operations. Notice how the GET now returns the inverted value and how `MarkProcessed` has been changed from `PUT` to `DELETE`. We now also have an additional method - `Create` to create the tokens.
 
-We are also going to need a `Delete` method. It is already defined on the `Repository` class so we only need to add it to `ITokenStore`. To make it more convenient let's use `Task Delete(string tokenId, string version)` signature. Now you probably ask where are we going to get the version from. The `Repository` returns the version value from `Get` but our `Exists` method does not return it. Let's fix that and make `Exists` return a tuple `(bool, string)`.
+Now go to the `OutboxBehavior`. Notice we already changed the code to use the token store but it does not compile yet. Fix it by using the `HasNotBeenProcessed` method. Remember to the negation. Store the token version in a variable. We will need it.
 
-Now go to the `OutboxBehavior` and invert the check that now calls the token store. Store the token version in a variable. We will need it. You may ask if it is OK that we pass the message ID as a parameter we called `tokenId`. And it actually is not OK but we will deal with that later. Now turn your attention to the bottom part of the method where we used to populate the inbox. After our renames it contains the `tokenStore.Create` call. We need to invert this one also. It becomes `tokenStore.Delete` and we need to pass our token version here.
+```c#
+var (hasNotBeenProcessed, tokenVersion) = await tokenStore.HasNotBeenProcessed(context.MessageId);
+```
+
+You may ask if it is OK that we pass the message ID as a parameter we called `tokenId`. And it actually is not OK but we will deal with that later. 
+
+Now turn your attention to the bottom part of the method where we used to populate the inbox. Notice that we now call `tokenStore.MarkProcessed` there. The intent is the same but remember that the underlying storage action is now `DELETE` rather than `PUT`. What is missing is the `tokenVersion` perameter. When we delete we need to ensure we are still *owners* of the token.
 
 Are we done? From the perspective of this endpoint, yes. But what about dispatching messages to the downstream endpoints? There is no code that creates tokens for them so they would not be processed. Let's fix that.
 
-Add a `foreach` clause that iterates over `outboxState.OutgoingMessages` before the dispatch code and add a `TokenId` header containing a Guid value. Don't forget to also created this token via `tokenStore.Create`. Now go back to the `Exist` check and replace the message ID parameter with the value of the `TokenId` header on the incoming message: `context.Headers.TryGetValue("TokenId", out var tokenId)`. Do the same in the `tokenStore.Delete` call. 
+Add a `foreach` clause that iterates over `outboxState.OutgoingMessages` before the dispatch code and add a `TokenId` header containing a Guid value. Don't forget to also create this token via `tokenStore.Create`. 
 
-What if there is no token ID on a message? The `SendSubmitOrder` message won't contain the token because it is sent from outside of a handler. In this case we don't want to treat the message as a duplicate and we don't want to delete the token (that does not exist). Let's add guard statements `tokenId != null`.
+```c#
+var token = Guid.NewGuid().ToString();
+outgoingMessage.Headers["TokenId"] = token;
+await tokenStore.Create(token);
+```
+
+Now go back to the `tokenStore.HasNotBeenProcessed` check and replace the message ID parameter with the value of the `TokenId` header on the incoming message: `context.Headers.TryGetValue("TokenId", out var tokenId)`. Do the same in the `tokenStore.MarkProcessed` call. 
 
 Are we done? Almost. Consider what happens if the code fails right after dispatching the messages.
