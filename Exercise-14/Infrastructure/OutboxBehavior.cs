@@ -10,14 +10,14 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
 {
     readonly Repository<T> repository;
     readonly IDispatchMessages dispatcher;
-    readonly IInboxStore inboxStore;
+    readonly ITokenStore tokenStore;
     readonly Func<object, string> getId;
 
-    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, IInboxStore inboxStore, Func<object, string> getId)
+    public OutboxBehavior(Repository<T> repository, IDispatchMessages dispatcher, ITokenStore tokenStore, Func<object, string> getId)
     {
         this.repository = repository;
         this.dispatcher = dispatcher;
-        this.inboxStore = inboxStore;
+        this.tokenStore = tokenStore;
         this.getId = getId;
     }
 
@@ -32,7 +32,7 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
 
         var (entity, version) = await repository.Get(id);
 
-        var hasBeenProcessed = await inboxStore.HasBeenProcessed(context.MessageId);
+        var hasBeenProcessed = await tokenStore.HasBeenProcessed(context.MessageId);
         if (hasBeenProcessed)
         {
             if (entity.OutboxState.ContainsKey(context.MessageId))
@@ -56,7 +56,7 @@ public class OutboxBehavior<T> : Behavior<IIncomingLogicalMessageContext>
         var toDispatch = outboxState.OutgoingMessages.Deserialize();
         await Dispatch(toDispatch, context);
 
-        await inboxStore.MarkProcessed(context.MessageId);
+        await tokenStore.MarkProcessed(context.MessageId);
 
         entity.OutboxState.Remove(context.MessageId);
         await repository.Put(entity, version);

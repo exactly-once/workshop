@@ -40,16 +40,18 @@ class Program
 
         var repository = new ShoppingCartRepository(cosmosClient, "Ex14");
         var inbox = new InboxStore(cosmosClient, "Ex14");
+        var tokenStore = new TokenStore(cosmosClient, "Ex14");
 
         await repository.Initialize();
         await inbox.Initialize();
+        await tokenStore.Initialize();
 
         var config = new EndpointConfiguration("Frontend");
         config.Pipeline.Register(new DuplicateMessagesBehavior(), "Duplicates outgoing messages");
         config.SendFailedMessagesTo("error");
         var routing = config.UseTransport<LearningTransport>().Routing();
         routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "Orders");
-        config.Pipeline.Register(b => new OutboxBehavior<ShoppingCart>(repository, b.Build<IDispatchMessages>(), inbox,
+        config.Pipeline.Register(b => new OutboxBehavior<ShoppingCart>(repository, b.Build<IDispatchMessages>(), tokenStore,
             m =>
             {
                 if (m is SendSubmitOrder sendSubmit)
