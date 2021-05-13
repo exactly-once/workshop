@@ -33,15 +33,14 @@ class Program
         var cosmosClient = new CosmosClient(endpointUri, primaryKey);
 
         var repository = new OrderRepository(cosmosClient, "Ex14");
-        var inbox = new InboxStore(cosmosClient, "Ex14");
+        var tokenStore = new TokenStore(cosmosClient, "Ex14");
 
         await repository.Initialize();
-        await inbox.Initialize();
-
+        await tokenStore.Initialize();
 
         var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
-        config.Pipeline.Register(b => new OutboxBehavior<Order>(repository, b.Build<IDispatchMessages>(), inbox,
+        config.Pipeline.Register(b => new OutboxBehavior<Order>(repository, b.Build<IDispatchMessages>(), tokenStore,
                 m =>
                 {
                     if (m is SubmitOrder submit)

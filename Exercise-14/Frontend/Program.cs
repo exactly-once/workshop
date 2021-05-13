@@ -39,11 +39,9 @@ class Program
         var cosmosClient = new CosmosClient(endpointUri, primaryKey);
 
         var repository = new ShoppingCartRepository(cosmosClient, "Ex14");
-        var inbox = new InboxStore(cosmosClient, "Ex14");
         var tokenStore = new TokenStore(cosmosClient, "Ex14");
 
         await repository.Initialize();
-        await inbox.Initialize();
         await tokenStore.Initialize();
 
         var config = new EndpointConfiguration("Frontend");
