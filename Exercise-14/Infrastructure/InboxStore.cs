@@ -35,12 +35,20 @@ public class TokenStore : Repository<TokenStore.Token>, ITokenStore
 
     public async Task<(bool, string)> HasNotBeenProcessed(string messageId)
     {
+        if (messageId == null)
+        {
+            return (true, null);
+        }
         var (token, version) = await Get(messageId);
         return (token != null, version);
     }
 
     public Task MarkProcessed(string messageId, string version)
     {
+        if (messageId == null)
+        {
+            return Task.CompletedTask;
+        }
         return Delete(new Token
         {
             Id = messageId
