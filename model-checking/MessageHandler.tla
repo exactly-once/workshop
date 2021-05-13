@@ -58,7 +58,7 @@ begin
 MainLoop:
     while TRUE do
     
-    Receive: (* wait for a message and store in msg vairable *)
+    Receive: (* wait for a message and store in msg variable *)
         await Cardinality(queueIn) > 0; 
         with m \in queueIn do msg := m; end with; 
     
