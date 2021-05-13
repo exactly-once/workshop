@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.IntegrationTests.System;
 using NServiceBus;
@@ -31,8 +33,8 @@ namespace Messaging.IntegrationTests.Tests
         }
 
         [Test]
-        [Repeat(25)]
-        public async Task PlaceOrder()
+        [TestCaseSource(nameof(TestCases))]
+        public async Task PlaceOrder(string caseNo)
         {
             var message = new PlaceOrder {Id = Guid.NewGuid()};
 
@@ -40,5 +42,8 @@ namespace Messaging.IntegrationTests.Tests
 
             Assert.Contains(message.Id, store.PlacedOrders, "PlaceOrder ");
         }
+
+
+        static IEnumerable<string> TestCases => Enumerable.Range(1, 25).Select(n => $"{n:00}");
     }
 }
