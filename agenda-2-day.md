@@ -35,11 +35,10 @@
     - Deterministic ID - [Exercise 9](https://github.com/exactly-once/workshop/tree/master/Exercise-9)
     - Non-deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
     - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
-    - Deterministic message generation - [Exercise 11](https://github.com/exactly-once/workshop/tree/master/Exercise-11)
 
 * Day 2 
   - Block 1 
-    - [NoSql Storages - CosmosDB](https://github.com/exactly-once/workshop/blob/master/Lectures/cosmosdb.pptx)
+    - Deterministic message generation - [Exercise 11](https://github.com/exactly-once/workshop/tree/master/Exercise-11)
     - [Integration testing messaging systems](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
     - Predictable integration tests - [Exercise](https://github.com/exactly-once/workshop/tree/master/testing/Messaging.IntegrationTests)
   - Block 2
@@ -54,5 +53,6 @@
     - Out of document Outbox. Part 1 - [Exercise 15](https://github.com/exactly-once/workshop/tree/master/Exercise-15)
     - Out of document Outbox. Part 2 - [Exercise 16](https://github.com/exactly-once/workshop/tree/master/Exercise-16)
   - Block 5
+    - [NoSql Storages - CosmosDB](https://github.com/exactly-once/workshop/blob/master/Lectures/cosmosdb.pptx)
     - [Http on the boundaries](https://github.com/exactly-once/workshop/blob/master/Lectures/azure-functions-http-boundaries.pptx)
     - [Azure Functions and CosmosDB case study](https://github.com/exactly-once/workshop/tree/master/Exercise-17)
