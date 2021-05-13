@@ -25,3 +25,37 @@ public class InboxStore : Repository<InboxStore.InboxItem>, IInboxStore
     {
     }
 }
+
+public class TokenStore : Repository<TokenStore.Token>, ITokenStore
+{
+    public TokenStore(CosmosClient cosmosClient, string databaseId)
+        : base(cosmosClient, databaseId)
+    {
+    }
+
+    public async Task<(bool, string)> HasNotBeenProcessed(string messageId)
+    {
+        var (token, version) = await Get(messageId);
+        return (token != null, version);
+    }
+
+    public Task MarkProcessed(string messageId)
+    {
+        return Delete(new Token
+        {
+            Id = messageId
+        }, null);
+    }
+
+    public Task Create(string messageId)
+    {
+        return Put(new Token
+        {
+            Id = messageId
+        }, null);
+    }
+
+    public class Token : Entity
+    {
+    }
+}
