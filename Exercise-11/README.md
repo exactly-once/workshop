@@ -19,7 +19,7 @@ OK, now let's get our hands dirty with code.
 - Invert the `if` statement in the beginning of the method and remove `else` branch (the one that does the logging).
 - Move the `PublishWithId` statements up to the business logic part, between `order.ProcessedMessages.Add` and `orderRepository.Store`.
 - Replace the deterministic ID generation with `Guid.NewGuid()`. We are storing these IDs once generated so we don't need to be deterministic any more. 
-- Replace the `context.PublishWithId` calls with `order.OutgoingMessages.Add(messageId, messageObject)`. The handler now just stores the outgoing messages. The behavior is going to push them out.
+- Replace the `context.PublishWithId` calls with `order.OutgoingMessages.Add(messageId, messageObject)`. The handler now just stores the outgoing messages.
 
 After these changes your business logic should be correctly _storing_ the outgoing messages. But it does not yet send them out. For that we need to add the _dispatching_ code below. Here's how it should look:
 
