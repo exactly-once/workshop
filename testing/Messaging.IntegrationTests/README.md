@@ -4,13 +4,13 @@ When writing integration tests for message-based systems it's common to make ass
 
 ### Goal
 
-The goal of this exercise is to write a single integration test that depends on the result of processing the last message in a conversation. The conversation starts with `PlaceOrder` command that has a 50/50 chance of triggering the final `FinalizeOrder` command or re-sending the same command with `1` seconds delay:
+The goal of this exercise is to write a single integration test that depends on the result of processing the last message in a conversation. The conversation starts with `PlaceOrder` command that has a 1 in 20 chance of triggering the final `FinalizeOrder` command or re-sending the same command with `1` seconds delay:
 
 ```csharp
-if (new Random().Next(0, 2) == 0)
+if (new Random().Next(0, 20) == 0)
 {
     var options = new SendOptions();
-    options.DelayDeliveryWith(TimeSpan.FromSeconds(1));
+    options.DelayDeliveryWith(TimeSpan.FromSeconds(10));
 
     await context.Send(message, options);
 }
@@ -20,7 +20,7 @@ else
 }
 ```
 
-This, in turn, causes flakiness in the sample integration test:
+This, in turn, causes flakiness in the sample integration test. Note that the test is being executed 25 times.
 
 ```csharp
 [Test]
@@ -37,7 +37,7 @@ public async Task PlaceOrder()
 
 ### Step 1
 
-Can we solve the problem with brute-force? Can we add `Task.Delay` in our test to make it pass consistently and not make it take a couple of minutes to pass?
+Can we solve the problem with a simple patch? Can we add `Task.Delay` in our test to make it pass consistently and not make it take a couple of minutes to pass?
 
 ### Step 2
 
