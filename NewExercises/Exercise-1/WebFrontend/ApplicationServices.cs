@@ -13,7 +13,7 @@ public class ApplicationServices
 
     public async Task<ShoppingCart> Get(string customer, string cartId)
     {
-        var (cart, version) = await repository.Get<ShoppingCart>(customer, cartId);
+        var cart = await repository.Get<ShoppingCart>(customer, cartId);
         return cart;
     }
 
@@ -29,22 +29,22 @@ public class ApplicationServices
             Id = orderId,
             Customer = customer
         };
-        return repository.Put(cart.Customer, (cart, null));
+        return repository.Put(cart.Customer, cart );
     }
 
     public async Task AddItem(string customer, string orderId, Filling filling)
     {
-        var (cart, version) = await repository.Get<ShoppingCart>(customer, orderId);
+        var cart = await repository.Get<ShoppingCart>(customer, orderId);
         if (!cart.Items.Contains(filling))
         {
             cart.Items.Add(filling);
         }
-        await repository.Put(cart.Customer, (cart, version));
+        await repository.Put(cart.Customer, cart);
     }
 
     public async Task SubmitOrder(string customer, string orderId)
     {
-        var (cart, version) = await repository.Get<ShoppingCart>(customer, orderId);
+        var cart = await repository.Get<ShoppingCart>(customer, orderId);
 
         var order = new Order
         {
@@ -53,6 +53,6 @@ public class ApplicationServices
             Items = cart.Items
         };
 
-        await repository.Put(cart.Customer, (order, null));
+        await repository.Put(cart.Customer, order);
     }
 }

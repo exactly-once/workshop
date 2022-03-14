@@ -105,9 +105,9 @@ public class Repository
         var response = await batch.ExecuteAsync().ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception(response.ErrorMessage);
+            throw new Exception("Batch execution errors: " + string.Join(", ", response.Select(x => x.StatusCode)));
         }
-
+        
         return response.Select(x => x.ETag).ToArray();
     }
 

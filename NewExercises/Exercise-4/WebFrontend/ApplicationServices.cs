@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Messages;
+using NServiceBus;
 
 public class ApplicationServices
 {
     readonly Repository repository;
+    readonly IMessageSession session;
 
-    public ApplicationServices(Repository repository)
+    public ApplicationServices(Repository repository, IMessageSession session)
     {
         this.repository = repository;
+        this.session = session;
     }
 
     public async Task<ShoppingCart> Get(string customer, string cartId)

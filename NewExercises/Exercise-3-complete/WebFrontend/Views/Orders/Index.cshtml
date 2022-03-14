@@ -1,0 +1,21 @@
+﻿@model List<Order>
+@{
+    ViewData["Title"] = "Your order history";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table>
+    <tr>
+        <th>Id</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+        </tr>
+    }
+</table>
+
+
+@Html.ActionLink("Create new", "Create", "Orders", ViewContext.RouteData.Values)

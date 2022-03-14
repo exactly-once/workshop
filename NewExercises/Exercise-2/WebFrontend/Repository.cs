@@ -51,7 +51,7 @@ public class Repository
         return items;
     }
 
-    public async Task<(T, string)> Get<T>(string partition, string id)
+    public async Task<T> Get<T>(string partition, string id)
         where T : Entity, new()
     {
         var container = await PrepareContainer();
@@ -61,7 +61,7 @@ public class Repository
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
             var newState = new T { Id = id };
-            return (newState, (string)null);
+            return newState;
         }
 
         if (!response.IsSuccessStatusCode)
@@ -73,15 +73,15 @@ public class Repository
         using var jsonReader = new JsonTextReader(streamReader);
         var state = serializer.Deserialize<T>(jsonReader);
 
-        return (state, response.Headers.ETag);
+        return state;
     }
 
-    public async Task<string[]> Put(string partition, params (Entity, string)[] items)
+    public async Task Put(string partition, params Entity[] items)
     {
         var container = await PrepareContainer();
         var batch = container.CreateTransactionalBatch(new PartitionKey(partition));
 
-        foreach (var (entity, version) in items)
+        foreach (var entity in items)
         {
             var payloadStream = new MemoryStream();
             var streamWriter = new StreamWriter(payloadStream);
@@ -89,17 +89,7 @@ public class Repository
             await streamWriter.FlushAsync();
             payloadStream.Seek(0, SeekOrigin.Begin);
 
-            if (version == null)
-            {
-                batch.CreateItemStream(payloadStream);
-            }
-            else
-            {
-                batch.UpsertItemStream(payloadStream, new TransactionalBatchItemRequestOptions()
-                {
-                    IfMatchEtag = version
-                });
-            }
+            batch.UpsertItemStream(payloadStream);
         }
 
         var response = await batch.ExecuteAsync().ConfigureAwait(false);
@@ -107,7 +97,5 @@ public class Repository
         {
             throw new Exception(response.ErrorMessage);
         }
-
-        return response.Select(x => x.ETag).ToArray();
     }
 }
