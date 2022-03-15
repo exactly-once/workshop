@@ -10,7 +10,7 @@ Fortunately for us, the changes won't be big.
 
 OK. We need to move the code for cleaning the outbox state out of the condition and add `MarkProcessed` between the dispatching and the cleanup code.
 
-Now let's focus on the cleanup. The goal was to avoid holding too many data inside the entity. To achieve it we need to replace the `OutboxState[context.MessageId] = null` code with simple `OutboxState.Remove(context.MessageId)`.
+Now let's focus on the cleanup. The goal was to avoid holding on to too many data inside the entity. To achieve it we need to replace the `OutboxState[context.MessageId] = null` code with simple `OutboxState.Remove(context.MessageId)`.
 
 Now take a look at the `outboxState != null` condition. Do we still need it?
 

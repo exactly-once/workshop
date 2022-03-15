@@ -85,21 +85,52 @@ Follow up:
 
 What you have seen are ghose messages. These are messages that carry the state that has not been persisted. Ghost messages are as bad as missing messages. We need to solve this problem.
 
-### Exercise 7 - remove the anomalies
+### Exercise 7 - re-send if in doubt
 
-We need to use the save+(re)publish approach to avoid message loss and ghost messages. But how to drive the re-publish? HTTP->messaging gatway. When Order is clicked, just send a message. The flag flip is going to be in a message handler now, not in the controller.
+- Go to the `ApplicationServices` class and change the logic to do the following:
+  - If the cart is not yet submitted, set the `Submitted` flag and save the cart
+  - Send the `SubmitOrder` message regardless if the cart has been submitted before or has just been submitted.
+- The new logic should now throw exceptions. Instead, if the `SubmitOrder` is invoked multiple times (e.g. when the previous attempt failed), it should re-send the message.
+- Check what are the consequences of this behavior to the `Orders` service.
 
-### Exercise 8: Duplicates on the receiver (lock timeout)
+Follow up:
+
+What we have just experienced is sender-side duplication. In order to avoid both lost and ghost messages we need to use the at-last-once approach to sending outgoing messages. The endpoint that receives these messages will have to deal with these duplicates. But before we get there, we want to take a look at another source of duplication.
+
+### Exercise 8: Re-send automatically
+
+- In the `Messages` project create a new message class `SendSubmitOrder` with two `string` properties: `Customer` and `CartId`.
+- In the `Program` class in the section where NServiceBus is configured remove the call to `SendOnly`. We need to make the `WebFrontend` and active endpoint to process the `SendSubmitOrder` messages.
+- In the same piece of code make sure the `repository` is available to NServiceBus handlers by adding following code
+
+```c#
+endpointConfiguration.RegisterComponents(c =>
+  {
+      c.RegisterSingleton(repository);
+  });
+```
+
+- In the `WebFrontend` project add a handler for the `SendSubmitOrder` message, similar to the `SubmitOrderHandler` in the `Orders` project
+  - Remember to implement the `IHandleMessages<SendSubmitOrder>` interface.
+  - Add a `repository` parameter of type `Repository` to the constructor and store the value in an instance field
+- Move the code from the `SubmitOrder` method to the `Handle` method of the new handler.
+  - Replace the parameter references to references to the incoming message
+  - Replace the `session.Send` call with `context.Send`
+- Change the code from the `SubmitOrder` method
+  - Remove existing code
+  - Add a call to `session.SendLocal` passing an instance of a `SendSubmitOrder` class.
+
+### Exercise 9: Duplicates on the receiver (lock timeout)
 
 The solution now uses the ASQ transport and there. Put the delay in the Process order handler.
-
-### Exercise 9: Duplicates on the sender side (broker issues causing re-publish)
-
-Enable the broker issue chaos monkey again. See how dupicate process order messages are sent.
 
 ### Exercise 10: Business ID-based deduplication
 
 Create-type operation can be de-duplicated based on the ID of the entity/aggregate to be created. Add such logic to the order. And test.
+
+- Go to the `SubmitOrderHandler` class and change the `Guid`-based order ID generation strategy with the value of the `CartId` property of the `SubmitOrder` message.
+- Run the solution to see the result
+- Modify the code of the `SubmitOrderHandler` to discard the message if an order already exists by using `repository.Get` method.
 
 ### Exercise 11, 12 and 13 - customer status policy
 

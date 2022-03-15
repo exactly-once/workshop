@@ -27,7 +27,6 @@ namespace Orders
                 .ConfigureServices(collection =>
                 {
                     collection.AddSingleton(appServices);
-                    collection.AddSingleton(appServices);
                 });
         }
     }

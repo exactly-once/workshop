@@ -58,6 +58,8 @@ public class ApplicationServices
             Items = cart.Items
         };
 
+        await Task.Delay(3000);
+
         await repository.Put(cart.Customer, order, cart);
     }
 }

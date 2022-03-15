@@ -16,6 +16,8 @@
                 throw new Exception("Simulated broker failure");
             }
             await next();
+
+            failed = false;
         }
     }
 }
