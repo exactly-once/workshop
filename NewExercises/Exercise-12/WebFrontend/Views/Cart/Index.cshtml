@@ -1,0 +1,29 @@
+﻿@model ShoppingCart
+@{
+    ViewData["Title"] = "Order";
+}
+
+@Html.ValidationSummary(false)
+
+<h1>@ViewData["Title"]  @Model.Id</h1>
+
+Customer: @Model.Customer
+
+<table>
+    <tr>
+        <th>Filling</th>
+    </tr>
+    @foreach (var item in Model.Items)
+    {
+        <tr>
+            <td>@item</td>
+        </tr>
+    }
+</table>
+
+@Html.ActionLink("Add item", "AddItem", "Cart", ViewContext.RouteData.Values)
+
+@using (Html.BeginForm("Submit", "Cart", ViewContext.RouteData.Values, FormMethod.Post))
+{
+    <input type="submit" value="Submit order" />
+}

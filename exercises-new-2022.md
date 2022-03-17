@@ -132,6 +132,33 @@ Create-type operation can be de-duplicated based on the ID of the entity/aggrega
 - Run the solution to see the result
 - Modify the code of the `SubmitOrderHandler` to discard the message if an order already exists by using `repository.Get` method.
 
+### Exercise 11
+
+Predictable automated tests for messaging systems
+
+### Exercise 12
+
+This and couple of following exercises use automated tests for show how our system behaves in various scenarios that might happen in messaging systems.
+
+Our system has been extended with new functionality. After order has been placed, we can book a pyment for a given order or cancel a payment that has been already booked. Let's see what happens when some of these messages get reordered:
+
+* Open `IntegrationTests.cs` in the `Test` project and naviage to `ChangeStatus` test
+* Use `SendInOrder` utility method to simulate scenario in which oder is placed, payment is booked and later cancelled but the `BookPayment` command in duplicated and the duplicate arrives as the last message:
+```csharp
+await SendInOrder(new IMessage[]
+  {
+      submitOrder,
+      bookPayment,
+      cancelPayment,
+      bookPayment
+  }
+);
+``` 
+* Run `ChangeStatus` test and check if the assertion holds
+* Add `List<Guid>` property to `Order` enity called `ProcessedMessages`
+* Use `ProcessedMessages` and `CartId` value in the `BookPayment` command to track processed messages and avoid re-processing duplicates
+
+
 ### Exercise 11, 12 and 13 - customer status policy
 
 Using a different solution that only has the policy endpoint. Using the acceptance testing framework.
