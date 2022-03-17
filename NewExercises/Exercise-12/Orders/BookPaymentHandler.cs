@@ -18,12 +18,6 @@ namespace Orders
         {
             var (order, version) = await repository.Get<Order>(message.Customer, message.CartId);
 
-            if (order.ProcessedMessages.Contains(message.Id))
-            {
-                log.Info("Duplicate 'BookPayment' detected");
-                return;
-            }
-            order.ProcessedMessages.Add(message.Id);
             order.PaymentBooked = true;
 
             await repository.Put(message.Customer, (order, version));

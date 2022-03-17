@@ -55,10 +55,7 @@ namespace Tests
 
             await SendInOrder(new IMessage[]
                 {
-                    submitOrder,
-                    bookPayment,
-                    cancelPayment,
-                    bookPayment
+                    //TODO: add messages here
                 }
             );
 
