@@ -18,8 +18,10 @@
     - [Ex5]() [Ex6]() 
     - _Break_
   - Block 3
+    - Partial failures lecture
+    - [Ex7]()
     - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html#/5) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Sources%20of%20duplication.md)
-    - [Ex7]() [Ex8]() [Ex9]()
+    - [Ex8]() [Ex9]()
     - _Break_
   - Block 4 
     - [Primary-key based deduplication]()
