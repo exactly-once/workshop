@@ -28,3 +28,64 @@ public async Task<IActionResult> StartNewGame(
 ```
 
 Any code executing in the `Once` method will be logically deduplicated and will produce deterministic results in this case `StartNewGame` message.
+
+
+* We would like to extend our sample application with writing game leader board to Azure blob when the game ends.
+* Let's start by adding new `SaveLeaderBoard` command
+```csharp
+    public class SaveLeaderBoard
+    {
+        public Guid GameId { get; set; }
+    }
+```
+* Make sure that ending the game (in `ShootingRange.cs`) results in sending out the new command
+```csharp
+[FunctionName(nameof(HandleEndGame))]
+public async Task HandleEndGame(
+    [QueueTrigger("end-game")] EndGame endGame,
+    [ExactlyOnce("{requestId}", "{gameId}")] IOnceExecutor<ShootingRangeState> execute,
+    [Queue("save-leader-board")] ICollector<SaveLeaderBoard> collector,
+    ILogger log)
+{
+    log.LogWarning($"Processed endGame:gameId={endGame.GameId}");
+
+    var saveLeaderBoard = await execute.Once(sr =>
+    {
+        sr.IsActive = false;
+
+        return new SaveLeaderBoard {GameId = endGame.GameId};
+    });
+
+    collector.Add(saveLeaderBoard);
+}
+```
+* Now lets add new function in the `LeaderBoard.cs` to handle the command and save the blob
+```csharp
+[FunctionName(nameof(SaveLeaderBoard))]
+public async Task SaveLeaderBoard(
+    [QueueTrigger("save-leader-board")] SaveLeaderBoard saveLeaderBoard,
+    [ExactlyOnce(requestId: "{gameId}", stateId: "{gameId}")] IOnceExecutor<LeaderBoardState> execute,
+    [Blob("game-results/{gameId}", FileAccess.Write)] TextWriter gameResultsBlob,
+    ILogger log)
+{
+    log.LogWarning($"Processing save leader board : gameId={saveLeaderBoard.GameId}");
+
+    var results = await execute.Once<GameResults>(board => new GameResults
+    {
+        EndDate = DateTime.Now,
+        Hits = board.NumberOfHits,
+        Misses = board.NumberOfAttempts - board.NumberOfHits
+    });
+
+    await gameResultsBlob.WriteLineAsync(@$"Date={results.EndDate}, Hits={results.Hits}, Misses={results.Misses}");
+}
+```
+* The exactly once processor results `GameResults` class instance that also needs to be defined
+```csharp
+public class GameResults
+{
+    public DateTime EndDate { get; set; }
+    public int Hits { get; set; }
+    public int Misses { get; set; }
+}
+```

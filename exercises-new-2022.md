@@ -136,7 +136,7 @@ Create-type operation can be de-duplicated based on the ID of the entity/aggrega
 
 Predictable automated tests for messaging systems
 
-### Exercise 12 ()
+### Exercise 12 
 
 NOTE: This and couple of following exercises use automated tests for show how our system behaves in various scenarios that might happen in messaging systems.
 
@@ -200,7 +200,7 @@ foreach (var outgoingMessage in payments.OutgoingMessages)
 }
 ```
 * Run all the test in the `Tests` project
-
+* Once we know that outgoing messages are out we can remove them form the `OutgoingMessages` and save the `Payments` entity
 
 ### Exercise 11, 12 and 13 - customer status policy
 

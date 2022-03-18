@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ExactlyOnce.AzureFunctions.Sample
 {
@@ -17,6 +17,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
     public class EndGame
     {
         public Guid GameId { get; set; }
+        public Guid RequestId { get; set; }
     }
 
     public class AttemptMade

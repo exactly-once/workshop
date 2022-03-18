@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -67,7 +68,8 @@ namespace ExactlyOnce.AzureFunctions.Sample
             var endGame = await execute.Once(
                 () => new EndGame
                 {
-                    GameId = request.GameId.ToGuid()
+                    GameId = request.GameId.ToGuid(),
+                    RequestId = Guid.NewGuid()
                 }
             );
 
