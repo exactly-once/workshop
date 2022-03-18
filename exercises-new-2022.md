@@ -188,6 +188,18 @@ new IMessage[] {
 }
 ```
 
+* Run the test and check if the asserition holds
+* Put logic in the `DropMessagesBehavior` to ensure that the `GrantCoupon` message is skipped (dropped) the firt time it is sent. This simulates situation when `PaymentBookHandler` failes on sending out `GrantCoupon` and the incoming message is retried.
+* Re-run the test. Does it work? Why?
+* Use `public List<ICommand> OutgoingMessages = new List<ICommand>();` property in the `Payments` entity to store the outoging messages and save them atomically together with the business changes.
+* Make sure that items in the `OutgoingMessages` are always sent. Also, when duplicates arrive:
+```csharp
+foreach (var outgoingMessage in payments.OutgoingMessages)
+{
+    await context.SendImmediately(outgoingMessage);
+}
+```
+* Run all the test in the `Tests` project
 
 
 ### Exercise 11, 12 and 13 - customer status policy

@@ -26,7 +26,7 @@ class SubmitOrderHandler : IHandleMessages<SubmitOrder>
             Id = message.CartId,
             Customer = message.Customer,
             Items = message.Items,
-            Value = PricePerItem * message.Items.Count
+            Value = RatePerItem * message.Items.Count
         };
 
         await repository.Put(message.Customer, (order, null));
@@ -34,7 +34,7 @@ class SubmitOrderHandler : IHandleMessages<SubmitOrder>
         log.Info("Order submitted "+ order.Id);
     }
 
-    private const int PricePerItem = 60;
+    private const int RatePerItem = 50;
 
     static readonly ILog log = LogManager.GetLogger<SubmitOrderHandler>();
 }

@@ -10,6 +10,5 @@ public class Order : Entity
 
     public int Value { get; set; }
 
-    public List<Guid> ProcessedMessages = new List<Guid>();
-
+    public List<Guid> ProcessedMessages { get; set; } = new List<Guid>();
 }

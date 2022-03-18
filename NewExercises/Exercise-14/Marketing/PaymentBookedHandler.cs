@@ -35,7 +35,7 @@ namespace Marketing
                 }
                 if (payments.TotalValue >= 100 && payments.TotalValue - message.Value < 100)
                 {
-                    await context.SendImmediately(new GrantCoupon {Customer = message.CustomerId});
+                    payments.OutgoingMessages.Add(new GrantCoupon {Customer = message.CustomerId});
                 }
 
                 payments.ProcessedMessage.Add(context.MessageId);
@@ -47,6 +47,11 @@ namespace Marketing
             else
             {
                 log.Info($"Duplicate detected from {nameof(PaymentBooked)} messageId={context.MessageId}");
+            }
+
+            foreach (var outgoingMessage in payments.OutgoingMessages)
+            {
+                await context.SendImmediately(outgoingMessage);
             }
         }
 

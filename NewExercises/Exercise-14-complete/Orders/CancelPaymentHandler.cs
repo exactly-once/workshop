@@ -33,7 +33,7 @@ namespace Orders
             }
 
             await context.PublishWithId(
-                new PaymentCancelled { CustomerId = order.Customer, Value = order.Value },
+                new PaymentCancelled {CustomerId = order.Customer, Value = order.Value},
                 Utils.DeterministicGuid(message.Id.ToString(), "Orders").ToString());
 
         }

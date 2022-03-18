@@ -18,29 +18,32 @@ namespace Marketing
         {
             var (payments, version) = await repository.Get<Payments>(message.CustomerId, Payments.RowId);
 
-            if (payments.ProcessedMessage.Contains(context.MessageId))
+            if (payments.ProcessedMessage.Contains(context.MessageId) == false)
             {
-                log.Info($"Duplicate detected for {nameof(PaymentCancelled)} messageId={context.MessageId}");
-                return;
-            }
-
-            if (version == null)
-            {
-                payments = new Payments
+                if (version == null)
                 {
-                    Customer = message.CustomerId,
-                    Id = Payments.RowId,
-                    TotalValue = -message.Value
-                };
+                    payments = new Payments
+                    {
+                        Customer = message.CustomerId,
+                        Id = Payments.RowId,
+                        TotalValue = -message.Value
+                    };
+                }
+                else
+                {
+                    payments.TotalValue -= message.Value;
+                }
+
+                payments.ProcessedMessage.Add(context.MessageId);
+
+                await repository.Put(message.CustomerId, (payments, version));
+
+                log.Info($"Processed {nameof(PaymentCancelled)} messageId={context.MessageId}");
             }
             else
             {
-                payments.TotalValue -= message.Value;
+                log.Info($"Duplicate detected for {nameof(PaymentCancelled)} messageId={context.MessageId}");
             }
-
-            await repository.Put(message.CustomerId, (payments, version));
-
-            log.Info($"Processed {nameof(PaymentCancelled)} messageId={context.MessageId}");
         }
 
         static readonly ILog log = LogManager.GetLogger<PaymentCancelledHandler>();

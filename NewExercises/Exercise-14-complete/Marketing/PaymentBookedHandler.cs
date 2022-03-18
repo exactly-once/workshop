@@ -17,11 +17,7 @@ namespace Marketing
         {
             var (payments, version) = await repository.Get<Payments>(message.CustomerId, Payments.RowId);
 
-            if (payments.ProcessedMessage.Contains(context.MessageId))
-            {
-                log.Info($"Duplicate detected from {nameof(PaymentBooked)} messageId={context.MessageId}");
-            }
-            else
+            if (payments.ProcessedMessage.Contains(context.MessageId) == false)
             {
                 if (version == null)
                 {
@@ -37,17 +33,20 @@ namespace Marketing
                     payments.TotalValue += message.Value;
 
                 }
-
-                payments.ProcessedMessage.Add(context.MessageId);
-
                 if (payments.TotalValue >= 100 && payments.TotalValue - message.Value < 100)
                 {
-                    payments.OutgoingMessages.Add(new GrantCoupon { Customer = message.CustomerId });
+                    payments.OutgoingMessages.Add(new GrantCoupon {Customer = message.CustomerId});
                 }
+
+                payments.ProcessedMessage.Add(context.MessageId);
 
                 await repository.Put(message.CustomerId, (payments, version));
 
                 log.Info($"Processed {nameof(PaymentBooked)} messageId={context.MessageId}");
+            }
+            else
+            {
+                log.Info($"Duplicate detected from {nameof(PaymentBooked)} messageId={context.MessageId}");
             }
 
             foreach (var outgoingMessage in payments.OutgoingMessages)

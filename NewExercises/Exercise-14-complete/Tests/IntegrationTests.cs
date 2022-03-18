@@ -57,91 +57,6 @@ namespace Tests
         }
 
         [Test]
-        public async Task SubmitOder()
-        {
-            var cartId = Guid.NewGuid().ToString();
-            var customerId = Guid.NewGuid().ToString();
-
-            var (conversationId, options) = tracer.Prepare();
-
-            var message = new SubmitOrder
-            {
-                CartId = cartId,
-                Customer = customerId,
-                Items = new List<Filling>()
-            };
-
-            await ordersEndpoint.Send(message, options);
-
-            await tracer.WaitUntilFinished(conversationId);
-
-            var (order, version) = await ordersRepository.Get<Order>(message.Customer, message.CartId);
-
-            Assert.AreEqual(order.Customer, customerId);
-        }
-
-        //ID-based de-duplication. Start with no message id on the commands
-        //Add message id to the commands and the ProcessedMessages to the order
-        [Test]
-        public async Task ChangeStatus()
-        {
-            var cartId = Guid.NewGuid().ToString();
-            var customerId = Guid.NewGuid().ToString();
-
-            var submitOrder = new SubmitOrder {CartId = cartId, Customer = customerId, Items = new List<Filling>()};
-
-            var bookPayment = new BookPayment {Id = Guid.NewGuid(), CartId = cartId, Customer = customerId};
-
-            var cancelPayment = new CancelPayment {Id = Guid.NewGuid(), CartId = cartId, Customer = customerId};
-
-            await SendInOrder(new IMessage[]
-                {
-                    submitOrder,
-                    bookPayment,
-                    cancelPayment,
-                    bookPayment
-                }
-            );
-
-            var (order, _) = await ordersRepository.Get<Order>(customerId, cartId);
-
-            Assert.AreEqual(order.PaymentBooked, false);
-        }
-
-        //Start with no deterministic message id in the order handler
-        [Test]
-        public async Task TrackTotalPaymentsValue()
-        {
-            var cartId = Guid.NewGuid().ToString();
-            var customerId = Guid.NewGuid().ToString();
-
-            var submitOrder = new SubmitOrder { CartId = cartId, Customer = customerId, Items = new List<Filling>
-                {
-                    Filling.Meat,
-                    Filling.Mushrooms,
-                    Filling.QuarkAndPotatoes
-                } };
-
-            var bookPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
-
-            var cancelPayment = new CancelPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
-
-            await SendInOrder(new IMessage[]
-                {
-                    submitOrder,
-                    bookPayment,
-                    cancelPayment,
-                    bookPayment
-                }
-            );
-
-            var (payment, _) = await marketingRepository.Get<Payments>(customerId, Payments.RowId);
-
-            Assert.AreEqual(0, payment.TotalValue);
-        }
-
-        //Start with no deterministic message id in the order handler
-        [Test]
         public async Task IssueCouponCardAfterFirst100USDSpent()
         {
             var cartId = Guid.NewGuid().ToString();
@@ -173,8 +88,7 @@ namespace Tests
             var bookFirstPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
             var bookSecondPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
 
-            await SendInOrder(new IMessage[]
-                {
+            await SendInOrder(new IMessage[] {
                     submitFirstOrder,
                     bookFirstPayment,
                     submitSecondOrder,
@@ -188,6 +102,68 @@ namespace Tests
             Assert.IsNotNull(version);
         }
 
+        [Test]
+        public async Task TrackTotalPaymentsValue()
+        {
+            var cartId = Guid.NewGuid().ToString();
+            var customerId = Guid.NewGuid().ToString();
+
+            var submitOrder = new SubmitOrder
+            {
+                CartId = cartId,
+                Customer = customerId,
+                Items = new List<Filling>
+                {
+                    Filling.Meat,
+                    Filling.Mushrooms,
+                    Filling.QuarkAndPotatoes
+                }
+            };
+
+            var bookPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
+
+            var cancelPayment = new CancelPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
+
+            await SendInOrder(new IMessage[]
+                {
+                    submitOrder,
+                    bookPayment,
+                    cancelPayment,
+                    bookPayment
+                }
+            );
+
+            var (payment, _) = await marketingRepository.Get<Payments>(customerId, Payments.RowId);
+
+            Assert.AreEqual(0, payment.TotalValue);
+        }
+
+        [Test]
+        public async Task ChangeStatus()
+        {
+            var cartId = Guid.NewGuid().ToString();
+            var customerId = Guid.NewGuid().ToString();
+
+            var submitOrder = new SubmitOrder { CartId = cartId, Customer = customerId, Items = new List<Filling>() };
+
+            var bookPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
+
+            var cancelPayment = new CancelPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
+
+            await SendInOrder(new IMessage[]
+                {
+                    submitOrder,
+                    bookPayment,
+                    cancelPayment,
+                    bookPayment
+                }
+            );
+
+            var (order, _) = await ordersRepository.Get<Order>(customerId, cartId);
+
+            Assert.AreEqual(order.PaymentBooked, false);
+        }
+
         async Task SendInOrder(IMessage[] messages)
         {
             foreach (var message in messages)
@@ -199,29 +175,21 @@ namespace Tests
                 await tracer.WaitUntilFinished(conversationId);
             }
         }
-        async Task Execute(Func<SendOptions, Task> step)
+
+        public class DropMessagesBehavior : Behavior<IOutgoingLogicalMessageContext>
         {
-            var (conversationId, options) = tracer.Prepare();
+            bool dropped = false;
 
-            await step(options);
-
-            await tracer.WaitUntilFinished(conversationId);
-        }
-    }
-
-    public class DropMessagesBehavior : Behavior<IOutgoingLogicalMessageContext>
-    {
-        private bool dropped = false;
-
-        public override async Task Invoke(IOutgoingLogicalMessageContext context, Func<Task> next)
-        {
-            if (!dropped && context.Message.Instance is GrantCoupon)
+            public override async Task Invoke(IOutgoingLogicalMessageContext context, Func<Task> next)
             {
-                dropped = true;
-            }
-            else
-            {
-                await next();
+                if (!dropped && context.Message.Instance is GrantCoupon)
+                {
+                    dropped = true;
+                }
+                else 
+                {
+                    await next();
+                }
             }
         }
     }

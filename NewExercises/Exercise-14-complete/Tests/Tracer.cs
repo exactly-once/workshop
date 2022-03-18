@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
-using Marketing;
 using NServiceBus;
 
 namespace Messaging.IntegrationTests.Tests

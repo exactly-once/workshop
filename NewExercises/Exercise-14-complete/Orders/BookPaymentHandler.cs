@@ -29,11 +29,11 @@ namespace Orders
             }
             else
             {
-                log.Info($"Duplicate 'BookPayment' detected OrderId={order.Id}");
+                log.Info("Detected 'BookPayment' duplicate");
             }
 
             await context.PublishWithId(
-                new PaymentBooked {CustomerId = order.Customer, Value = order.Value},
+                new PaymentBooked {CustomerId = order.Customer, Value = order.Value}, 
                 Utils.DeterministicGuid(message.Id.ToString(), "Orders").ToString());
         }
 
