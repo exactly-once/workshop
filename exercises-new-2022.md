@@ -34,7 +34,7 @@ Follow up: what happens if you click "Order" twice _very_ quickly? Two orders
 - Move the code that creates and saves the order from the `SubmitOrder` method to the `Handle` method of `SubmitOrderHandler`
   - You can now remove the `Task.Delay`
   - Consider logging something at the end of the `Handle` method e.g. `log.Info("Order submitted "+ order.Id);`
-  - Remember that in the `SubmitOrder` method you still need to save the cart after the flag is is set
+  - Remember that in the `SubmitOrder` method you still need to save the cart after the flag is set
 - In the `SubmitOrder` method, after the call to `repository.Put` to save the state of the cart, add code to send the `SubmitOrder` message. Use the `session` field of type `IMessageSession` and its `Send` method. Set the properties of the `SubmitOrder` message based on the shopping cart.
 
 Introduction to messaging - asynchronous processing, distributed systems etc.
@@ -90,7 +90,7 @@ What you have seen are ghose messages. These are messages that carry the state t
 - Go to the `ApplicationServices` class and change the logic to do the following:
   - If the cart is not yet submitted, set the `Submitted` flag and save the cart
   - Send the `SubmitOrder` message regardless if the cart has been submitted before or has just been submitted.
-- The new logic should now throw exceptions. Instead, if the `SubmitOrder` is invoked multiple times (e.g. when the previous attempt failed), it should re-send the message.
+- The new logic should not throw exceptions. Instead, if the `SubmitOrder` is invoked multiple times (e.g. when the previous attempt failed), it should re-send the message.
 - Check what are the consequences of this behavior to the `Orders` service.
 
 Follow up:
@@ -136,11 +136,11 @@ Create-type operation can be de-duplicated based on the ID of the entity/aggrega
 
 Predictable automated tests for messaging systems
 
-### Exercise 12
+### Exercise 12 ()
 
-This and couple of following exercises use automated tests for show how our system behaves in various scenarios that might happen in messaging systems.
+NOTE: This and couple of following exercises use automated tests for show how our system behaves in various scenarios that might happen in messaging systems.
 
-Our system has been extended with new functionality. After order has been placed, we can book a pyment for a given order or cancel a payment that has been already booked. Let's see what happens when some of these messages get reordered:
+Our system has been extended with new functionality. After order has been placed, we can book a payment for a given order or cancel a payment that has already been booked. Let's see what happens when some of these messages get reordered:
 
 * Open `IntegrationTests.cs` in the `Test` project and naviage to `ChangeStatus` test
 * Use `SendInOrder` utility method to simulate scenario in which oder is placed, payment is booked and later cancelled but the `BookPayment` command in duplicated and the duplicate arrives as the last message:
@@ -156,7 +156,38 @@ await SendInOrder(new IMessage[]
 ``` 
 * Run `ChangeStatus` test and check if the assertion holds
 * Add `List<Guid>` property to `Order` enity called `ProcessedMessages`
-* Use `ProcessedMessages` and `CartId` value in the `BookPayment` command to track processed messages and avoid re-processing duplicates
+```csharp
+ public List<Guid> ProcessedMessages { get; set; } = new List<Guid>();
+```
+* Use `ProcessedMessages` and `Id` value in the `BookPayment` command to track processed messages and avoid re-processing duplicates
+
+### Exercise 13
+
+Due to considerable sucess of our the business, the system has been extended with new `Marketing` endpoint, reponsible for tracking value of payments booked for any given customer. Now when status of an order is changed either `PaymentBooked` or `PaymentCancelled` event is published. 
+
+Unfortunatelly, our production support team claims that once in a while the calculated value for a customer does not match the total from all the payments. Let's see if we can reproducte such a scenario.
+
+* Go to `TrackTotalPaymentsValue` test and check if it passes. Why does it fail? Check what is are the `MessageId` values for both duplicates of the `BookPayment` message. Why are they different?
+* In the `BookPaymentHandler` and `CancelPaymentHandler` use `PublishWithId` extension method and use `Utils` class to ensure that the published messages have ids that are deterministically derived from the incoming message id and the endpoint name.
+* Why do we need to put the endpont name in there?
+* Ensure that both tests are passing
+
+### Exercise 14
+
+Now that we can reliably calculate value of all the payments made by a customer the business wants to put that to a good use. Our team needs to add a small feature ie. when a customer goes over 100 USD in total paymets for the first time we want to send them a coupon.
+
+* To to `IssueCouponCardAfterFirst100USDSpent` test and define the follwong sequence of message processing. What could be a production scenario in which this could happen?
+
+```csharp
+new IMessage[] {
+  submitFirstOrder,
+  bookFirstPayment,
+  submitSecondOrder,
+  bookSecondPayment,
+  bookFirstPayment //HINT: this is a retried message
+}
+```
+
 
 
 ### Exercise 11, 12 and 13 - customer status policy

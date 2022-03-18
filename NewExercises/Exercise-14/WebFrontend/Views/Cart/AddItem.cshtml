@@ -1,0 +1,21 @@
+﻿@using Messages
+@model ItemModel
+@{
+    ViewData["Title"] = "Add new item";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Now you can add a new item to your order.</p>
+
+@using (Html.BeginForm("AddItem", "Cart", FormMethod.Post))
+{
+<table>
+    <tr>
+        <td>Filling: </td>
+        <td>@Html.DropDownListFor(m => m.Filling, Html.GetEnumSelectList<Filling>())</td>
+    </tr>
+    <tr>
+        <td colspan="2"><input type="submit" value="Add item" /></td>
+    </tr>
+</table>
+}
