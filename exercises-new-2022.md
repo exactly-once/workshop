@@ -78,12 +78,13 @@ Explanation: you can go back and see the cart on the list but you can't re-submi
 
 ### Exercise 6 - change the order of operations
 
-- Go to the `ApplicationServices` class and the `SubmitOrder` method and check if the system can handle the broker failures gracefully.
+- Go to the `ApplicationServices` class and the `SubmitOrder` method and reverse the order of `repository.Put` and `session.Send`. This should make sure that the state of the cart remains not `Submitted` if the message sending failed.
+- Check if the system can handle the broker failures gracefully.
 - Go on add add few more orders.
 
 Follow up:
 
-What you have seen are ghose messages. These are messages that carry the state that has not been persisted. Ghost messages are as bad as missing messages. We need to solve this problem.
+What you have seen are ghost messages. These are messages that carry the state that has not been persisted. Ghost messages are as bad as missing messages. We need to solve this problem.
 
 ### Exercise 7 - re-send if in doubt
 
@@ -120,9 +121,9 @@ endpointConfiguration.RegisterComponents(c =>
   - Remove existing code
   - Add a call to `session.SendLocal` passing an instance of a `SendSubmitOrder` class.
 
-### Exercise 9: Duplicates on the receiver (lock timeout)
+### Exercise 9: Duplicates on the receiver
 
-The solution now uses the ASQ transport and there. Put the delay in the Process order handler.
+Previous exercise 2.
 
 ### Exercise 10: Business ID-based deduplication
 
@@ -130,7 +131,7 @@ Create-type operation can be de-duplicated based on the ID of the entity/aggrega
 
 - Go to the `SubmitOrderHandler` class and change the `Guid`-based order ID generation strategy with the value of the `CartId` property of the `SubmitOrder` message.
 - Run the solution to see the result
-- Modify the code of the `SubmitOrderHandler` to discard the message if an order already exists by using `repository.Get` method.
+- Modify the code of the `SubmitOrderHandler` to discard the message if an order already exists by using `repository.Get` method. Remember to check the `version` part of the return because the `Get` method always returns a non-null item.
 
 ### Exercise 11
 
@@ -165,14 +166,13 @@ await SendInOrder(new IMessage[]
 
 Due to considerable sucess of our the business, the system has been extended with new `Marketing` endpoint, reponsible for tracking value of payments booked for any given customer. Now when status of an order is changed either `PaymentBooked` or `PaymentCancelled` event is published. 
 
-Unfortunatelly, our production support team claims that once in a while the calculated value for a customer does not match the total from all the payments. Let's see if we can reproducte such a scenario.
 
 * Go to `TrackTotalPaymentsValue` test and check if it passes. Why does it fail? Check what is are the `MessageId` values for both duplicates of the `BookPayment` message. Why are they different?
 * In the `BookPaymentHandler` and `CancelPaymentHandler` use `PublishWithId` extension method and use `Utils` class to ensure that the published messages have ids that are deterministically derived from the incoming message id and the endpoint name.
 * Why do we need to put the endpont name in there?
 * Ensure that both tests are passing
+Previous exercise 11. Storing outgoing messages.
 
-### Exercise 14
 
 Now that we can reliably calculate value of all the payments made by a customer the business wants to put that to a good use. Our team needs to add a small feature ie. when a customer goes over 100 USD in total paymets for the first time we want to send them a coupon.
 
@@ -202,14 +202,8 @@ foreach (var outgoingMessage in payments.OutgoingMessages)
 * Run all the test in the `Tests` project
 * Once we know that outgoing messages are out we can remove them form the `OutgoingMessages` and save the `Payments` entity
 
-### Exercise 11, 12 and 13 - customer status policy
 
-Using a different solution that only has the policy endpoint. Using the acceptance testing framework.
 
- - SubmitOrder -> OrderSubmitted
-   - Idempotent operations not idempotent when re-ordering -> use message IDs
-   - ID-based deduplication only good if IDs are stable
-   - Deterministic state
 
 ### Summary
 

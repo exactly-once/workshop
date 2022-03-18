@@ -8,6 +8,7 @@
 <table>
     <tr>
         <th>Id</th>
+        <th>Accepted</th>
         <th>Submitted</th>
         <th></th>
     </tr>
@@ -15,6 +16,7 @@
     {
         <tr>
             <td>@item.Id</td>
+            <td>@item.Accepted</td>
             <td>@item.Submitted</td>
             <td>@Html.ActionLink("Details", "Index", "Cart", new { customerId = item.Customer, cartId = item.Id})</td>
         </tr>

@@ -1,5 +1,6 @@
 namespace Orders
 {
+    using System;
     using System.Threading.Tasks;
     using Messages;
     using NServiceBus;
@@ -15,15 +16,16 @@ namespace Orders
 
         public async Task Handle(SendSubmitOrder message, IMessageHandlerContext context)
         {
-            var (cart, version) = await repository.Get<ShoppingCart>(message.Customer, message.CartId);
+            var(cart, version) = await repository.Get<ShoppingCart>(message.Customer, message.CartId);
             if (cart.Submitted)
             {
-                //Log
+                throw new Exception("Order already submitted");
             }
-            else
+
+            if (!cart.Accepted)
             {
-                cart.Submitted = true;
-                await repository.Put(cart.Customer, (cart, version));
+                cart.Accepted = true;
+                version = (await repository.Put(cart.Customer, (cart, version)))[0];
             }
 
             var msg = new SubmitOrder
@@ -32,7 +34,12 @@ namespace Orders
                 CartId = message.CartId,
                 Items = cart.Items
             };
-            await context.Send(msg);
+            var sendOptions = new SendOptions();
+            sendOptions.RequireImmediateDispatch();
+            await context.Send(msg, sendOptions);
+
+            cart.Submitted = true;
+            await repository.Put(cart.Customer, (cart, version));
         }
     }
 }
