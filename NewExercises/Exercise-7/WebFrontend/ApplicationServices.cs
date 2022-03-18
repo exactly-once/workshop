@@ -26,19 +26,19 @@ public class ApplicationServices
         return repository.List<ShoppingCart>(customer);
     }
 
-    public Task CreateCart(string customer, string orderId)
+    public Task CreateCart(string customer, string cartId)
     {
         var cart = new ShoppingCart
         {
-            Id = orderId,
+            Id = cartId,
             Customer = customer
         };
         return repository.Put(cart.Customer, (cart, null));
     }
 
-    public async Task AddItem(string customer, string orderId, Filling filling)
+    public async Task AddItem(string customer, string cartId, Filling filling)
     {
-        var (cart, version) = await repository.Get<ShoppingCart>(customer, orderId);
+        var (cart, version) = await repository.Get<ShoppingCart>(customer, cartId);
         if (!cart.Items.Contains(filling))
         {
             cart.Items.Add(filling);
@@ -46,9 +46,9 @@ public class ApplicationServices
         await repository.Put(cart.Customer, (cart, version));
     }
 
-    public async Task SubmitOrder(string customer, string orderId)
+    public async Task SubmitOrder(string customer, string cartId)
     {
-        var (cart, version) = await repository.Get<ShoppingCart>(customer, orderId);
+        var (cart, version) = await repository.Get<ShoppingCart>(customer, cartId);
         if (cart.Submitted)
         {
             throw new Exception("Order already submitted");
@@ -59,7 +59,7 @@ public class ApplicationServices
         var msg = new SubmitOrder
         {
             Customer = customer,
-            OrderId = orderId,
+            CartId = cartId,
             Items = cart.Items
         };
         await session.Send(msg);

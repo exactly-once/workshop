@@ -49,10 +49,15 @@ public class ApplicationServices
     public async Task SubmitOrder(string customer, string cartId)
     {
         var (cart, version) = await repository.Get<ShoppingCart>(customer, cartId);
-        if (!cart.Submitted)
+        if (cart.Submitted)
         {
-            cart.Submitted = true;
-            await repository.Put(cart.Customer, (cart, version));
+            throw new Exception("Order already submitted");
+        }
+
+        if (!cart.Accepted)
+        {
+            cart.Accepted = true;
+            version = (await repository.Put(cart.Customer, (cart, version)))[0];
         }
 
         var msg = new SubmitOrder
@@ -63,6 +68,9 @@ public class ApplicationServices
         };
         await session.Send(msg);
 
-        
+        cart.Submitted = true;
+        await repository.Put(cart.Customer, (cart, version));
+
+
     }
 }
