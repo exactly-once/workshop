@@ -14,3 +14,4 @@ Let's get our hands dirty.
   - Consider logging something at the end of the `Handle` method e.g. `log.Info("Order submitted "+ order.Id);`.
   - Remember that in the `SubmitOrder` method you still need to save the cart after the flag is is set.
 - In the `SubmitOrder` method, after the call to `repository.Put` to save the state of the cart, add the code to send the `SubmitOrder` message. Use the `session` field of type `IMessageSession` and its `Send` method. Set the properties of the `SubmitOrder` message based on the shopping cart.
+- Run the application and check if you can submit an order. Make sure that both `WebFrontend` and `Orders` are selected as start projects.
