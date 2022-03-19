@@ -1,4 +1,4 @@
-# Exercise 12: Generic outbox - follow-up
+# Exercise 15: Generic outbox - follow-up
 
 The solution looks really good but we can make it even better. So far we stored our business messages in the outbox. The downside of that is that headers, which are an essential parts of a message, were missing. We'll fix that now.
 

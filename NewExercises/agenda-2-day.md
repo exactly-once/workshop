@@ -18,13 +18,13 @@
     - [Ex5]() [Ex6]() 
     - _Break_
   - Block 3
-    - Partial failures lecture
+    - [Partial failures lecture](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html#/5) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.md)
     - [Ex7]()
     - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html#/5) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Sources%20of%20duplication.md)
     - [Ex8]() [Ex9]()
     - _Break_
   - Block 4 
-    - [Primary-key based deduplication]()
+    - [Primary-key based deduplication](TBD)
     - [Ex10]()
     - [Integration tests]()
     - _Break_
@@ -46,6 +46,7 @@
   - Block 4
     - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
     - Generic Outbox - [Ex15]
+    - [Inbox](TBD)
     - Inbox - [Ex16]
     - _Break_
   - Block 5

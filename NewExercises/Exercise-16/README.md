@@ -1,4 +1,4 @@
-# Exercise 13: Inbox
+# Exercise 16: Inbox
 
 In the previous exercise we have implemented a generic version of the Outbox pattern. We quickly discussed its downsides and agreed that we can do better. In this exercise we will introduce a concept of Inbox as a shared storage of deduplication information.
 

@@ -4,9 +4,9 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Building reliable event-driven microservice architectures</title>
-		<meta name="description" content="Building reliable event-driven microservice architectures">
-		<meta name="author" content="Szymon Pobiega">
+		<title>Outbox</title>
+		<meta name="description" content="Inbox">
+		<meta name="author" content="Szymon Pobiega Tomasz Masternak">
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -157,95 +157,60 @@
 			</aside>
 			<div class="slides">
 				<section>
-					<h2>Building reliable event-driven microservice architectures</h2>
+					<h2>Inbox</h2>
 					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
 				</section>
 				<section>
-					<h1>Event driven?</h1>
-					<h2 class="fragment">Distributed</h2>
-					<h2 class="fragment">Asynchronous</h2>
+					<h1>Deduplication data</h1>
 				</section>
 				<section>
-					<h1>Why distributed?</h1>
+					<h2>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="1,2|3,4|5,6">
+await deduplicationStore
+	.Add(messageId);
+entity.OutboxState
+	.Remove(messageId);
+await persister
+	.Persist(entity);
+					</code></pre>
+					</h2>
 				</section>
 				<section>
-					<img src="images/siloed-apps.png" class="stretch"/>
+					<h2>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim>
+if (await deduplicationStore
+	.HasBeenProcessed(messageId))
+{
+	return;
+}
+if (!entity.OutboxState
+	.ContainsKey(messageId))
+{
+					</code></pre>
+					</h2>
 				</section>
 				<section>
-					<img src="images/distributed-system.png" class="stretch"/>
+					<h2>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="1">
+entity = await persister.Load(id)
+if (await deduplicationStore
+	.HasBeenProcessed(messageId))
+{
+	return;
+}
+if (!entity.OutboxState
+	.ContainsKey(messageId))
+{
+					</code></pre>
+					</h2>
 				</section>
 				<section>
-					<h1>Construction</h1>
-					<hr>
-					<h1>Maintenance</h1>
+					<h2 class="fragment">Store at least in one place</h2>
+					<h2 class="fragment">Always check in both places</h2>
+					<h2 class="fragment">Use optimistic concurrency</h2>
 				</section>
 				<section>
-					<h1>Isolation</h1>
-				</section>
-				<section>
-					<h1>Failure tolerance</h1>
-				</section>
-				<section>
-					<img src="images/bsod.png" class="stretch"/>
-				</section>
-				<section>
-					<h1>Stateless</h1>
-				</section>
-				<section>
-					<h1>Failure domains</h1>
-				</section>
-				<section>
-					<h1>Bugs</h1>
-				</section>
-				<section>
-					<h1>Scalability</h1>
-				</section>
-				<section>
-					<h1>Data tier</h1>
-				</section>
-				<section>
-					<h1>Distributed code</h1>
-					<h1>Centralized data</h1>
-				</section>
-				<section>
-					<h1>Shared mutable global state</h1>
-				</section>
-				<section>
-					<img src="images/kafka-microservices.png" class="stretch"/>
-				</section>
-				<section>
-					<blockquote style="width: 100%;">
-<h3>
-"democracy is the worst form of government except for all those other forms that have been tried from time to time"
-</h3>
--- Winston Churchill
-					</blockquote>
-				</section>
-				<section>
-					<h1>Why asynchronous?</h1>
-				</section>
-				<section>
-					<h2>HTTP</h2>
-					<h2>REST</h2>
-					<h2>gRPC</h2>
-				</section>
-				<section>
-					<img src="images/distributed-transaction.png" class="stretch"/>
-				</section>
-				<section>
-					<img src="images/async-process.png" class="stretch"/>
-				</section>
-				<section>
-					<h1>Failure handling</h1>
-				</section>
-				<section>
-					<h1>At-most-once</h1>
-				</section>
-				<section>
-					<h1>At-least-once</h1>
-				</section>
-				<section>
-					<h1>Exactly-once?</h1>
+					<h1>Consistency matters</h1>
 				</section>
 			</div>
 		</div>

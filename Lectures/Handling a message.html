@@ -4,9 +4,9 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Building reliable event-driven microservice architectures</title>
-		<meta name="description" content="Building reliable event-driven microservice architectures">
-		<meta name="author" content="Szymon Pobiega">
+		<title>Message ID</title>
+		<meta name="description" content="Handling a message">
+		<meta name="author" content="Szymon Pobiega Tomasz Masternak">
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -157,95 +157,97 @@
 			</aside>
 			<div class="slides">
 				<section>
-					<h2>Building reliable event-driven microservice architectures</h2>
+					<h2>Handling a message</h2>
 					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
 				</section>
 				<section>
-					<h1>Event driven?</h1>
-					<h2 class="fragment">Distributed</h2>
-					<h2 class="fragment">Asynchronous</h2>
+					<h1>Message</h1>
 				</section>
 				<section>
-					<h1>Why distributed?</h1>
+					<h3>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="">
+public class BookPayment : IMessage
+{
+	public string CartId { get; set; }
+	public string Customer { get; set; }
+	public Guid Id { get; set; }
+}
+					</code></pre>
+					</h3>
 				</section>
 				<section>
-					<img src="images/siloed-apps.png" class="stretch"/>
+					<h1>Handler</h1>
 				</section>
 				<section>
-					<img src="images/distributed-system.png" class="stretch"/>
+					<h4>
+					<pre class="stretch"><code class="java" data-noescape data-trim data-line-numbers="">
+public class MsgBean implements javax.jms.MessageListener {
+	public void onMessage(javax.jms.Message msg) {
+	
+		String receivedMsg = ((TextMessage) msg).getText();
+		System.out.println("Received message: " + receivedMsg);
+	}
+}
+					</code></pre>
+					</h4>
 				</section>
 				<section>
-					<h1>Construction</h1>
+					<h4>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="">
+public class MsgHandler : IHandleMessages&lt;MyMessage&gt;
+{
+	public Task Handle(MyMessage message, IMessageHandlerContext context)
+	{
+		log.Info($"Received message {message.Text}");
+		return context.Send(new OtherMessage());
+	}
+}
+					</code></pre>
+					</h4>
+				</section>
+				<section>
+					<h4>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="">
+public interface IConsumer<in TMessage> :
+	IConsumer
+	where TMessage : class
+{
+	Task Consume(ConsumeContext<TMessage> context);
+}
+					</code></pre>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="">
+public interface IHandleMessages<in TMessage> : IHandleMessages
+{
+	Task Handle(TMessage message);
+}
+					</code></pre>
+					</h4>
+				</section>
+				<section>
+					<h1>Endpoint</h1>
+				</section>
+				<section>
+					<h4>
+					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="1|3|5|7|9|11">
+var config = new EndpointConfiguration("MyEndpoint");
+
+/*Lots of configuration code*/
+
+var endpoint = await Endpoint.Start(config);
+
+await endpoint.Send(new MyMessage());
+
+/*Wait for the process kill signal*/
+
+await endpoint.Stop();
+
+					</code></pre>
+					</h4>
+				</section>
+				<section>
+					<h1>Services</h1>
 					<hr>
-					<h1>Maintenance</h1>
-				</section>
-				<section>
-					<h1>Isolation</h1>
-				</section>
-				<section>
-					<h1>Failure tolerance</h1>
-				</section>
-				<section>
-					<img src="images/bsod.png" class="stretch"/>
-				</section>
-				<section>
-					<h1>Stateless</h1>
-				</section>
-				<section>
-					<h1>Failure domains</h1>
-				</section>
-				<section>
-					<h1>Bugs</h1>
-				</section>
-				<section>
-					<h1>Scalability</h1>
-				</section>
-				<section>
-					<h1>Data tier</h1>
-				</section>
-				<section>
-					<h1>Distributed code</h1>
-					<h1>Centralized data</h1>
-				</section>
-				<section>
-					<h1>Shared mutable global state</h1>
-				</section>
-				<section>
-					<img src="images/kafka-microservices.png" class="stretch"/>
-				</section>
-				<section>
-					<blockquote style="width: 100%;">
-<h3>
-"democracy is the worst form of government except for all those other forms that have been tried from time to time"
-</h3>
--- Winston Churchill
-					</blockquote>
-				</section>
-				<section>
-					<h1>Why asynchronous?</h1>
-				</section>
-				<section>
-					<h2>HTTP</h2>
-					<h2>REST</h2>
-					<h2>gRPC</h2>
-				</section>
-				<section>
-					<img src="images/distributed-transaction.png" class="stretch"/>
-				</section>
-				<section>
-					<img src="images/async-process.png" class="stretch"/>
-				</section>
-				<section>
-					<h1>Failure handling</h1>
-				</section>
-				<section>
-					<h1>At-most-once</h1>
-				</section>
-				<section>
-					<h1>At-least-once</h1>
-				</section>
-				<section>
-					<h1>Exactly-once?</h1>
+					<h1>Components</h1>
 				</section>
 			</div>
 		</div>

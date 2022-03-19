@@ -4,9 +4,9 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Building reliable event-driven microservice architectures</title>
-		<meta name="description" content="Building reliable event-driven microservice architectures">
-		<meta name="author" content="Szymon Pobiega">
+		<title>Message ID</title>
+		<meta name="description" content="Primary key-based deduplication">
+		<meta name="author" content="Szymon Pobiega Tomasz Masternak">
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -157,96 +157,53 @@
 			</aside>
 			<div class="slides">
 				<section>
-					<h2>Building reliable event-driven microservice architectures</h2>
+					<h2>Primary key-based deduplication</h2>
 					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
 				</section>
 				<section>
-					<h1>Event driven?</h1>
-					<h2 class="fragment">Distributed</h2>
-					<h2 class="fragment">Asynchronous</h2>
+					<h1>Primary key</h1>
 				</section>
 				<section>
-					<h1>Why distributed?</h1>
+					<h2>Creating a document is idempotent</h2>
 				</section>
 				<section>
-					<img src="images/siloed-apps.png" class="stretch"/>
+					<h2>
+					<pre class="stretch"><code class="sql" data-noescape data-trim data-line-numbers="">
+if (Exists(entityId))
+{
+	return;
+}
+var entity = Create(entityId);
+					</code></pre>
+					</h2>
 				</section>
 				<section>
-					<img src="images/distributed-system.png" class="stretch"/>
+					<h2 class="fragment"><code>(AddItem)</code> - idempotent</h2>
+					<h2 class="fragment"><code>(RemoveItem)</code> - idempotent</h2>
+					<h2 class="fragment"><code>(AddItem, RemoveItem)</code> - ⚠️not idempotent</h2>
 				</section>
 				<section>
-					<h1>Construction</h1>
+					<h2>\(A \cup B = (A \cup B) \cup B\)</h2>
+					<h2>\(A \cap B = (A \cap B) \cap B\)</h2>
+				</section>
+				<section>
+					<h2>\((((A \cup B) \cup B) \cap B) \cap B\)</h2>
 					<hr>
-					<h1>Maintenance</h1>
+					<h2>\((((A \cup B) \cap B) \cap B) \cup B\)</h2>
 				</section>
 				<section>
-					<h1>Isolation</h1>
+					<h2>Out-of-order delivery breaks state-based deduplication</h2>
 				</section>
 				<section>
-					<h1>Failure tolerance</h1>
+					<h1>State machine deduplication</h1>
 				</section>
 				<section>
-					<img src="images/bsod.png" class="stretch"/>
+					<h1>Message identity</h1>
 				</section>
 				<section>
-					<h1>Stateless</h1>
+					<h2>Natural vs Artificial</h2>
 				</section>
-				<section>
-					<h1>Failure domains</h1>
-				</section>
-				<section>
-					<h1>Bugs</h1>
-				</section>
-				<section>
-					<h1>Scalability</h1>
-				</section>
-				<section>
-					<h1>Data tier</h1>
-				</section>
-				<section>
-					<h1>Distributed code</h1>
-					<h1>Centralized data</h1>
-				</section>
-				<section>
-					<h1>Shared mutable global state</h1>
-				</section>
-				<section>
-					<img src="images/kafka-microservices.png" class="stretch"/>
-				</section>
-				<section>
-					<blockquote style="width: 100%;">
-<h3>
-"democracy is the worst form of government except for all those other forms that have been tried from time to time"
-</h3>
--- Winston Churchill
-					</blockquote>
-				</section>
-				<section>
-					<h1>Why asynchronous?</h1>
-				</section>
-				<section>
-					<h2>HTTP</h2>
-					<h2>REST</h2>
-					<h2>gRPC</h2>
-				</section>
-				<section>
-					<img src="images/distributed-transaction.png" class="stretch"/>
-				</section>
-				<section>
-					<img src="images/async-process.png" class="stretch"/>
-				</section>
-				<section>
-					<h1>Failure handling</h1>
-				</section>
-				<section>
-					<h1>At-most-once</h1>
-				</section>
-				<section>
-					<h1>At-least-once</h1>
-				</section>
-				<section>
-					<h1>Exactly-once?</h1>
-				</section>
+				
 			</div>
 		</div>
 
