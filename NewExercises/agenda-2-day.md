@@ -54,5 +54,5 @@
     - [Exercise 16 - Outbox with inbox](Exercise-16/README.md)
     - _Coffee break_
   - Block 5
-    - Azure Functions Case-Study - Exercices       
+    - [Azure Functions Case-Study - Exercise](https://github.com/exactly-once/workshop/blob/master/workshop/azure-functions-cs)       
     - Q & A
