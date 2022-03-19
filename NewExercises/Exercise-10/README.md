@@ -1,4 +1,4 @@
-# Exercise 10: Business ID-based deduplication
+# Exercise 10: Primary key-based deduplication
 
 Create-type operation can be de-duplicated based on the ID of the entity/aggregate to be created. Add such logic to the order. And test.
 

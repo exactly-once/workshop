@@ -8,93 +8,51 @@
 
 * Day 1
   - Block 1
-    - [Introduction](../Lectures/Intro.html)   
-    - Intro to [CosmosDb]()
-    - [Exercise 1](Exercise-2/README.md)
-    - [Exercise 2](Exercise-2/README.md)
-    - [Exercise 3](Exercise-3/README.md)
-    - _Break_
+    - [Introduction](https://exactly-once.github.io/workshop/Lectures/Intro.html)   
+    - Intro to Cosmos DB
+    - [Exercise 1 - A simple web application](Exercise-1/README.md)
+    - [Exercise 2 - State-based deduplication](Exercise-2/README.md)
+    - [Exercise 3 - Optimistic concurrency](Exercise-3/README.md)
+    - _Coffee break_
   - Block 2
     - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.md) 
-    - [Ex4]()
-    - [Ex5]() [Ex6]() 
-    - _Break_
+    - [Exercise 4 - Make it asynchronous](Exercise-4/README.md)
+    - [Exercise 5 - Monkeys of Chaos](Exercise-5/README.md) 
+    - [Exercise 6 - The USB Rule](Exercise-6/README.md)
+    - _Coffee break_
   - Block 3
-    - [Partial failures lecture](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html#/5) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.md)
-    - [Ex7]()
-    - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html#/5) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Sources%20of%20duplication.md)
-    - [Ex8]() [Ex9]()
-    - _Break_
+    - [Partial failures](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.md)
+    - [Exercise 7 - If in doubt, try again](Exercise-7/README.md)
+    - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Sources%20of%20duplication.md)
+    - [Exercise 8 - Automate it](Exercise-8/README.md)
+    - [Exercise 9 - Message duplication on the receiver side](Exercise-9/README.md)
+    - _Coffee break_
   - Block 4 
-    - [Primary-key based deduplication](TBD)
-    - [Ex10]()
+    - [Primary-key based deduplication](https://exactly-once.github.io/workshop/Lectures/PK%20based%20deduplication.html)
+    - [Exercise 10 - Primary key-based deduplication](Exercise-10/README.md)
     - [Integration tests]()
-    - _Break_
+    - _Coffee break_
   - Block 5
-    - [Ex11]()
+    - [Exercise 11 - Conversation-based integration tests](Exercise-11/README.md)
     - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Messages%20are%20delivered%20in-order.md)
     - [Message ID](https://exactly-once.github.io/workshop/Lectures/Message%20ID.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.md) 
-    - [Ex12]()
-    - Q/A?
+    - [Exercise 12 - ](Exercise-12/README.md)
+    - Q & A
 * Day 2
   - Block 1
-    - [Ex13]()
-    - [Ex14]()
-    - _Break_()
+    - [Exercise 13 - ](Exercise-13/README.md)
+    - [Exercise 14 - ](Exercise-14/README.md)
+    - _Coffee break_
   - Block 2
     - TLA+ - Intro
   - Block 3
     - TLA+ - Coding
   - Block 4
-    - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
-    - Generic Outbox - [Ex15]
+    - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Outbox.md)
+    - [Exercise 15 - Generic outbox](Exercise-15/README.md)
     - [Inbox](TBD)
-    - Inbox - [Ex16]
-    - _Break_
+    - [Exercise 16 - Outbox with inbox](Exercise-16/README.md)
+    - _Coffee break_
   - Block 5
     - Azure Functions Case-Study - Exercices       
-    - Q/A
-    - Break
------------------    
-    - Receiver-side duplication - [Exercise 2](https://github.com/exactly-once/workshop/tree/master/Exercise-2)
-    - Sender-side duplication - [Exercise 3](https://github.com/exactly-once/workshop/tree/master/Exercise-3)
-    - Simulated duplication - [Exercise 4](https://github.com/exactly-once/workshop/tree/master/Exercise-4)
-    - _Break_
-  - Block 3
-    - DB failure simulation - [Exercise 5](https://github.com/exactly-once/workshop/tree/master/Exercise-5)
-    - Broker failure simulation - [Exercise 6](https://github.com/exactly-once/workshop/tree/master/Exercise-6)
-    - [Partial failures](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.md)
-    - Follow-up to [Exercise 6](https://github.com/exactly-once/workshop/blob/master/Exercise-6/follow-up.md)
-    - _Lunch Break_
-  - Block 4
-    - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Messages%20are%20delivered%20in-order.md)
-    
-    - [Message ID](https://exactly-once.github.io/workshop/Lectures/Message%20ID.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.md)
-    - Id-based deduplication - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
-    - _Break_
-  - Block 5
-    - Follow up - Ex 8 - [Exercise 8](https://github.com/exactly-once/workshop/tree/master/Exercise-8)
-    - Deterministic ID - [Exercise 9](https://github.com/exactly-once/workshop/tree/master/Exercise-9)
-    - Non-deterministic messages - [Exercise 10](https://github.com/exactly-once/workshop/tree/master/Exercise-10)
-    - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html)
-
-* Day 2 
-  - Block 1 
-    - Deterministic message generation - [Exercise 11](https://github.com/exactly-once/workshop/tree/master/Exercise-11)
-    - [Integration testing messaging systems](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
-    - Predictable integration tests - [Exercise](https://github.com/exactly-once/workshop/tree/master/testing/Messaging.IntegrationTests)
-  - Block 2
-    - [Introduction to model-checking with TLA+](https://github.com/exactly-once/workshop/blob/master/Lectures/tla.pptx)
-    - Model-checking outbox - [Exercise](https://github.com/exactly-once/workshop/tree/master/model-checking)
-  - Block 3
-    - Generic Outbox - [Exercise 12](https://github.com/exactly-once/workshop/tree/master/Exercise-12)
-    - Inbox - [Exercise 13](https://github.com/exactly-once/workshop/tree/master/Exercise-13)
-    - [Sync-async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
-  - Block 4
-    - Token-based deduplication - [Exercise 14](https://github.com/exactly-once/workshop/tree/master/Exercise-14)
-    - Out of document Outbox. Part 1 - [Exercise 15](https://github.com/exactly-once/workshop/tree/master/Exercise-15)
-    - Out of document Outbox. Part 2 - [Exercise 16](https://github.com/exactly-once/workshop/tree/master/Exercise-16)
-  - Block 5
-    - [NoSql Storages - CosmosDB](https://github.com/exactly-once/workshop/blob/master/Lectures/cosmosdb.pptx)
-    - [Http on the boundaries](https://github.com/exactly-once/workshop/blob/master/Lectures/azure-functions-http-boundaries.pptx)
-    - [Azure Functions and CosmosDB case study](https://github.com/exactly-once/workshop/tree/master/Exercise-17)
+    - Q & A

@@ -1,4 +1,4 @@
-# Exercise 6 - The USB principle
+# Exercise 6 - The USB Rule
 
 It is a well-known fact that the classis USB plug never fits the first time. You *always* have to turn it around but it does not fit either. Then you turn it around again and it fits. Scientists are still working on explaining that phenomenon ;-)
 

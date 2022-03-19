@@ -1,4 +1,4 @@
-## Conversation based integration tests
+# Exercise 11: Conversation-based integration tests
 
 When writing integration tests for message-based systems it's common to make assertions on the results of the whole conversation and not the initial command alone. This part of the tutorial shows how to instrument message handling endpoints so that it's possible for the testing logic to run assertions only after all messages in the conversation have been processed. 
 

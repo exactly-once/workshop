@@ -1,4 +1,4 @@
-# Exercide 5 - Simulate problems
+# Exercide 5 - Monkeys of Chaos
 
 In this exercise we are going to use the principles of [chaos engineering](https://en.wikipedia.org/wiki/Chaos_engineering) to ensure our system is robust. Instead of testing the behavior of our system system in different failure modes based on pure chance, we are going to build a *chaos monkey* -- a piece of code that is going to introduce a certain category of anomalies into our system **on purpose**. This will allow our code to cope with such anomalies better when they occur in production (according to Murphy's laws it is going to happen on Friday afternoon just before your long-planned vacation).
 
