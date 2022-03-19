@@ -13,16 +13,14 @@ Now let's get our hands dirty.
 - Persist the changes done to the order via `orderRepository.Store` after the call to `next()` (this line invokes the message handler)
 - Replace usages of repository in the `AddItemHandler` with usages of the `Order` instance managed by the `OutboxBehavior`
   - Replace the repository usage with retrieving the `Order` from the context: `var order = context.Extensions.Get<Order>();`
-  - Remove the second call to `orderRepository.Store` as it is handled by the behavior
+  - Remove the second first to `orderRepository.Store` as it is handled by the behavior
 - Run the code
 
 With this change we moved most of the code responsible for loading and storing the entity to the `OutboxBehavior` and the handler can focus on the actual business logic. But there is some stuff left so let's continue.
 
 - Move the code responsible for pushing out generated messages to the `OutboxBehavior`
   - Remove (cut) the last section of code from the `AddItemHandler` where messages are published and cleared from the collection
-  - Add (paste) that code just above the `orderRepository.Store` in the `Invoke` method of the `OutboxBehavior`
-  - Notice that now the last call to `orderRepository.Store` can be moved from the `AddItemHandler` to the `OutboxBehavior`. When the message handler finishes, the invocation resumes just after the call to `next()` in the behavior. Move the `Store` call there.
-  - Remove the references to the `OrderRepository` from the `AddItemHandler`
+  - Add (paste) that code just below the `orderRepository.Store` in the `Invoke` method of the `OutboxBehavior`
 
 Looks better, doesn't it? Event better, it compiles and works. Let's now take care of the last bit of the handler that is related to the deduplication -- the check if a message has been processed.
 

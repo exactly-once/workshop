@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
@@ -24,7 +25,26 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
             await next();
             return;
         }
-        await next();
+
+        var order = await orderRepository.Load(orderMessage.OrderId);
+        context.Extensions.Set(order);
+
+        if (!order.ProcessedMessages.Contains(context.MessageId))
+        {
+
+            await next();
+            await orderRepository.Store(order);
+        }
+
+        if (order.OutgoingMessages.Any())
+        {
+            foreach (var kvp in order.OutgoingMessages)
+            {
+                await context.PublishWithId(kvp.Value, kvp.Key);
+            }
+            order.OutgoingMessages.Clear();
+            await orderRepository.Store(order);
+        }
     }
 
     Task Dispatch(TransportOperation[] transportOperations, IExtendable context)
