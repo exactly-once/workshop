@@ -1,0 +1,8 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "51150cfd-679d-4189-bba4-aca24ae05d1e"
+  }
+}
