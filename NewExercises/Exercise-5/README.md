@@ -1,8 +1,8 @@
 # Exercide 5 - Simulate problems
 
-In this exercise we are going to use the principles of *chaos engineering* to ensure our system is robust. Instead of relying on pure chance for testing the failure modes of our system, we are going to build into a *chaos monkey* -- a piece of code that is going to introduce a certain category of anomalies into our system **on purpose**. This will allow us to write code that handles these types of anomalies when they occur in production (according to Murphy's laws it is going to happen on Friday afternoon just before your long-planned vacation).
+In this exercise we are going to use the principles of [chaos engineering](https://en.wikipedia.org/wiki/Chaos_engineering) to ensure our system is robust. Instead of testing the behavior of our system system in different failure modes based on pure chance, we are going to build a *chaos monkey* -- a piece of code that is going to introduce a certain category of anomalies into our system **on purpose**. This will allow our code to cope with such anomalies better when they occur in production (according to Murphy's laws it is going to happen on Friday afternoon just before your long-planned vacation).
 
-In NServiceBus the appropriate extension point for this task is the `Behavior` class. NServiceBus has message processing pipelines for incoming and outgoing messages. These pipelines are composed of `Behaviors`. Each behavior can execute arbitrary code and pass invocation to behaviors that are further down the pipeline. Here's an example behavior:
+In NServiceBus, the appropriate extension point for this task is the `Behavior` class. NServiceBus handles incoming and outgoing messages by passing them through processing pipelines composed of `Behaviors`. Each behavior can execute arbitrary code and pass invocation to behaviors further down the pipeline. Here's an example behavior:
 
 ```
 class MyBehavior : Behavior<IOutgoingLogicalMessageContext> //T defines in which part of the pipeline the behavior is injected
