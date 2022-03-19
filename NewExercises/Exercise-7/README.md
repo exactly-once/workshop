@@ -1,8 +1,8 @@
 # Exercise 7 - If in doubt, try again
 
-What you have seen in the previous exerise were ghost messages. These messages carry state that has not been persisted. Ghost messages are as bad as missing messages because they can easily turn a system that was supposed to be eventually consistent into one which is immediately inconsistent. We need to solve this problem.
+What you have seen in the previous exercise were ghost messages. These messages carry information about state changes that have not been persisted. Ghost messages are as bad as missing messages because they can easily turn a system that was supposed to be eventually consistent into an immediately inconsistent one. We need to solve this problem.
 
-The solution is to go back to the previous save-fist, send-later approach (remember the USB principle?) but this time allow re-sending the submission message. In order to make sure it is safe to do it we'll intoruce another state of the shopping cart -- `Accepted`. We mark the cart as accepted before attempting to send a message and we mark it as submitted after we know at least one copy of the message has been sent.
+The solution is to go back to the previous save-fist, send-later approach (remember the USB principle?) but this time allow re-sending the submission message. To make sure it is safe to do it we'll introduce another state of the shopping cart -- `Accepted`. We mark the cart as accepted before attempting to send a message and we mark it as submitted after we know at least one copy of the message has been sent.
 
 - Notice we have added a new `Accepted` flag to the shopping cart. It will be used in the submission logic.
 - Go to the `ApplicationServices` class and change the logic of the `SubmitOrder` method to do the following:
