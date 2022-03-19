@@ -46,7 +46,7 @@
   - Block 2
     - TLA+ - Intro
   - Block 3
-    - TLA+ - Coding
+    - [TLA+ - Coding](https://github.com/exactly-once/workshop/tree/master/model-checking)
   - Block 4
     - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Outbox.md)
     - [Exercise 15 - Generic outbox](Exercise-15/README.md)
