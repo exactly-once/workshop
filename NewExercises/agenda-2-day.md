@@ -30,18 +30,18 @@
   - Block 4 
     - [Primary-key based deduplication](https://exactly-once.github.io/workshop/Lectures/PK%20based%20deduplication.html)
     - [Exercise 10 - Primary key-based deduplication](Exercise-10/README.md)
-    - [Integration tests]()
+    - [Integration tests](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
     - _Coffee break_
   - Block 5
-    - [Exercise 11 - Conversation-based integration tests](Exercise-11/README.md)
+    - [Exercise 11](Exercise-11/README.md) - Conversation-based integration tests
     - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Messages%20are%20delivered%20in-order.md)
     - [Message ID](https://exactly-once.github.io/workshop/Lectures/Message%20ID.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.md) 
-    - [Exercise 12 - ](Exercise-12/README.md)
+    - [Exercise 12 - Id-based deduplication](Exercise-12/README.md) 
     - Q & A
 * Day 2
   - Block 1
-    - [Exercise 13 - ](Exercise-13/README.md)
-    - [Exercise 14 - ](Exercise-14/README.md)
+    - [Exercise 13 - Deterministic identifers](Exercise-13/README.md)
+    - [Exercise 14 - State-based deduplication](Exercise-14/README.md) 
     - _Coffee break_
   - Block 2
     - TLA+ - Intro
