@@ -8,9 +8,11 @@
 
 * Day 1
   - Block 1
-    - [Introduction](https://exactly-once.github.io/workshop/Lectures/Intro.html)   
-    - Intro to [CosmosDb]() and the project with [Ex 1]()
-    - [Ex2] and [Ex3]
+    - [Introduction](../Lectures/Intro.html)   
+    - Intro to [CosmosDb]()
+    - [Exercise 1](Exercise-2/README.md)
+    - [Exercise 2](Exercise-2/README.md)
+    - [Exercise 3](Exercise-3/README.md)
     - _Break_
   - Block 2
     - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.md) 
