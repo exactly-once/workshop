@@ -10,11 +10,13 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
 {
     OrderRepository orderRepository;
     IDispatchMessages dispatcher;
+    IInboxStore inboxStore;
 
-    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher)
+    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher, IInboxStore inboxStore)
     {
         this.orderRepository = orderRepository;
         this.dispatcher = dispatcher;
+        this.inboxStore = inboxStore;
     }
 
     public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
@@ -24,7 +26,26 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
             await next();
             return;
         }
-        await next();
+
+        var order = await orderRepository.Load(orderMessage.OrderId)
+                    ?? new Order {Id = orderMessage.OrderId};
+
+        if (!order.OutboxState.TryGetValue(context.MessageId, out var outboxState))
+        {
+            context.Extensions.Set(order);
+            var messages = await InvokeMessageHandler(context, next);
+            outboxState = new OutboxState {OutgoingMessages = messages.Serialize()};
+            order.OutboxState[context.MessageId] = outboxState;
+            await orderRepository.Store(order);
+        }
+
+        if (outboxState != null)
+        {
+            var toDispatch = outboxState.OutgoingMessages.Deserialize();
+            await Dispatch(toDispatch, context);
+            order.OutboxState[context.MessageId] = null;
+            await orderRepository.Store(order);
+        }
     }
 
     Task Dispatch(TransportOperation[] transportOperations, IExtendable context)
