@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
@@ -11,11 +10,13 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
 {
     OrderRepository orderRepository;
     IDispatchMessages dispatcher;
+    IInboxStore inboxStore;
 
-    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher)
+    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher, IInboxStore inboxStore)
     {
         this.orderRepository = orderRepository;
         this.dispatcher = dispatcher;
+        this.inboxStore = inboxStore;
     }
 
     public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
@@ -26,27 +27,23 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
             return;
         }
 
-        var order = await orderRepository.Load(orderMessage.OrderId);
-        context.Extensions.Set(order);
+        var order = await orderRepository.Load(orderMessage.OrderId)
+                    ?? new Order {Id = orderMessage.OrderId};
 
-        if (!order.OutgoingMessages.ContainsKey(context.MessageId))
+        if (!order.OutboxState.TryGetValue(context.MessageId, out var outboxState))
         {
-            var outboxState = new OutboxState();
-            order.OutgoingMessages.Add(context.MessageId, outboxState);
-            context.Extensions.Set(outboxState);
-
-            await next();
+            context.Extensions.Set(order);
+            var messages = await InvokeMessageHandler(context, next);
+            outboxState = new OutboxState {OutgoingMessages = messages.Serialize()};
+            order.OutboxState[context.MessageId] = outboxState;
             await orderRepository.Store(order);
         }
 
-        if (order.OutgoingMessages[context.MessageId] != null)
+        if (outboxState != null)
         {
-            foreach (var kvp in order.OutgoingMessages[context.MessageId].OutgoingMessages)
-            {
-                await context.PublishWithId(kvp.Payload, kvp.Id);
-            }
-
-            order.OutgoingMessages[context.MessageId] = null;
+            var toDispatch = outboxState.OutgoingMessages.Deserialize();
+            await Dispatch(toDispatch, context);
+            order.OutboxState[context.MessageId] = null;
             await orderRepository.Store(order);
         }
     }

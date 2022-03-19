@@ -1,8 +1,8 @@
 # Exercise 16: Generic outbox - part 2
 
-The solution looks really good but we can make it even better. So far we stored our business messages in the outbox. The downside of that is that headers, which are an essential parts of a message, were missing. We'll fix that now.
+In this exercise we are going to refactor the solution to simplify the management of the deduplication data. We are going to replace the `ProcessedMessages` and `OutgoingMessages` collections with a single `OutgoingMessages` collection.
 
-Let's start by combining `ProcessedMessages` and `OutgoingMessages` collections into a single one. The goal is to implement the following logic:
+The goal is to implement the following logic:
 
 **If the `OutgoingMessages` dictionary contains a non-null value for a message ID, that message has been processed but the resulting outgoing messages have not been dispatched. If it contains `null` then that message have been processed and resulting outgoing messages dispatched. If it does not contain that value, the message has not been processed.**
 
@@ -10,8 +10,8 @@ Let's start by combining `ProcessedMessages` and `OutgoingMessages` collections 
 - Change the _has been processed_ condition `!order.ProcessedMessages.Contains(context.MessageId)` to use the `OutgoingMessages` property: `!order.OutgoingMessages.ContainsKey(context.MessageId)`
 - Change the _mark as processed_ statement (`order.ProcessedMessages.Add(context.MessageId);`) in the `AddItemHandler` to use the `OutgoingMessages` property: `var outboxState = new OutboxState(); order.OutgoingMessages.Add(context.MessageId, outboxState)`
 - Notice that this statement can be moved to the `OutboxBehavior` just prior to the call to `next()`. Do that. Then put the `outboxState` into the context by doing `context.Extensions.Set(outboxState)`
-- Retrieve the `outboxState` in the `AddItemHandler` via `context.Extensions.Get<OutboxState>();`
-- Replace the calls to `order.OutgoingMessages.Add` for publishing messages with `outboxState.OutgoingMessages.Add(new Message(...`
+- Retrieve the `outboxState` in the `AddItemHandler` via `var outboxState = context.Extensions.Get<OutboxState>();`
+- Replace the calls to `order.OutgoingMessages.Add` for publishing messages with `outboxState.OutgoingMessages.Add(new Message(id, payload))`
 - Change the condition for dispatching outgoing messages to take into account the new structure of `OutgoingMessages`. Change `if (order.OutgoingMessages.Any())` to `order.OutgoingMessages[context.MessageId] != null`. Notice that we don't need to check if the value for the key exists because the structure code guarantees that.
 - Replace the `order.OutgoingMessages` with `order.OutgoingMessages[context.MessageId].OutgoingMessages` in the `foreach`
 - Replace the reference to `Value` with `Payload` and `Key` with `Id`.

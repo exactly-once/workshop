@@ -1,18 +1,13 @@
-# Exercise 17: Inbox
+# Exercise 16: Generic outbox - part 3
 
-In the previous exercise we have implemented a generic version of the Outbox pattern. We quickly discussed its downsides and agreed that we can do better. In this exercise we will introduce a concept of Inbox as a shared storage of deduplication information.
+The solution looks really good but we can make it even better. Message serialization is a very important aspect of every distributed system. Sometimes this serialization is quite complex.
 
-Fortunately for us, the changes won't be big.
- - First, notice that the `OutboxBehavior` class has an additional field -- the `inboxStore`. As discussed, messages that have been completely processed should have entries in that store.
- - Let's add the code that checks the inbox store. Where should we insert this code? To check the inbox call `HasBeenProcessed` method passing the message ID.
- - The whole middle section of the algorithm remains unchanged. Let's take a look at the bottom part.
- - Where should we insert the `MarkProcessed` call to mark add an entry to the inbox?
+In the current solution messages are serialized in two ways. First, they are serialized as part of the `Order` aggregate using whatever mechanism the data store uses. Then, they are serialized for sending over the wire. This may cause problems, especially with more complex data types.
 
-OK. We need to move the code for cleaning the outbox state out of the condition and add `MarkProcessed` between the dispatching and the cleanup code.
+In this exercise we are going to plug in deeper into the messaging framework in order to allow for storing wire-formatted messages in the outbox.
 
-Now let's focus on the cleanup. The goal was to avoid holding on to too many data inside the entity. To achieve it we need to replace the `OutboxState[context.MessageId] = null` code with simple `OutboxState.Remove(context.MessageId)`.
-
-Now take a look at the `outboxState != null` condition. Do we still need it?
-
-Finally let's imagine a scenario in which the code fails just after `MarkProcessed`. What happens when the message is retried? How can we solve this issue?
-
+- In the `OutboxState` replace the `Message` class with built in `NServiceBus.Transport.TransportOperation` and make it an array instead of a list.
+- Replace the call to `next()` with a call to `InvokeMessageHandler`. Assign the returned value to `order.OutgoingMessages[context.MessageId].OutgoingMessages`
+- Replace the `forach` loop with a call to `Dispatch`.
+- Replace the calls to `outboxState.OutgoingMessages.Add` in the `AddItemHandler` to `context.Publish`. Drop the ID. The framework will generate one for you. Remember to `await` this call.
+- You can remove the `outboxState` from the `AddItemHandler` now. That's quite an achievement! There is no more deduplication logic in the message handler!
