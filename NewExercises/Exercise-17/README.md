@@ -1,4 +1,4 @@
-# Exercise 16: Generic outbox - part 3
+# Exercise 17: Generic outbox - part 3
 
 The solution looks really good but we can make it even better. Message serialization is a very important aspect of every distributed system. Sometimes this serialization is quite complex.
 
