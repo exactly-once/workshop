@@ -57,5 +57,6 @@
     - [Exercise 18 - Outbox with inbox](Exercise-16/README.md)
     - _Coffee break_
   - Block 5
+    - [Deduplication types](https://exactly-once.github.io/workshop/Lectures/Deduplication%20types.html)
     - [Azure Functions Case-Study - Exercise](https://github.com/exactly-once/workshop/tree/master/azure-functions-cs)       
     - Q & A
