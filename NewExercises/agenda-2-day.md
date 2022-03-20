@@ -17,6 +17,7 @@
   - Block 2
     - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.md) 
     - [Exercise 4 - Make it asynchronous](Exercise-4/README.md)
+    - [Sync-Async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
     - [Exercise 5 - Monkeys of Chaos](Exercise-5/README.md) 
     - [Exercise 6 - The USB Rule](Exercise-6/README.md)
     - _Coffee break_
@@ -50,8 +51,10 @@
   - Block 4
     - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Outbox.md)
     - [Exercise 15 - Generic outbox](Exercise-15/README.md)
-    - [Inbox](TBD)
-    - [Exercise 16 - Outbox with inbox](Exercise-16/README.md)
+    - [Inbox](https://exactly-once.github.io/workshop/Lectures/Inbox.html#/)
+    - [Exercise 16 - Generic outbox 2](Exercise-16/README.md)
+    - [Exercise 17 - Generic outbox 3](Exercise-17/README.md)
+    - [Exercise 18 - Outbox with inbox](Exercise-16/README.md)
     - _Coffee break_
   - Block 5
     - [Azure Functions Case-Study - Exercise](https://github.com/exactly-once/workshop/tree/master/azure-functions-cs)       
