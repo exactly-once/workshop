@@ -34,7 +34,7 @@ class Program
         config.RegisterComponents(c =>
         {
             c.RegisterSingleton(orderRepository);
-            c.RegisterSingleton(new InMemoryInboxStore());
+            c.RegisterSingleton<IInboxStore>(new InMemoryInboxStore());
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
