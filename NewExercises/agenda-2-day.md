@@ -42,7 +42,7 @@
 * Day 2
   - Block 1
     - [Exercise 13 - Deterministic identifers](Exercise-13/README.md)
-    - [Exercise 14 - State-based deduplication](Exercise-14/README.md) 
+    - [Exercise 14 - State based message generation](Exercise-14/README.md) 
     - _Coffee break_
   - Block 2
     - [TLA+ - Intro](https://github.com/exactly-once/workshop/blob/master/Lectures/TLA%5EM%20in%20model-checking%20w%20praktyce.pptx)
