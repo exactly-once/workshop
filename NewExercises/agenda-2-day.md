@@ -1,8 +1,8 @@
 ### Prerequisites
-   * VS 2019 and .net472
-   * Visual Studio Code and TLA+ extension
-   * NServiceBus 7
+   * VS 2019 or later
+   * netcoreapp3.1
    * CosmosDB Emulator
+   * Visual Studio Code and TLA+ extension
 
 ### Agenda
 
