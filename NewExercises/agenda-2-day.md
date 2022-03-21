@@ -27,9 +27,9 @@
     - [Exercise 7 - If in doubt, try again](Exercise-7/README.md)
     - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Sources%20of%20duplication.md)
     - [Exercise 8 - Automate it](Exercise-8/README.md)
+    - _Coffee break_
   - Block 5
     - [Exercise 9 - Message duplication on the receiver side](Exercise-9/README.md)
-    - _Coffee break_
     - [Primary-key based deduplication](https://exactly-once.github.io/workshop/Lectures/PK%20based%20deduplication.html)
     - [Exercise 10 - Primary key-based deduplication](Exercise-10/README.md)
     - [Integration tests](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
