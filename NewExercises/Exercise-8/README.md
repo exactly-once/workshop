@@ -15,9 +15,9 @@ Let's write some code.
 - In the same piece of code, make sure the `repository` is available to NServiceBus handlers by adding following code:
 
 ```c#
-endpointConfiguration.RegisterComponents(c =>
+endpointConfiguration.RegisterComponents(collection =>
   {
-      c.RegisterSingleton(repository);
+      collection.AddSingleton(repository);
   });
 ```
 
