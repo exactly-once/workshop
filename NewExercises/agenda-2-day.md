@@ -11,29 +11,30 @@
     - [Introduction](https://exactly-once.github.io/workshop/Lectures/Intro.html)   
     - Intro to Cosmos DB
     - [Exercise 1 - A simple web application](Exercise-1/README.md)
+  - Block 2
     - [Exercise 2 - State-based deduplication](Exercise-2/README.md)
     - [Exercise 3 - Optimistic concurrency](Exercise-3/README.md)
+    - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.md)
     - _Coffee break_
-  - Block 2
-    - [Why distributed and asynchronous](https://exactly-once.github.io/workshop/Lectures/Why%20distributed%20and%20asynchronous.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Why%20distributed%20and%20asynchronous.md) 
+  - Block 3
     - [Exercise 4 - Make it asynchronous](Exercise-4/README.md)
     - [Sync-Async boundary](https://exactly-once.github.io/workshop/Lectures/Sync-Async.html)
     - [Exercise 5 - Monkeys of Chaos](Exercise-5/README.md) 
-    - [Exercise 6 - The USB Rule](Exercise-6/README.md)
     - _Coffee break_
-  - Block 3
+  - Block 4
+    - [Exercise 6 - The USB Rule](Exercise-6/README.md)
     - [Partial failures](https://exactly-once.github.io/workshop/Lectures/Partial%20failures.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Partial%20failures.md)
     - [Exercise 7 - If in doubt, try again](Exercise-7/README.md)
     - [Sources of duplication](https://exactly-once.github.io/workshop/Lectures/Sources%20of%20duplication.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Sources%20of%20duplication.md)
     - [Exercise 8 - Automate it](Exercise-8/README.md)
     - [Exercise 9 - Message duplication on the receiver side](Exercise-9/README.md)
     - _Coffee break_
-  - Block 4 
+  - Block 5 
     - [Primary-key based deduplication](https://exactly-once.github.io/workshop/Lectures/PK%20based%20deduplication.html)
     - [Exercise 10 - Primary key-based deduplication](Exercise-10/README.md)
     - [Integration tests](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
     - _Coffee break_
-  - Block 5
+  - Block 6
     - [Exercise 11](Exercise-11/README.md) - Conversation-based integration tests
     - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Messages%20are%20delivered%20in-order.md)
     - [Message ID](https://exactly-once.github.io/workshop/Lectures/Message%20ID.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.md) 
