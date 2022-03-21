@@ -23,11 +23,11 @@ class MyBehavior : Behavior<IOutgoingLogicalMessageContext> // T defines in whic
 ```
 
 Create a behavior in the outgoing pipeline that duplicates the send invocation:
-- In the `WebFrontend` project create a new class derived from `Behavior<IOutgoingLogicalMessageContext>`
-- In the `Invoke` method, call `await next()` to create a behavior that does nothing but just forwards the invocation
-- In the `Program` class of `WebFrontend` project, register the behavior with `EndpointConfiguration` via `Pipeline.Register` API (e.g. after the call to `endpointConfiguration.SendOnly()`)
-- Run the solution to check if messages continue to flow. Put a breakpoint in the new behavior to verify that it is invoked
-- In the behavior class, add an instance field `failed` to ensure that only the first message triggers the failure
+- In the `WebFrontend` project create a new class derived from `Behavior<IOutgoingLogicalMessageContext>` and implement its members
+- In the `Invoke` method, call `await next()` to create an empty behavior that just forwards the invocation
+- In the `Program` class of the `WebFrontend` project, register the behavior on the `endpointConfiguration`-variable using the `Pipeline.Register`-API (e.g. after the call to `endpointConfiguration.SendOnly()`)
+- Run the solution to check if messages continue to flow. Place a breakpoint in the new behavior to verify that it is invoked
+- In the behavior class, add an instance field named `failed` to ensure that only the first message triggers the failure
 - Before the `next()` call, add code that checks whether the `failed` flag is set. If it is not, set the flag to `true` and throw a new `Exception`. This will ensure that the first attempt to send a message after the web application is started is always going to fail.
 
 Now try placing the order and observe what happens. Has the backend received the message? What does the customer believe happened to their pierogi order?
