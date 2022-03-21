@@ -11,5 +11,5 @@ This business rule also represents the most basic form of request deduplication.
 - If not, set that property to `true`.
 - In the `repository.Put`-method, pass the cart as a parameter to ensure the submitted flag is persisted. This method uses [Cosmos DB's `TransactionalBatch` feature](https://docs.microsoft.com/en-us/azure/cosmos-db/sql/transactional-batch) to ensure that modifications to all passed objects are persisted [atomically](https://en.wikipedia.org/wiki/Atomicity_(database_systems)).
 
-This helped to mitigate the behavior we perceived previously. 
+This helped mitigate the behavior we perceived previously. 
 Next, try adding a simulated pause (e.g. via `await Task.Delay(3000)`) right before the `repository.Put` call, to help us simulate concurrent submissions. Now, try the duplicate order submission scenario using two browser tabs. What behavior do you observe?
