@@ -21,4 +21,4 @@ await SendInOrder(new IMessage[]
 ```csharp
  public List<Guid> ProcessedMessages { get; set; } = new List<Guid>();
 ```
-* Go to the `BookPaymentHandler` and `CancelPaymentHandler` and modify the deduplication logic to use message Ids. At the end of the message processing in the handler include the Id of the message being processed in the `ProcessedMessages` collection. At the beginning of the handler code check if the message already exists in the collection. If so, return without doing anything in the handler.
+* Go to the `BookPaymentHandler` and `CancelPaymentHandler` and modify the deduplication logic to use message Ids. At the end of the message processing in the handler, but before the `Order` is persisted, include the Id of the message being processed in the `ProcessedMessages` collection. At the beginning of the handler code check if the message already exists in the collection. If so, return without doing anything in the handler.
