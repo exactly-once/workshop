@@ -32,22 +32,23 @@
     - [Exercise 9 - Message duplication on the receiver side](Exercise-9/README.md)
     - [Primary-key based deduplication](https://exactly-once.github.io/workshop/Lectures/PK%20based%20deduplication.html)
     - [Exercise 10 - Primary key-based deduplication](Exercise-10/README.md)
-    - [Integration tests](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
     - Q & A
 * Day 2
   - Block 1
+    - [Integration tests](https://github.com/exactly-once/workshop/blob/master/Lectures/integration-testing.pptx)
     - [Exercise 11](Exercise-11/README.md) - Conversation-based integration tests
     - [Messages are delivered in-order](https://exactly-once.github.io/workshop/Lectures/Messages%20are%20delivered%20in-order.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Messages%20are%20delivered%20in-order.md)
+  - Block 2
     - [Message ID](https://exactly-once.github.io/workshop/Lectures/Message%20ID.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Message%20ID.md) 
     - [Exercise 12 - Id-based deduplication](Exercise-12/README.md)
     - [Exercise 13 - Deterministic identifers](Exercise-13/README.md)
     - [Exercise 14 - State based message generation](Exercise-14/README.md) 
     - _Coffee break_
-  - Block 2
-    - [TLA+ - Intro](https://github.com/exactly-once/workshop/blob/master/Lectures/TLA%5EM%20in%20model-checking%20w%20praktyce.pptx)
   - Block 3
-    - [TLA+ - Coding](https://github.com/exactly-once/workshop/tree/master/model-checking)
+    - [TLA+ - Intro](https://github.com/exactly-once/workshop/blob/master/Lectures/TLA%5EM%20in%20model-checking%20w%20praktyce.pptx)
   - Block 4
+    - [TLA+ - Coding](https://github.com/exactly-once/workshop/tree/master/model-checking)
+  - Block 5
     - [Outbox](https://exactly-once.github.io/workshop/Lectures/Outbox.html) [script](https://github.com/exactly-once/workshop/blob/master/Lectures/Outbox.md)
     - [Exercise 15 - Generic outbox](Exercise-15/README.md)
     - [Inbox](https://exactly-once.github.io/workshop/Lectures/Inbox.html#/)
@@ -55,7 +56,7 @@
     - [Exercise 17 - Generic outbox 3](Exercise-17/README.md)
     - [Exercise 18 - Outbox with inbox](Exercise-16/README.md)
     - _Coffee break_
-  - Block 5
+  - Block 6
     - [Deduplication types](https://exactly-once.github.io/workshop/Lectures/Deduplication%20types.html)
     - [Azure Functions Case-Study - Exercise](https://github.com/exactly-once/workshop/tree/master/azure-functions-cs)       
     - Q & A
