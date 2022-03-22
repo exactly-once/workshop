@@ -89,11 +89,7 @@ namespace Tests
             var bookSecondPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
 
             await SendInOrder(new IMessage[] {
-                    submitFirstOrder,
-                    bookFirstPayment,
-                    submitSecondOrder,
-                    bookSecondPayment,
-                    bookFirstPayment //HINT: this is a retried message
+                    //TODO: Define message sequence
                 }
             );
 
@@ -178,18 +174,9 @@ namespace Tests
 
         public class DropMessagesBehavior : Behavior<IOutgoingLogicalMessageContext>
         {
-            bool dropped = false;
-
             public override async Task Invoke(IOutgoingLogicalMessageContext context, Func<Task> next)
             {
-                if (!dropped && context.Message.Instance is GrantCoupon)
-                {
-                    dropped = true;
-                }
-                else 
-                {
-                    await next();
-                }
+                await next();
             }
         }
     }
