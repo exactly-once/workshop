@@ -54,7 +54,7 @@
     - [Inbox](https://exactly-once.github.io/workshop/Lectures/Inbox.html#/)
     - [Exercise 16 - Generic outbox 2](Exercise-16/README.md)
     - [Exercise 17 - Generic outbox 3](Exercise-17/README.md)
-    - [Exercise 18 - Outbox with inbox](Exercise-16/README.md)
+    - [Exercise 18 - Outbox with inbox](Exercise-18/README.md)
     - _Coffee break_
   - Block 6
     - [Deduplication types](https://exactly-once.github.io/workshop/Lectures/Deduplication%20types.html)
