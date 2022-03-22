@@ -15,7 +15,9 @@ new IMessage[] {
 ``` 
  
 * Run the test and check if the asserition holds 
-* Put logic in the `DropMessagesBehavior` to ensure that the `GrantCoupon` message is skipped (dropped) the first time it is sent. This simulates situation when `PaymentBookHandler` failes on sending out `GrantCoupon` and the incoming message is retried. 
+* Put logic in the `DropMessagesBehavior` to ensure that the `GrantCoupon` message is skipped (dropped) the first time it is sent. This simulates situation when `PaymentBookHandler` failes on sending out `GrantCoupon` and the incoming message is retried. Use the same method as in [Exercise 5](../Exercise-5/README.md):
+  * Add a boolean flag `dropped`
+  * In the `Invoke` method check if the `context.Message.Instance` is `GrantCoupon`. If so, and the flag is `false` then flip the flag and return. Otherwise invoke `await next()`. This logic will ensure that only the first instance of the `GrantCoupon` message is dropped. 
 * Re-run the test. Does it work? Why? 
 * Use `public List<ICommand> OutgoingMessages = new List<ICommand>();` property in the `Payments` entity to store the outoging messages and save them atomically together with the business changes. 
 * Make sure that items in the `OutgoingMessages` are always sent. Also, when duplicates arrive: 
