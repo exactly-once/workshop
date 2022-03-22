@@ -16,7 +16,7 @@ if (!IsDuplicate())
 SendAndPublishMessages()'
 ```
  
-* Go to `TrackTotalPaymentsValue` test and check if it passes. Why does it fail? Check what is are the `MessageId` values for both duplicates of the `BookPayment` message. Why are they different? 
+* Go to `TrackTotalPaymentsValue` test and check if it passes. Why does it fail? Open the results of the test run and check what is are the `messageId` values for both duplicates of the `BookPayment` message. Why are they different? Doest it resemble any situation we have seen before?
 * In the `BookPaymentHandler` and `CancelPaymentHandler` use `PublishWithId` extension method and use `Utils` class to ensure that the published messages have ids that are deterministically derived from the incoming message id and the endpoint name. 
 * Why do we need to put the endpont name in there? 
 * Ensure that both tests are passing 
