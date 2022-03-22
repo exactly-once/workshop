@@ -14,7 +14,7 @@ await SendInOrder(new IMessage[]
   }
 );
 ``` 
-* Run `ChangeStatus` test and check if the assertion holds
+* Run `ChangeStatus` test and check if the assertion holds. If not then can you tell what is wrong?
 * Add `List<Guid>` property to `Order` enity called `ProcessedMessages`
 ```csharp
  public List<Guid> ProcessedMessages { get; set; } = new List<Guid>();
