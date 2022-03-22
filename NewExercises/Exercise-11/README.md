@@ -4,7 +4,7 @@ When writing integration tests for message-based systems it's common to make ass
 
 ### Goal
 
-The goal of this exercise is to write a single integration test that depends on the result of processing the last message in a conversation. The conversation starts with `PlaceOrder` command that has a 1 in 20 chance of triggering the final `FinalizeOrder` command or re-sending the same command with `1` seconds delay:
+The goal of this exercise is to write a single integration test that depends on the processing result of the last message in a conversation. The conversation starts with the `PlaceOrder` command that has a 1 in 20 chance of triggering the final `FinalizeOrder` command or re-sending the same command with `1` seconds delay:
 
 ```csharp
 if (new Random().Next(0, 20) == 0)
@@ -43,11 +43,12 @@ static IEnumerable<string> TestCases => Enumerable.Range(1, 25).Select(n => $"{n
 
 ### Step 1
 
-Can we solve the problem with a simple patch? Can we add `Task.Delay` in our test to make it pass consistently and not make it take a couple of minutes to pass?
+Can we solve the problem with a simple patch? Can we add `Task.Delay` in our test to make it pass consistently?
 
 ### Step 2
 
-Let's add behavior to the message processing pipeline in our endpoint so that for every incoming message and all messages that are generated we capture their identifiers and sent this data off to a dedicated queue for further processing using `TracingBehavior`:
+Let's add behavior to the message processing pipeline in our endpoint to capture identifiers for every incoming message and its resulting outgoing messages and send this data off to a dedicated queue for further processing.
+This `TracingBehavior` is registered on the endpoint:
 
 ```csharp 
  (endpoint, store) = await Program.StartEndpoint(c =>
@@ -56,16 +57,16 @@ Let's add behavior to the message processing pipeline in our endpoint so that fo
 });
 ```
 
-TASK: Add a missing piece of logic to the `TracingBehavior` to capture outgoing message identifiers in the `OutgoingMessageIds` property of the `TracingMessage`. Run the test in the `Debug` mode to make sure the data is being captured.
+TASK: Add the missing logic to the `TracingBehavior` to capture outgoing message identifiers in the `OutgoingMessageIds` property of the `TracingMessage`. Run the test in `Debug` mode to ensure the data is captured.
 
 ### Step 3
 
 Tracing messages sent to the `trace` queue will be processed by a dedicated endpoint encapsulated in the `Tracer` class. 
 
-TASK: Create an instance of the `Tracer` class in the `Setup` method of the test and make sure it's properly clean-up in the `Cleanup` 
+TASK: Create an instance of the `Tracer` class in the `Setup` method of the test and make sure it's properly cleaned up in the `Cleanup` method. 
 
 ### Step 4
 
-`Tracer` provides logic to setup conversation tracking and later to wait until the conversation finishes. In order, to set up, the conversation one needs to call the `Prepare` method which returns `conversationId` and `SendOptions` tuple.
+`Tracer` provides logic to set up conversation tracking and wait until the conversation finishes. In order to set up, the conversation one needs to call the `Prepare` method which returns `conversationId` and `SendOptions` tuple.
 
 TASK: Extend the test code by calling the `tracer.Prepare` and `tracer.WaitUntilFinished` to make sure that test asserts are called at the right time.

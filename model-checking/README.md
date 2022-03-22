@@ -2,14 +2,15 @@
 
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [TLA+ extensions](https://github.com/alygin/vscode-tlaplus/wiki/How-to-Install)
+- [JAVA](https://github.com/tlaplus/vscode-tlaplus/wiki/Installing-Java)
  
 ## Setup
 
-In the exercise we won't check for deadlocks and we want to prevent the model checker from checking that. In Visual Studio Code go to TLA extension settings and in `Tla Plus > Tlc > Model checker` field specify `-deadlock` parameter. 
+In this exercise, we won't check for deadlocks, therefore we want to prevent the model checker from checking these. In Visual Studio Code, go to the TLA extension's settings and in the `Tla Plus > Tlc > Model checker` field, specify the `-deadlock` parameter. 
 
 ## Introduction
 
-`MessageHandler.tla` holds a TLA+ specification of a message processing handler. It models an environment with no distributed transactions available i.e. messaging infrastructure and the business data store operations are performed without any atomicity guarantees. 
+`MessageHandler.tla` holds a TLA+ specification of a message processing handler. It models an environment without distributed transactions i.e. messaging infrastructure and the business data store operations are performed without atomicity guarantees. 
 
 ## Exercise 1
 
@@ -17,13 +18,13 @@ Model-checking with TLA+ requires two elements, a specification (`MessageHandler
 
 To run the model checker we need to:
  * Parse the specification: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: parse module`
- * Check the model: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: check the model with TLC`
+ * Check the model: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> -> `TLA+: check model with TLC`
 
- This opens `TLA+ model checking` window that shows the model checking status and the final result.
+ This opens the `TLA+ model checking` window which shows the model checking status as well as the final result.
 
 ## Exercise 2
 
-Let's verify that the model does not allow for ghost messages using `NoGhostMessages` formula:
+Let's verify that the model does not allow for ghost messages using the `NoGhostMessages` formula:
 
 ```tla+
 NoGhostMessages == \A m \in processed : 
@@ -31,7 +32,7 @@ NoGhostMessages == \A m \in processed :
                         \/   \E chg \in db       : chg.id = m.id
 ```
 
-In the Visual Studio code:
+In Visual Studio Code:
  * Open `MessageHandler.cfg` and add `NoGhostMessages` in the `INVARIANTS` section of the file.
  * Parse and model-check the specification.
  * The check fails with:
@@ -41,7 +42,7 @@ In the Visual Studio code:
 
 ## Exercise 3
 
-Let's verify that the model does not allow any outgoing messages to be lost using `NoLostMessages` formula:
+Let's verify that the model does not allow any outgoing messages to be lost using the `NoLostMessages` formula:
 
 ```tla+
 NoLostMessages == \A m \in processed :
@@ -50,11 +51,11 @@ NoLostMessages == \A m \in processed :
 ```
 
  * Open `MessageHandler.cfg` and add `NoLostMessages` in the `INVARIANTS` sections.
- * Parse and model check the specification.
+ * Parse and model-check the specification.
  * The check fails with:
     > Invariant NoLostMessages is violated.
- * Analyze the trace to understand what happened
- * Let's patch the problem temporarily and change the atomicity of the steps (this models 2PC) to prevent outgoing message loss
+ * Analyze the trace to understand what happened.
+ * Let's patch the problem temporarily and change the atomicity of the steps (this models 2PC) to prevent outgoing message loss.
 
 ```tla+
 UpdateDbAndSend: (* update data base and send output messages - can fail *)
@@ -66,7 +67,7 @@ UpdateDbAndSend: (* update data base and send output messages - can fail *)
 
 ## Exercise 4
 
-Let's verify that the model does not allow for duplicated processing of the same message using `NoDuplicatedProcessings` formula:
+Let's verify that the model does not allow for duplicate processing of the same message using `NoDuplicatedProcessings` formula:
 
 ```tla+
 NoDuplicatedProcessings == \A a \in db:
@@ -85,14 +86,14 @@ end if;
 ```
 ## Exercise 5
 
-Now we want to keep current properties but remove the atomicity between database updates and sending out messages: 
- * First, we will make a change to the specification. Currently, our model allows for a message to be partially processed due to failures. We will change it so that every message is eventually processed - possibly with some failures. 
+Now, we want to keep current properties but remove the atomicity between database updates and sending out messages: 
+ * First, we will make a change to the specification. Currently, our model allows for a message to be partially processed due to failures. We will change this so that every message is eventually processed - possibly with some failures. 
  * Add `Fails(messageId)` definition at the top of the `define` section.
 
 ```tla+
 Fails(messageId) == IF failures[messageId] <= MaxFailures THEN {TRUE, FALSE} ELSE {FALSE}
 ```
- * Change the `Fail` macro to update the number of failures for a given message and jump back to the `MainLoop` label
+ * Change the `Fail` macro to update the number of failures for a given message and jump back to the `MainLoop` label.
 
 ```tla+
 macro Fail(messageId) begin
@@ -100,8 +101,8 @@ macro Fail(messageId) begin
     goto MainLoop;
 end macro;
 ```
- * Split `UpdateDbAndSend` lables back into two separate labels.
- * Change specification in the `UpdateDb` and `Send` and `AckInMsg` labels to model the fact that there can be up to`MaxFailuers` for any given message. E.g:
+ * Split `UpdateDbAndSend` labels back into two separate labels.
+ * Change specification in the `UpdateDb`, `Send` and `AckInMsg` labels to model the fact that there can be up to`MaxFailuers` for any given message. E.g:
 
 ```tla+
 UpdateDb:
@@ -121,7 +122,7 @@ UpdateDb:
 
 ## Exercise 6
 
-Let's check that the handler returns a consistent output using following formula:
+Let's check that the handler returns consistent output using the following formula:
 
 ``` tla+
 ConsistentOutput == \A m1 \in queueOut:
@@ -130,9 +131,9 @@ ConsistentOutput == \A m1 \in queueOut:
 
  * Add the `ConsistentOutput` formula definition to the specification.
  * Add `ConsistentOutput` to the `INVARIANTS` section.
- * Parse and model check the specification.
+ * Parse and model-check the specification.
  * Analyze the failing trace.
- * Change the `Send` label part to make sure that the output messages are sent are based on the DB state with consistent transaction id.
+ * Change the `Send` label part to ensure that the output messages sent are based on the DB state with a consistent transaction id.
 
  HINT: You can get the version of the DB change for given message id using `with` statement:
 
@@ -144,14 +145,14 @@ end with;
 
 ## Exercise 7
 
-Let's make the model a bigger by changing model parameters
+Let's increase the model size by changing model parameters:
  * Change model to allow for `3` failures per-message and start with `3` messages in the input queue.
  * Parse and check the specification.
- * Capture number of states checked.
+ * Capture the number of states checked.
 
 The model is getting big so let's put it on a diet:
  * Merge the `Process` label with `Receive`.
- * Instead of per-message failure, let's move to a single "total failures" counter. Tweak the `Fail` macro and `Fails` formula to depend on the global `failures` variable.
+ * Instead of using per-message failure counters, let's move to a single "total failures" counter. Tweak the `Fail` macro and `Fails` formula to depend on the global `failures` variable.
 
 ``` tla+
 macro Fail() begin
@@ -159,7 +160,7 @@ macro Fail() begin
     goto MainLoop;
 end macro;
 ```
- * Compare size of the model before and after the changes.
+ * Compare the size of the model before and after the changes.
 
 ## Exercise 8
 
