@@ -1,3 +1,7 @@
+### Prerequisites
+
+- [CosmosDB Emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-develop-emulator?tabs=docker-linux%2Ccsharp&pivots=api-nosql#install-the-emulator)
+
 ### Azure Functions Case Study
 
 In this exercise, we are going to see how to use the algorithm from the previous exercise in the Azure Functions programing model.

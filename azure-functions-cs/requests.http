@@ -1,0 +1,8 @@
+## Create New Game
+
+POST http://localhost:7071/api/StartNewGame HTTP/1.1
+Content-Type: application/json
+
+{
+    "gameId": "1234"
+}
