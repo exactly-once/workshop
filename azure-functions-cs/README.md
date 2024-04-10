@@ -31,10 +31,12 @@ public async Task<IActionResult> StartNewGame(
 }
 ```
 
-Any code executing in the `Once` method will be logically deduplicated and will produce deterministic results in this case `StartNewGame` message.
+Any code executing in the `Once` method is deduplicated and produces deterministic results - in the example above a `StartNewGame` message.
 
 
-* We would like to extend our sample application with writing game leader board to Azure blob when the game ends.
+### Exercise 
+
+* We would like to extend our sample application by storing the game leader board in Azure blob whenever a game ends.
 * Let's start by adding new `SaveLeaderBoard` command
 ```csharp
     public class SaveLeaderBoard
@@ -42,7 +44,7 @@ Any code executing in the `Once` method will be logically deduplicated and will 
         public Guid GameId { get; set; }
     }
 ```
-* Make sure that ending the game (in `ShootingRange.cs`) results in sending out the new command
+* Make sure that ending the game (in `ShootingRange.cs`) results in sending out the `SaveLeaderBoard` command
 ```csharp
 [FunctionName(nameof(HandleEndGame))]
 public async Task HandleEndGame(
@@ -84,7 +86,7 @@ public async Task SaveLeaderBoard(
     await gameResultsBlob.WriteLineAsync(@$"Date={results.EndDate}, Hits={results.Hits}, Misses={results.Misses}");
 }
 ```
-* The exactly once processor results `GameResults` class instance that also needs to be defined
+* The exactly once processor returns an intance of `GameResults` class that has to be defined
 ```csharp
 public class GameResults
 {

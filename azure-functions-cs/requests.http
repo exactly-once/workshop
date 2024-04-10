@@ -1,4 +1,4 @@
-## Create New Game
+### Start New Game
 
 POST http://localhost:7071/api/StartNewGame HTTP/1.1
 Content-Type: application/json
@@ -6,3 +6,30 @@ Content-Type: application/json
 {
     "gameId": "1234"
 }
+
+### Fire At
+
+POST http://localhost:7071/api/FireAt HTTP/1.1
+Content-Type: application/json
+
+{
+    "requestId": "a",
+    
+    "gameId": "1234",
+    "position": "2"
+}
+
+### End Game
+
+POST http://localhost:7071/api/EndGame HTTP/1.1
+Content-Type: application/json
+
+{
+    "gameId": "1234"
+}
+
+
+### Request Timeout
+
+GET http://localhost:7071/api/RequestTimestamp HTTP/1.1
+Content-Type: application/json
