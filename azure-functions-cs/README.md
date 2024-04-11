@@ -38,7 +38,8 @@ Any code executing in the `Once` method is deduplicated and produces determinist
 ### Exercise 
 
 
-> **_NOTE:_** Use the [requests.http](./requests.http) to trigger http requests to our functions app.
+> [!NOTE]
+>  Use the [requests.http](./requests.http) to trigger http requests to our functions app.
 
 * We would like to extend our sample application by storing the game leader board in Azure blob whenever a game ends.
 * Let's start by adding new `SaveLeaderBoard` command
