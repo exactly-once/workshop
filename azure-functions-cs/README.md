@@ -1,6 +1,7 @@
 ### Prerequisites
 
 - [CosmosDB Emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-develop-emulator?tabs=docker-linux%2Ccsharp&pivots=api-nosql#install-the-emulator)
+- [VisualStudio Code](https://code.visualstudio.com/) with [REST Client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
 
 ### Azure Functions Case Study
 
@@ -35,6 +36,9 @@ Any code executing in the `Once` method is deduplicated and produces determinist
 
 
 ### Exercise 
+
+
+> **_NOTE:_** Use the [requests.http](./requests.http) to trigger http requests to our functions app.
 
 * We would like to extend our sample application by storing the game leader board in Azure blob whenever a game ends.
 * Let's start by adding new `SaveLeaderBoard` command
