@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 public class ConsistentInMemoryStore<T>
     where T : class, IEntity
