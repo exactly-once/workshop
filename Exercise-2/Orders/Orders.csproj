@@ -10,7 +10,7 @@
     <PackageReference Include="NServiceBus.Serilog" Version="4.*" />
     <PackageReference Include="NServiceBus.Transport.AzureStorageQueues" Version="9.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
