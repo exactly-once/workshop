@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 
 namespace Messaging.IntegrationTests.System
@@ -9,9 +10,7 @@ namespace Messaging.IntegrationTests.System
     {
         static async Task Main(string[] args)
         {
-            var (endpoint, _) = await StartEndpoint();
-
-            await endpoint.SendLocal(new PlaceOrder());
+            await StartEndpoint();
 
             Console.WriteLine("Press any <key> to exit.");
             Console.ReadKey();
@@ -27,7 +26,7 @@ namespace Messaging.IntegrationTests.System
             transport.Routing().RouteToEndpoint(typeof(PlaceOrder), endpointName);
 
             var orderStore = new OrderStore();
-            configuration.RegisterComponents(cc => cc.RegisterSingleton(orderStore));
+            configuration.RegisterComponents(cc => cc.AddSingleton(orderStore));
 
             configure?.Invoke(configuration);
 
@@ -66,11 +65,19 @@ namespace Messaging.IntegrationTests.System
         {
             Console.WriteLine("Order received");
 
-            var options = new SendOptions();
-            options.DelayDeliveryWith(TimeSpan.FromSeconds(5));
-            options.RouteReplyToThisInstance();
+            if (new Random().Next(0, 20) == 0)
+            {
+                Console.WriteLine("Delaying order processing");
 
-            await context.SendLocal(new FinalizeOrder{Id = message.Id});
+                var options = new SendOptions();
+                options.DelayDeliveryWith(TimeSpan.FromSeconds(10));
+
+                await context.Send(message, options);
+            }
+            else
+            {
+                await context.SendLocal(new FinalizeOrder{Id = message.Id});
+            }
         }
 
         public Task Handle(FinalizeOrder message, IMessageHandlerContext context)

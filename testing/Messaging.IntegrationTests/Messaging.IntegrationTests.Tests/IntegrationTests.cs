@@ -40,7 +40,7 @@ namespace Messaging.IntegrationTests.Tests
 
             await endpoint.Send(message);
 
-            Assert.Contains(message.Id, store.PlacedOrders, "PlaceOrder ");
+            Assert.That(store.PlacedOrders.Contains(message.Id), "PlaceOrder ");
         }
 
 

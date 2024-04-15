@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Messaging.IntegrationTests.System;
 using NServiceBus;
@@ -10,16 +12,17 @@ namespace Messaging.IntegrationTests.Tests
     {
         IEndpointInstance endpoint;
         OrderStore store;
-        
-        Tracer tracer = new Tracer();
+        Tracer tracer;
 
         [SetUp]
         public async Task Setup()
         {
             (endpoint, store) = await Program.StartEndpoint(c =>
             {
-                c.Pipeline.Register(new TracingBehavior(), "Trace input and output messages.");
+                c.Pipeline.Register(new TracingBehavior(), "Traces input-output messages");
             });
+
+            tracer = new Tracer();
 
             await tracer.Start();
         }
@@ -28,21 +31,26 @@ namespace Messaging.IntegrationTests.Tests
         public async Task CleanUp()
         {
             await endpoint.Stop();
+
             await tracer.Stop();
         }
 
         [Test]
-        public async Task PlaceOrder()
+        [TestCaseSource(nameof(TestCases))]
+        public async Task PlaceOrder(string caseNo)
         {
-            var (conversationId, options) = tracer.Prepare();
+            var (conversationId, sendOptions) = tracer.Prepare();
 
             var message = new PlaceOrder {Id = Guid.NewGuid()};
 
-            await endpoint.Send(message, options);
+            await endpoint.Send(message, sendOptions);
 
             await tracer.WaitUntilFinished(conversationId);
 
-            Assert.Contains(message.Id, store.PlacedOrders);
+            Assert.That(store.PlacedOrders.Contains(message.Id), "PlaceOrder ");
         }
+
+
+        static IEnumerable<string> TestCases => Enumerable.Range(1, 25).Select(n => $"{n:00}");
     }
 }
