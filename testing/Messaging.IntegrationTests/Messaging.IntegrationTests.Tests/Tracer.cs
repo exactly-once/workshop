@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 
 namespace Messaging.IntegrationTests.Tests
@@ -15,7 +16,7 @@ namespace Messaging.IntegrationTests.Tests
             configuration.UseTransport<LearningTransport>();
 
             conversationTracker = new ConversationTracker();
-            configuration.RegisterComponents(cc => cc.RegisterSingleton(conversationTracker));
+            configuration.RegisterComponents(cc => cc.AddSingleton(conversationTracker));
 
             tracer = await Endpoint.Start(configuration);
         }

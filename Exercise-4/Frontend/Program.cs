@@ -35,6 +35,8 @@ class Program
 
         config.EnableInstallers();
 
+        config.Pipeline.Register(typeof(ChaosBehavior),"Chaos behavior that simulates message duplication.");
+
         var endpoint = await Endpoint.Start(config).ConfigureAwait(false);
 
         Console.WriteLine("'submit <order-id>' to create a new order.");

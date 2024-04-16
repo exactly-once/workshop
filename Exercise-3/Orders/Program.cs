@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
@@ -26,12 +27,12 @@ class Program
 
         var config = new EndpointConfiguration("Orders");
         config.UseSerialization<XmlSerializer>();
-        config.UsePersistence<InMemoryPersistence>();
-        var transport = config.UseTransport<LearningTransport>();
+        config.UsePersistence<NonDurablePersistence>();
+        config.UseTransport<LearningTransport>();
 
         config.RegisterComponents(c =>
         {
-            c.RegisterSingleton(new OrderRepository());
+            c.AddSingleton(new OrderRepository());
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));

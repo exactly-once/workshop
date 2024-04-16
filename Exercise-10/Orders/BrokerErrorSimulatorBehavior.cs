@@ -9,7 +9,7 @@ class BrokerErrorSimulatorBehavior : Behavior<IOutgoingLogicalMessageContext>
 
     public override async Task Invoke(IOutgoingLogicalMessageContext context, Func<Task> next)
     {
-        if (!failed && context.Message.Instance is ItemAdded itemAdded && itemAdded.Filling == Filling.QuarkAndPotatoes)
+        if (!failed && context.Message.Instance is ItemAdded {Filling: Filling.QuarkAndPotatoes})
         {
             failed = true;
             throw new Exception();

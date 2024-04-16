@@ -94,10 +94,10 @@ class Program
         await endpoint.Stop().ConfigureAwait(false);
     }
 
-    static async Task Send(IEndpointInstance endpoint, object message)
+    static Task Send(IEndpointInstance endpoint, object message)
     {
-#pragma warning disable 4014
-        endpoint.Send(message);
-#pragma warning restore 4014
+        _ = endpoint.Send(message);
+
+        return Task.CompletedTask;
     }
 }

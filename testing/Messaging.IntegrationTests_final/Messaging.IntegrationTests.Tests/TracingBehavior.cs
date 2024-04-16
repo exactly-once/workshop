@@ -12,14 +12,13 @@ namespace Messaging.IntegrationTests.Tests
         {
             await next().ConfigureAwait(false);
 
-            var pending = context.Extensions.Get<PendingTransportOperations>();
+            var outgoingMessages = context.Extensions.Get<PendingTransportOperations>();
 
             var trace = new TraceMessage
             {
                 ConversationId = Guid.Parse(context.Headers[Headers.ConversationId]),
                 IncomingMessageId = Guid.Parse(context.Headers[Headers.MessageId]),
-                OutgoingMessageId = pending.Operations.Select(o => Guid.Parse((string) o.Message.Headers[Headers.MessageId]))
-                    .ToArray()
+                OutgoingMessageId = outgoingMessages.Operations.Select(o => Guid.Parse(o.Message.MessageId)).ToArray()
             };
 
             var sendOptions = new SendOptions();
