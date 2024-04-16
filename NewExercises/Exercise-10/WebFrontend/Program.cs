@@ -37,7 +37,7 @@ namespace Orders
                     routing.RouteToEndpoint(typeof(SubmitOrder), "Orders");
                     endpointConfiguration.RegisterComponents(c =>
                     {
-                        c.RegisterSingleton(repository);
+                        c.AddSingleton(repository);
                     });
                     endpointConfiguration.Pipeline.Register(new BrokerFailureSimulationBehavior(), "Simulates broker failures");
                     return endpointConfiguration;
