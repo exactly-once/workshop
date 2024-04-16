@@ -33,8 +33,8 @@ namespace Orders
             }
 
             await context.PublishWithId(
-                new PaymentBooked {CustomerId = order.Customer, Value = order.Value}, 
-                Utils.DeterministicGuid(message.Id.ToString(), "Orders").ToString());
+                new PaymentBooked {CustomerId = order.Customer, Value = order.Value},
+                    Utils.DeterministicGuid(message.Id.ToString(), "Orders").ToString());
         }
 
         static readonly ILog log = LogManager.GetLogger<BookPaymentHandler>();
