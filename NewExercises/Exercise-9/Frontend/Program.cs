@@ -31,10 +31,11 @@ class Program
         var config = new EndpointConfiguration("Frontend");
         config.SendFailedMessagesTo("error");
         config.UseSerialization<XmlSerializer>();
-        config.UsePersistence<InMemoryPersistence>();
-        var transport = config.UseTransport<AzureStorageQueueTransport>();
-        transport.ConnectionString("TODO:connection-string");
-        var routing = transport.Routing();
+        config.UsePersistence<NonDurablePersistence>();
+
+        var transport = new AzureStorageQueueTransport("TODO:connection-string");
+        var routing = config.UseTransport(transport);
+        
         routing.RouteToEndpoint(typeof(SubmitOrder).Assembly, "TODO:endpoint-name");
 
         config.EnableInstallers();

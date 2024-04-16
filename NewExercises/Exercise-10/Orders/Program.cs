@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
@@ -37,7 +38,7 @@ class Program
         config.UseTransport<LearningTransport>();
         config.RegisterComponents(c =>
         {
-            c.RegisterSingleton(repository);
+            c.AddSingleton(repository);
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
