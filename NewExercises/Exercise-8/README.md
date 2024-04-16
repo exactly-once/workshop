@@ -17,7 +17,7 @@ Let's write some code.
 ```c#
 endpointConfiguration.RegisterComponents(c =>
   {
-      c.RegisterSingleton(repository);
+      c.AddSingleton(repository);
   });
 ```
 
