@@ -1,7 +1,7 @@
 ### Prerequisites
    * VS 2022 and .NET 8
    * Visual Studio Code and TLA+ extension
-   * NServiceBus 7
+   * NServiceBus 8
    * CosmosDB Emulator
 
 ### Agenda
