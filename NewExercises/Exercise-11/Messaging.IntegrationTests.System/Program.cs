@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 
 namespace Messaging.IntegrationTests.System
@@ -25,7 +26,7 @@ namespace Messaging.IntegrationTests.System
             transport.Routing().RouteToEndpoint(typeof(PlaceOrder), endpointName);
 
             var orderStore = new OrderStore();
-            configuration.RegisterComponents(cc => cc.RegisterSingleton(orderStore));
+            configuration.RegisterComponents(cc => cc.AddSingleton(orderStore));
 
             configure?.Invoke(configuration);
 
