@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 
 namespace Messaging.IntegrationTests.Tests
@@ -13,9 +14,10 @@ namespace Messaging.IntegrationTests.Tests
         {
             var configuration = new EndpointConfiguration("trace");
             configuration.UseTransport<LearningTransport>();
+            configuration.UseSerialization<XmlSerializer>();
 
             conversationTracker = new ConversationTracker();
-            configuration.RegisterComponents(cc => cc.RegisterSingleton(conversationTracker));
+            configuration.RegisterComponents(cc => cc.AddSingleton(conversationTracker));
 
             configuration.AssemblyScanner().ExcludeAssemblies("Marketing.exe", "Orders.exe");
 
