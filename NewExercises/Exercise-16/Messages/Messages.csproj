@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8</TargetFramework>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="NServiceBus" Version="8.*" />
+	</ItemGroup>
 
 </Project>
