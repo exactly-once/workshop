@@ -29,20 +29,23 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
         var order = await orderRepository.Load(orderMessage.OrderId);
         context.Extensions.Set(order);
 
-        if (!order.ProcessedMessages.Contains(context.MessageId))
+        if (!order.OutgoingMessages.ContainsKey(context.MessageId))
         {
-
+            var outboxState = new OutboxState();
+            order.OutgoingMessages.Add(context.MessageId, outboxState);
+            context.Extensions.Set(outboxState);
             await next();
             await orderRepository.Store(order);
         }
 
-        if (order.OutgoingMessages.Any())
+        if (order.OutgoingMessages[context.MessageId] != null)
         {
-            foreach (var kvp in order.OutgoingMessages)
+            foreach (var kvp in order.OutgoingMessages[context.MessageId].OutgoingMessages)
             {
-                await context.PublishWithId(kvp.Value, kvp.Key);
+                await context.PublishWithId(kvp.Payload, kvp.Id);
             }
-            order.OutgoingMessages.Clear();
+
+            order.OutgoingMessages[context.MessageId] = null;
             await orderRepository.Store(order);
         }
     }
