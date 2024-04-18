@@ -12,11 +12,6 @@ class DuplicateMessagesBehavior : Behavior<IOutgoingLogicalMessageContext>
         {
             await next();
         }
-        else if (context.Message.Instance is AddItem addMushrooms && addMushrooms.Filling == Filling.Mushrooms)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            await next();
-        }
         else if (context.Message.Instance is RemoveItem removeMeat && removeMeat.Filling == Filling.Meat)
         {
             await next();
