@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketing;
@@ -59,12 +59,13 @@ namespace Tests
         [Test]
         public async Task IssueCouponCardAfterFirst100USDSpent()
         {
-            var cartId = Guid.NewGuid().ToString();
+            var firstCartId = Guid.NewGuid().ToString();
+            var secondCartId = Guid.NewGuid().ToString();
             var customerId = Guid.NewGuid().ToString();
 
             var submitFirstOrder = new SubmitOrder
             {
-                CartId = cartId,
+                CartId = firstCartId,
                 Customer = customerId,
                 Items = new List<Filling>
                 {
@@ -76,7 +77,7 @@ namespace Tests
 
             var submitSecondOrder = new SubmitOrder
             {
-                CartId = cartId,
+                CartId = secondCartId,
                 Customer = customerId,
                 Items = new List<Filling>
                 {
@@ -85,8 +86,8 @@ namespace Tests
                 }
             };
 
-            var bookFirstPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
-            var bookSecondPayment = new BookPayment { Id = Guid.NewGuid(), CartId = cartId, Customer = customerId };
+            var bookFirstPayment = new BookPayment { Id = Guid.NewGuid(), CartId = firstCartId, Customer = customerId };
+            var bookSecondPayment = new BookPayment { Id = Guid.NewGuid(), CartId = secondCartId, Customer = customerId };
 
             await SendInOrder(new IMessage[] {
                     //TODO: Define message sequence
