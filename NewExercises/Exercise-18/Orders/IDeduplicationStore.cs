@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-interface IInboxStore
+interface IDeduplicationStore
 {
     Task<bool> HasBeenProcessed(string messageId);
     Task MarkProcessed(string messageId);

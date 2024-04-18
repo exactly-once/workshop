@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-class InMemoryInboxStore : IInboxStore
+class InMemoryDeduplicationStore : IDeduplicationStore
 {
     ConcurrentDictionary<string, bool> store = new ConcurrentDictionary<string, bool>();
 

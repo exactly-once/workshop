@@ -9,14 +9,14 @@ using NServiceBus.Transport;
 class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
 {
     OrderRepository orderRepository;
-    IDispatchMessages dispatcher;
-    IInboxStore inboxStore;
+    IMessageDispatcher dispatcher;
+    IDeduplicationStore deduplicationStore;
 
-    public OutboxBehavior(OrderRepository orderRepository, IDispatchMessages dispatcher, IInboxStore inboxStore)
+    public OutboxBehavior(OrderRepository orderRepository, IMessageDispatcher dispatcher, IDeduplicationStore deduplicationStore)
     {
         this.orderRepository = orderRepository;
         this.dispatcher = dispatcher;
-        this.inboxStore = inboxStore;
+        this.deduplicationStore = deduplicationStore;
     }
 
     public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
@@ -50,7 +50,7 @@ class OutboxBehavior : Behavior<IIncomingLogicalMessageContext>
 
     Task Dispatch(TransportOperation[] transportOperations, IExtendable context)
     {
-        return dispatcher.Dispatch(new TransportOperations(transportOperations), new TransportTransaction(), context.Extensions);
+        return dispatcher.Dispatch(new TransportOperations(transportOperations), new TransportTransaction());
     }
 
     static async Task<TransportOperation[]> InvokeMessageHandler(IExtendable context, Func<Task> next)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
@@ -28,13 +29,13 @@ class Program
         var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
         config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
-        config.Pipeline.Register(b => new OutboxBehavior(b.Build<OrderRepository>(), b.Build<IDispatchMessages>(), b.Build<IInboxStore>()),
+        config.Pipeline.Register(b => new OutboxBehavior(b.GetRequiredService<OrderRepository>(), b.GetRequiredService<IMessageDispatcher>(), b.GetRequiredService<IDeduplicationStore>()),
             "Deduplicates incoming messages");
         var orderRepository = new OrderRepository();
         config.RegisterComponents(c =>
         {
             c.RegisterSingleton(orderRepository);
-            c.RegisterSingleton<IInboxStore>(new InMemoryInboxStore());
+            c.RegisterSingleton<IDeduplicationStore>(new InMemoryDeduplicationStore());
         });
         config.Recoverability().Immediate(x => x.NumberOfRetries(5));
         config.Recoverability().Delayed(x => x.NumberOfRetries(0));
