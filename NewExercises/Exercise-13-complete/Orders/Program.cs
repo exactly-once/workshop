@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Serilog;
@@ -44,12 +45,13 @@ namespace Orders
 
             var config = new EndpointConfiguration("Orders");
             var transport = config.UseTransport<LearningTransport>();
-            config.RegisterComponents(c => { c.RegisterSingleton(repository); });
+            config.RegisterComponents(c => { c.AddSingleton(repository); });
             config.Recoverability().Immediate(x => x.NumberOfRetries(5));
             config.Recoverability().Delayed(x => x.NumberOfRetries(0));
             config.SendFailedMessagesTo("error");
             config.EnableInstallers();
             config.LimitMessageProcessingConcurrencyTo(8);
+            config.UseSerialization<XmlSerializer>();
 
             configure?.Invoke(config, transport.Routing());
 

@@ -7,6 +7,7 @@ namespace Orders
 {
     using Messages;
     using NServiceBus;
+    using System.Configuration;
     using WebFrontend;
 
     public class Program
@@ -37,9 +38,10 @@ namespace Orders
                     routing.RouteToEndpoint(typeof(SubmitOrder), "Orders");
                     endpointConfiguration.RegisterComponents(c =>
                     {
-                        c.RegisterSingleton(repository);
+                        c.AddSingleton(repository);
                     });
                     endpointConfiguration.Pipeline.Register(new BrokerFailureSimulationBehavior(), "Simulates broker failures");
+                    endpointConfiguration.UseSerialization<XmlSerializer>();
                     return endpointConfiguration;
                 })
                 .ConfigureServices(collection =>
