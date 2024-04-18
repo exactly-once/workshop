@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.Logging;
+using NServiceBus.ObjectBuilder;
 using NServiceBus.Serilog;
 using NServiceBus.Transport;
 using Serilog;
@@ -28,7 +30,7 @@ class Program
         var config = new EndpointConfiguration("Orders");
         config.UseTransport<LearningTransport>();
         config.Pipeline.Register(new BrokerErrorSimulatorBehavior(), "Simulates broker errors");
-        config.Pipeline.Register(b => new OutboxBehavior(b.Build<OrderRepository>(), b.Build<IDispatchMessages>()),
+        config.Pipeline.Register(b => new OutboxBehavior(b.GetRequiredService<OrderRepository>(), b.GetRequiredService<IMessageDispatcher>()),
             "Deduplicates incoming messages");
         var orderRepository = new OrderRepository();
         config.RegisterComponents(c =>

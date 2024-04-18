@@ -97,7 +97,7 @@ class Program
     static async Task Send(IEndpointInstance endpoint, object message)
     {
 #pragma warning disable 4014
-        endpoint.Send(message);
+        await endpoint.Send(message);
 #pragma warning restore 4014
     }
 }
