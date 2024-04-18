@@ -11,19 +11,17 @@ class AddItemHandler : IHandleMessages<AddItem>
         IMessageHandlerContext context)
     {
         var order = context.Extensions.Get<Order>();
-        var outboxState = context.Extensions.Get<OutboxState>();
 
         var line = new OrderLine(message.Filling);
         order.Lines.Add(line);
         log.Info($"Item {message.Filling} added.");
 
-
-        outboxState.OutgoingMessages.Add(new Message(Guid.NewGuid().ToString(), 
-            new ItemAdded(message.OrderId, message.Filling)));
+        order.ProcessedMessages.Add(context.MessageId);
+        order.OutgoingMessages.Add(Guid.NewGuid().ToString(), new ItemAdded(message.OrderId, message.Filling));
         if (order.Lines.Count == 1)
         {
-            outboxState.OutgoingMessages.Add(new Message(Guid.NewGuid().ToString(),
-                new FirstItemAdded(message.OrderId)));
+            order.OutgoingMessages.Add(Guid.NewGuid().ToString(),
+                new FirstItemAdded(message.OrderId));
         }
     }
 
