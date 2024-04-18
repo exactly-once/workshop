@@ -161,15 +161,16 @@
 					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
 				</section>
 				<section>
-					<ul>
-						<li class="fragment"><h2>No multiple updates</h2></li>
-						<li class="fragment"><h2>No ghost messages</h2></li>
-						<li class="fragment"><h2>No lost sends</h2></li>
-						<li class="fragment"><h2>Deterministic message IDs</h2></li>
-					</ul>
+					<h2 class="fragment">No multiple updates</h2>
+					<h2 class="fragment">No ghost messages</h2>
+					<h2 class="fragment">No lost sends</h2>
+					<h2 class="fragment">Deterministic message IDs</h2>
 				</section>
 				<section>
 					<h1>Inconsistent</h1>
+					<aside class="notes">
+						What we have just experienced showed us that we were missing one critical thing since the very beginning of our journey. We didn't really pay much attention to how we are generating the outgoing messages. 
+					</aside>
 				</section>
 				<section>
 					<blockquote style="width: 100%;">
@@ -197,18 +198,36 @@
 				</section>
 				<section>
 					<h2>How are messages produced?</h2>
+					<aside class="notes">
+						In the first attempt we are *generating* messages as we go in the process of executing the business logic. That ensures that the messages that are going to be sent out are in sync with the changes that are going to be applied to the database. In the second attempt when the changes in the database are already applied we are *deriving* the messages to be sent. What are we deriving them from?
+					</aside>
 				</section>
 				<section>
 					<h2 class="fragment">Derived from input</h2>
 					<h2 class="fragment">Derived from data</h2>
+					<aside class="notes">
+						In our case it is clear that we are deriving the outgoing messages from the incoming message. Got a `AddItem` message? Then clearly we need to re-publish an `ItemAdded` event with corresponding properties. As we've seen, that's not a good strategy for deriving messages.
+
+If not from the incoming message then maybe from the data stored? Unfortunately that would not work either as we don't know if the state has been modified in the first attempt at processing the current message or before.
+					</aside>
 				</section>
 				<section>
 					<h1>Data?<br>What data?</h1>
+					<aside class="notes">
+						If not from the incoming message and not from the current state then how? Well, the only correct way would be to derive the messages to be sent of from the snapshot of the state at the point when the initial attempt at sending messages was done. In order to do so the business logic would have to be able to access the state of the data at the point when message has been marked as processed. That approach can be achieved in two ways.
+					</aside>
 				</section>
 				<section>
 					<h2 class="fragment">Event Sourcing</h2>
 					<h2 class="fragment">Versioned state</h2>
 					<h2 class="fragment">Persisted messages</h2>
+					<aside class="notes">
+						In event sourcing the state of an entity is not updated in place but rather represented as an ordered stream of events, each representing a single state change. The snapshot of the current state, when needed, is computed by application of a special state function on all events in order. Additional consequence of this approach is the fact that it is possible to compute the state as it was previously at any point in time.
+<hr/>
+An alternative approach is to store a new snapshot of the state each time the state is modified. This way we can retried historical snapshots when needed.
+<hr/>
+Both described approaches are associated with significant additional complexity compared to the standard approach. Are we really doomed to adopt on of them in order to make our message derivation code correct? As you may suspect the answer is yes and no. Yes, if we want to continue depending on deriving messages then we need to adopt a storage approach that allows reconstructing state as it was at any moment in time. And no, we don't need it because message derivation is not the only solution.
+					</aside>
 				</section>
 				<section>
 					<h2>
