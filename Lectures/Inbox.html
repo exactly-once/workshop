@@ -4,8 +4,8 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Outbox</title>
-		<meta name="description" content="Inbox">
+		<title>Deduplication store</title>
+		<meta name="description" content="Deduplication store">
 		<meta name="author" content="Szymon Pobiega Tomasz Masternak">
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
@@ -157,60 +157,24 @@
 			</aside>
 			<div class="slides">
 				<section>
-					<h2>Inbox</h2>
+					<h2>Deduplication store</h2>
 					<p><a href="https://exactly-once.github.io/">exactly-once.github.io</a></p>
 				</section>
 				<section>
-					<h1>Deduplication data</h1>
+					<h2 class="fragment">Good databases are expensive</h2>
+					<h2 class="fragment">The more deduplication data the better</h2>
+					<h2 class="fragment">Deduplication data is simple</h2>
 				</section>
 				<section>
-					<h2>
-					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="1,2|3,4|5,6">
-await deduplicationStore
-	.Add(messageId);
-entity.OutboxState
-	.Remove(messageId);
-await persister
-	.Persist(entity);
-					</code></pre>
-					</h2>
+					<img class="stretch" src="images/outbox-7.png" />
 				</section>
 				<section>
-					<h2>
-					<pre class="stretch"><code class="csharp" data-noescape data-trim>
-if (await deduplicationStore
-	.HasBeenProcessed(messageId))
-{
-	return;
-}
-if (!entity.OutboxState
-	.ContainsKey(messageId))
-{
-					</code></pre>
-					</h2>
-				</section>
-				<section>
-					<h2>
-					<pre class="stretch"><code class="csharp" data-noescape data-trim data-line-numbers="1">
-entity = await persister.Load(id)
-if (await deduplicationStore
-	.HasBeenProcessed(messageId))
-{
-	return;
-}
-if (!entity.OutboxState
-	.ContainsKey(messageId))
-{
-					</code></pre>
-					</h2>
+					<img class="stretch" src="images/outbox-8.png" />
 				</section>
 				<section>
 					<h2 class="fragment">Store at least in one place</h2>
 					<h2 class="fragment">Always check in both places</h2>
 					<h2 class="fragment">Use optimistic concurrency</h2>
-				</section>
-				<section>
-					<h1>Consistency matters</h1>
 				</section>
 			</div>
 		</div>
