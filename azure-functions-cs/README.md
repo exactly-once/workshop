@@ -75,7 +75,7 @@ public async Task HandleEndGame(
 [FunctionName(nameof(SaveLeaderBoard))]
 public async Task SaveLeaderBoard(
     [QueueTrigger("save-leader-board")] SaveLeaderBoard saveLeaderBoard,
-    [ExactlyOnce(requestId: "{gameId}", stateId: "{gameId}")] IOnceExecutor<LeaderBoardState> execute,
+    [ExactlyOnce(requestId: "{gameId}", stateId: "save-leader-board")] IOnceExecutor<LeaderBoardState> execute,
     [Blob("game-results/{gameId}", FileAccess.Write)] TextWriter gameResultsBlob,
     ILogger log)
 {
