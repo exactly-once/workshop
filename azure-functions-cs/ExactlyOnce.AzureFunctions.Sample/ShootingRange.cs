@@ -72,7 +72,7 @@ namespace ExactlyOnce.AzureFunctions.Sample
         [FunctionName(nameof(HandleEndGame))]
         public async Task HandleEndGame(
             [QueueTrigger("end-game")] StartNewGame startGame,
-            [ExactlyOnce("{gameId}", "{gameId}")] IOnceExecutor<ShootingRangeState> execute,
+            [ExactlyOnce("{gameId}", "end-game")] IOnceExecutor<ShootingRangeState> execute,
             ILogger log)
         {
             log.LogWarning($"Processed endGame:gameId={startGame.GameId}");
